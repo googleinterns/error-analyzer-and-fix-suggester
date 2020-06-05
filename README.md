@@ -1,7 +1,9 @@
 # Error Analyzer and Fix Suggester
 The project aims at improving the productivity of beginners & intermediate developers.
 
-#### Given a large error log(obtained through URLs, log files, plain text etc.), the tool will:
+
+#### Features
+**Given a large error log(obtained through URLs, log files, plain text etc.), the tool will:**  
 - Identify errors and highlight them.
 - Display a paginated view of log files.
 - Provide log search interface for searching large files to allow user to search based on regex.
