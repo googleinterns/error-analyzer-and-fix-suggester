@@ -12,6 +12,6 @@ Moreover, manually searching for errors in large log files (say > 5M) is difficu
 
 #### Tech used
 **Database**
-We used elasticsearch as our database engine. We utilise elasticsearch's inbuilt features of full-text search and regex query to identify error lines.
+We used elasticsearch as our database engine. We utilise elasticsearch's inbuilt features of full-text search and regex query to identify error lines.  
 **Server**
 The database is connected to the server using java high-level REST API. Maven app engine is used to run the application.
