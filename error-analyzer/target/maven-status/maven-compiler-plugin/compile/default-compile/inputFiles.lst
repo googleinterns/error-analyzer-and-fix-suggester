@@ -1,1 +1,2 @@
-/home/rythmag/error-analyzer-and-fix-suggester/error-analyzer/src/main/java/com/google/sps/servlets/DataServlet.java
+/home/kirtidabas/error-analyzer-and-fix-suggester/error-analyzer/src/main/java/com/google/sps/data/ErrorsLogs.java
+/home/kirtidabas/error-analyzer-and-fix-suggester/error-analyzer/src/main/java/com/google/sps/servlets/Pagination.java
