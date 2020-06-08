@@ -1,12 +1,24 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Error analyzer</title>
-  </head>
-  <body>
-    <div>
-      <h1>Setting things up<h1>
-    </div>
-  </body>
+   <head>
+      <meta charset="UTF-8">
+      <title>Log Analyzer</title>
+      <link rel="stylesheet" href="style.css">
+   </head>
+   <body>
+      <div id="content">
+         <h1>Error Analyzer</h1>
+         <form action="/data" method="POST">
+            <textarea name="message" wrap="hard" placeholder="Paste your text here" style="width:600px; height:400px;"></textarea><br/>
+            <br/><br/>
+            <input type="submit" name="textbutton"/>
+         </form>
+         <br/><br/>
+         <h4>Upload your File</h4>
+         <form action="upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" class="custom-file-input"/>
+            <input type="submit" name ="filebutton" />
+         </form>
+      </div>
+   </body>
 </html>
