@@ -17,21 +17,27 @@ package com.google.sps.data;
 import java.util.*;
 
 public class Keywords{
-    private ArrayList<String> keywordsList = new ArrayList<String>();
-    private Keywords(){
+    // private ArrayList<String> keywordsList = new ArrayList<String>();
+    private ArrayList<String> createList(){
+        ArrayList<String> keywordsList = new ArrayList<String>();
         keywordsList.add("error");
         keywordsList.add("fatal");
         keywordsList.add("severe");
+        keywordsList.add("exit");
+        keywordsList.add("exception");
+        return keywordsList;
     }
     public String getQueryString(){
+        ArrayList<String> keywordsList = createList();
         String queryString = "";
         for(String keyword : keywordsList){
-            if(queryString == ""){
-                queryString.concat(keyword);
+            if(queryString.length() == 0){
+                queryString = queryString.concat(keyword);
             }else{
-                queryString.concat(" OR " + keyword);
+                queryString = queryString.concat(" OR " + keyword);
             }
         }
+        System.out.println("--------------------" + queryString);
         return queryString;
     }
     

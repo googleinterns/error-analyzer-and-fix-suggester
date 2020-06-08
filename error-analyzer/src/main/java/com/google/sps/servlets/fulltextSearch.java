@@ -14,6 +14,7 @@
 
 package com.google.sps.servlets;
 
+import com.google.sps.data.Keywords;
 import com.google.gson.Gson;
 import java.util.*;
 import java.lang.*;
@@ -46,23 +47,26 @@ public class fulltextSearch extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        SearchHits hits = getHits();
-        ArrayList<String> errorMsgs = new ArrayList(getLogText(hits));
+        SearchHits hits = getQueryHits();
+        ArrayList<String> errorMsgs = getLogText(hits);
         response.setContentType("application/json");
         
         Gson gson = new Gson();
         String json = gson.toJson(errorMsgs);
         response.getWriter().println(json);
     }
+    // method used only for development phase. the hits are stored later.
     private String extractLogData(SearchHit hit){
         String sourceAsString = hit.getSourceAsString();
         Map<String, Object> sourceAsMap = hit.getSourceAsMap();
         return (String) sourceAsMap.get("log_text");
     }
-    private SearchHits getHits() throws IOException{
+    private SearchHits getQueryHits() throws IOException{
         SearchRequest searchRequest = new SearchRequest(indexFile);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder(); 
-        searchSourceBuilder.query(QueryBuilders.matchQuery("log_text","error OR warning")); 
+        // kewords class contains all the terms used combined in OR logic.
+        Keywords errorKeywords = new Keywords();
+        searchSourceBuilder.query(QueryBuilders.matchQuery("log_text",errorKeywords.getQueryString() )); 
         searchRequest.source(searchSourceBuilder); 
 
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
@@ -70,6 +74,7 @@ public class fulltextSearch extends HttpServlet {
         return hits;
     }
     private ArrayList<String> getLogText(SearchHits hits){
+
         ArrayList<String> errorMsgs = new ArrayList();
         for (SearchHit hit : hits){
             errorMsgs.add(extractLogData(hit));
