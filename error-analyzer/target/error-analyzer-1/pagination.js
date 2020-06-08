@@ -17,24 +17,11 @@ function nextPage() {
 
 // change content of page 
 async function changePage(page) {
-
-    const btnPrev = document.getElementById("btnPrev");
-    const btnNext = document.getElementById("btnNext");
-    const listing_table = document.getElementById("listingTable");
-    const page_span = document.getElementById("page");
     const fileName = document.getElementById("fileName");
     const logs = document.getElementById("logs");
     const fileType = logs.checked ? "logs" : "errors";
-    if (page < 1) page = 1;
+    if (page < 1 || page==undefined) page = 1;
 
-
-    // if page is undefined page is refreshed fetch the correct page to show from localstorage
-    if (page == undefined) {
-        currentPage = localStorage.getItem("page");
-        // if localstorage don't have current page value show page 1
-        if (page == undefined)
-            page = 1;
-    }
     currentPage = page;
     const params = new URLSearchParams();
     params.append('requestedPage', currentPage);
@@ -42,22 +29,40 @@ async function changePage(page) {
     params.append('fileName', fileName.value);
     params.append('next', next);
 
-    console.log(currentPage + " " + fileName.value);
     // ask for data to display from java servlet 
     const response = await fetch('/pagination', {
         method: 'POST',
         body: params
     });
-    const display = await response.json();
-    console.log(display);
-    listing_table.innerHTML = "";
 
+    const display = await response.json();
+    const lastPage= display.lastPage;
+
+    console.log(lastPage);
+
+    show(display,page);
+    
+    if(lastPage==true)
+    showAndHideBtn(page,true);
+    else
+    showAndHideBtn(page);
+    
+    
+}
+function show( display,page){
+    const listing_table = document.getElementById("listingTable");
+    const page_span = document.getElementById("page");
+    listing_table.innerHTML = "";
     // dynamically add element to result page
-    display.logsOrErrors.forEach((logError) => {
+    display.logOrError.forEach((logError) => {
         listing_table.innerHTML += logError.name + "<br>";
     })
-    const totalPages = display.totalPages;
-    page_span.innerHTML = page + "/" + totalPages;
+    page_span.innerHTML = page ;
+}
+function showAndHideBtn(page,lastPage){
+
+    const btnPrev = document.getElementById("btnPrev");
+    const btnNext = document.getElementById("btnNext");
 
     // hide previous button when on page 1
     if (page == 1) {
@@ -66,12 +71,9 @@ async function changePage(page) {
         btnPrev.style.visibility = "visible";
     }
     // hide next button when 
-    if (page == totalPages) {
+    if (lastPage!=undefined) {
         btnNext.style.visibility = "hidden";
     } else {
         btnNext.style.visibility = "visible";
     }
-
-    // store current page so that on refreshing the page we are not taken to page 1 again
-    localStorage.setItem('page', currentPage);
 }

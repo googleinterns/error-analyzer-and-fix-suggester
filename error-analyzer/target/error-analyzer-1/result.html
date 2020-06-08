@@ -6,14 +6,12 @@
 	<title>Error analyzer</title>
 </head>
 
-<!-- on load show the page user was on before reloading -->
-
 <body onload="changePage()">
     <section>
-        <form method="POST" action="/search">
+        <form>
             <input type="text" id="searchBar" name="searchBar">
-            <button type="submit">search</button>
         </form>
+         <button onclick="search()">search</button>
     </section>
 	<!-- choose file  -->
 	<section>
@@ -23,7 +21,7 @@
 			<input type="radio" id="errors" name="display" value="errors">errors
         </form>
 			<!-- if user is changing file then show results starting from 1st page -->
-			<button onclick="changePage(1)">submit</button>
+			<button onclick="changePage()">submit</button>
 	</section>
 	<!-- show result -->
 	<section>
@@ -35,6 +33,7 @@
 		page: <span id="page"></span>
 	</section>
 	<script src="pagination.js"></script>
+    <script src="search.js"></script>
 </body>
 
 </html>
