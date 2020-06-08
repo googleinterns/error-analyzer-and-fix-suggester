@@ -18,8 +18,8 @@ function nextPage() {
 // change content of page 
 async function changePage(page) {
 
-    var btnPrev = document.getElementById("btnPrev");
-    var btnNext = document.getElementById("btnNext");
+    const btnPrev = document.getElementById("btnPrev");
+    const btnNext = document.getElementById("btnNext");
     const listing_table = document.getElementById("listingTable");
     const page_span = document.getElementById("page");
     const fileName = document.getElementById("fileName");
@@ -27,37 +27,36 @@ async function changePage(page) {
     const fileType = logs.checked ? "logs" : "errors";
     if (page < 1) page = 1;
 
+
     // if page is undefined page is refreshed fetch the correct page to show from localstorage
     if (page == undefined) {
         currentPage = localStorage.getItem("page");
-        // fileName.value = localStorage.getItem("fileName");
-        // fileType = localStorage.getItem("fileType");
-    // if localstorage don't have current page value show page 1
+        // if localstorage don't have current page value show page 1
         if (page == undefined)
             page = 1;
     }
-    
+    currentPage = page;
     const params = new URLSearchParams();
     params.append('requestedPage', currentPage);
     params.append('fileType', fileType);
     params.append('fileName', fileName.value);
     params.append('next', next);
 
+    console.log(currentPage + " " + fileName.value);
     // ask for data to display from java servlet 
     const response = await fetch('/pagination', {
         method: 'POST',
         body: params
     });
     const display = await response.json();
-    const logsOrErrors = display.logsOrErrors;
-    const totalPages = display.totalPages;
+    console.log(display);
     listing_table.innerHTML = "";
 
-    // dynamiocally add element to result page
-    logsOrErrors.forEach((logError) => {
-        listing_table.innerHTML += logError + "<br>";
+    // dynamically add element to result page
+    display.logsOrErrors.forEach((logError) => {
+        listing_table.innerHTML += logError.name + "<br>";
     })
-
+    const totalPages = display.totalPages;
     page_span.innerHTML = page + "/" + totalPages;
 
     // hide previous button when on page 1
@@ -75,6 +74,4 @@ async function changePage(page) {
 
     // store current page so that on refreshing the page we are not taken to page 1 again
     localStorage.setItem('page', currentPage);
-    // localStorage.setItem('fileName',fileName.value);
-    // localStorage.setItem('fileType',fileType);
 }
