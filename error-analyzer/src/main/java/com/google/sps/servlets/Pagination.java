@@ -39,8 +39,7 @@ import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 
-@
-WebServlet("/pagination")
+@WebServlet("/pagination")
 public class Pagination extends HttpServlet {
 
     private final int recordsPerPage = 3;
@@ -51,15 +50,15 @@ public class Pagination extends HttpServlet {
     private RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
     private SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
-    private class ReturnObj {
+    private class LogPagesResponse {
         ArrayList < Map < String, Object > > logsOrErrors;
         int totalPages;
-        public ReturnObj(ArrayList < Map < String, Object > > logsOrErrors, int totalPages) {
+        public LogPagesResponse(ArrayList < Map < String, Object > > logsOrErrors, int totalPages) {
             this.logsOrErrors = logsOrErrors;
             this.totalPages = totalPages;
         }
-    }@
-    Override
+    }
+    @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int page = Integer.parseInt(request.getParameter("requestedPage"));
         String fileName = request.getParameter("fileName");
@@ -72,10 +71,7 @@ public class Pagination extends HttpServlet {
 
         // if file field is empty the user haven't choosen anyfile so return empty object
         if (fileName.length() == 0) {
-            ReturnObj display = new ReturnObj(data, 1);
-            String json = convertToJson(display);
-            response.setContentType("application/json");
-            response.getWriter().println(json);
+            returnEmptyObject();
             return;
         }
         int sizeOfFile = 1;
@@ -86,6 +82,7 @@ public class Pagination extends HttpServlet {
             // the user won't be knowing the name of error file generated corresponding to his log file so we need to change fileName depending on type of file
             if (fileType.equals("error"))
                 fileName = "error" + fileName;
+
             sizeOfFile = totalNoOfPages(fileName);
             totalPages = (int) Math.ceil((double) sizeOfFile / (double) recordsPerPage);
 
@@ -98,23 +95,17 @@ public class Pagination extends HttpServlet {
         } else {
             int start = recordsPerPage * ((page - 1) % noOfPages);
             int stop = start + recordsPerPage - 1;
+
             // if the page user is asking for is the last page then it can contain less data than the standard amount of data that we were showing
             if (page == totalPages && sizeOfFile % recordsPerPage != 0)
                 stop = start + (int)(sizeOfFile % recordsPerPage) - 1;
+
             String json = returnResponse(data, start, stop, search, totalPages);
             response.setContentType("application/json");
             response.getWriter().println(json);
 
             // maintain window
-            if (next.equals("true") && page + extraPageInFrontAndBack <= totalPages) {
-                int Start = recordsPerPage * (page + extraPageInFrontAndBack - 1);
-                int startIdx = recordsPerPage * ((page + extraPageInFrontAndBack - 1) % noOfPages);
-                addToData(Start, recordsPerPage, data, startIdx, fileName);
-            } else if (next.equals("false") && page - extraPageInFrontAndBack > 0) {
-                int Start = recordsPerPage * (page - extraPageInFrontAndBack - 1);
-                int startIdx = recordsPerPage * ((page - extraPageInFrontAndBack - 1) % noOfPages);
-                addToData(Start, recordsPerPage, data, startIdx, fileName);
-            }
+            maintainWindow(recordsPerPage,page,next,extraPageInFrontAndBack,totalPages,fileName);
         }
     }
     // picks content from maintained window on the basis of required page and convert it into json format
@@ -128,7 +119,7 @@ public class Pagination extends HttpServlet {
                 display.add(element);
             }
         }
-        ReturnObj displayObj = new ReturnObj(display, totalPages);
+        LogPagesResponse displayObj = new LogPagesResponse(display, totalPages);
         return convertToJson(displayObj);
     }
     // put/change content of data for maintaining continuous window of pages(here window of 5 pages)
@@ -154,7 +145,7 @@ public class Pagination extends HttpServlet {
         }
     }
     // return json for java Map<String,Object>
-    private String convertToJson(ReturnObj display) {
+    private String convertToJson(LogPagesResponse display) {
         Gson gson = new Gson();
         String json = gson.toJson(display);
         return json;
@@ -169,6 +160,26 @@ public class Pagination extends HttpServlet {
             return response.getHits().getHits().length;
         } catch (Exception e) {
             return 1;
+        }
+    }
+    // return empty object 
+    private void returnEmptyObject(){
+        LogPagesResponse display = new LogPagesResponse(data, 1);
+        String json = convertToJson(display);
+        response.setContentType("application/json");
+        response.getWriter().println(json);
+    }
+
+    // maintains window of size totalpages
+    private void maintainWindow(int recordsPerPage,int page,String next,int extraPageInFrontAndBack,int totalPages,String fileName){
+        if (next.equals("true") && page + extraPageInFrontAndBack <= totalPages) {
+                int Start = recordsPerPage * (page + extraPageInFrontAndBack - 1);
+                int startIdx = recordsPerPage * ((page + extraPageInFrontAndBack - 1) % noOfPages);
+                addToData(Start, recordsPerPage, data, startIdx, fileName);
+        } else if (next.equals("false") && page - extraPageInFrontAndBack > 0) {
+                int Start = recordsPerPage * (page - extraPageInFrontAndBack - 1);
+                int startIdx = recordsPerPage * ((page - extraPageInFrontAndBack - 1) % noOfPages);
+                addToData(Start, recordsPerPage, data, startIdx, fileName);
         }
     }
 

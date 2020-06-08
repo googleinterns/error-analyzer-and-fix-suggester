@@ -11,23 +11,3 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-package com.google.sps.data;
-
-// class contains hits of latest full-text search
-import java.util.*;
-public class ErrorsLogs {
-    private HashSet < String > searchedErrors;
-
-    public ErrorsLogs() {
-        searchedErrors = new HashSet();
-    }
-    // method to add hits
-    public HashSet <String> getSearchedErrors() {
-        return searchedErrors;
-    }
-    // method to fetch hits
-    public void setSearchedErrors(HashSet < String > list) {
-        searchedErrors = list;
-
-    }
-}
