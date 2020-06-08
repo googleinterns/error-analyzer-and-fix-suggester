@@ -1,3 +1,4 @@
 com/google/sps/data/ErrorsLogs.class
 com/google/sps/servlets/Pagination.class
-com/google/sps/servlets/Pagination$ReturnObj.class
+com/google/sps/servlets/Search.class
+com/google/sps/servlets/Pagination$LogPagesResponse.class

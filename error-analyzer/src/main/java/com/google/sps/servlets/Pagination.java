@@ -71,7 +71,7 @@ public class Pagination extends HttpServlet {
 
         // if file field is empty the user haven't choosen anyfile so return empty object
         if (fileName.length() == 0) {
-            returnEmptyObject();
+            returnEmptyObject(response);
             return;
         }
         int sizeOfFile = 1;
@@ -123,25 +123,20 @@ public class Pagination extends HttpServlet {
         return convertToJson(displayObj);
     }
     // put/change content of data for maintaining continuous window of pages(here window of 5 pages)
-    private void addToData(int start, int size, ArrayList < Map < String, Object >> data, int startIdx, String fileName) {
+    private void addToData(int start, int size, ArrayList < Map < String, Object >> data, int startIdx, String fileName)  throws IOException{
         SearchRequest searchRequest = new SearchRequest(fileName);
         searchSourceBuilder.query(QueryBuilders.matchAllQuery()).size(size).from(start);
         searchRequest.source(searchSourceBuilder);
-        try {
-            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHits hits = searchResponse.getHits();
-            SearchHit[] searchHits = hits.getHits();
-
-            int i = startIdx;
-            for (SearchHit hit: searchHits) {
-                if (i >= data.size())
-                    data.add(hit.getSourceAsMap());
-                else
-                    data.set(i, hit.getSourceAsMap());
-                i++;
-            }
-        } catch (Exception e) {
-            return;
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        SearchHits hits = searchResponse.getHits();
+        SearchHit[] searchHits = hits.getHits();
+        int i = startIdx;
+        for (SearchHit hit: searchHits) {
+            if (i >= data.size())
+                data.add(hit.getSourceAsMap());
+            else
+                data.set(i, hit.getSourceAsMap());
+            i++;
         }
     }
     // return json for java Map<String,Object>
@@ -151,19 +146,15 @@ public class Pagination extends HttpServlet {
         return json;
     }
     // returns total pages for a file 
-    private int totalNoOfPages(String fileName) {
-        try {
+    private int totalNoOfPages(String fileName) throws IOException {
             searchSourceBuilder.query(QueryBuilders.matchAllQuery());
             SearchRequest searchRequest = new SearchRequest(fileName);
             searchRequest.source(searchSourceBuilder);
             SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
             return response.getHits().getHits().length;
-        } catch (Exception e) {
-            return 1;
-        }
     }
     // return empty object 
-    private void returnEmptyObject(){
+    private void returnEmptyObject(HttpServletResponse response) throws IOException{
         LogPagesResponse display = new LogPagesResponse(data, 1);
         String json = convertToJson(display);
         response.setContentType("application/json");
@@ -171,7 +162,7 @@ public class Pagination extends HttpServlet {
     }
 
     // maintains window of size totalpages
-    private void maintainWindow(int recordsPerPage,int page,String next,int extraPageInFrontAndBack,int totalPages,String fileName){
+    private void maintainWindow(int recordsPerPage,int page,String next,int extraPageInFrontAndBack,int totalPages,String fileName) throws IOException{
         if (next.equals("true") && page + extraPageInFrontAndBack <= totalPages) {
                 int Start = recordsPerPage * (page + extraPageInFrontAndBack - 1);
                 int startIdx = recordsPerPage * ((page + extraPageInFrontAndBack - 1) % noOfPages);

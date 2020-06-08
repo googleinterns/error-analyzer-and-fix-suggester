@@ -26,7 +26,7 @@ public class ErrorsLogs {
         return searchedErrors;
     }
     // method to fetch hits
-    public void setSearchedErrors(HashSet < String > list) {
+    public void setSearchedErrors(HashSet <String> list) {
         searchedErrors = list;
 
     }
