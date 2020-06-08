@@ -40,7 +40,7 @@ import org.elasticsearch.action.search.SearchResponse;
 
 @WebServlet("/fulltext_query")
 public class fulltextSearch extends HttpServlet {
-    private String indexFile = "trial_index";
+    private String indexFile = "trial_index"; //later fetched from request
     private RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
     private SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
@@ -62,7 +62,7 @@ public class fulltextSearch extends HttpServlet {
     private SearchHits getHits() throws IOException{
         SearchRequest searchRequest = new SearchRequest(indexFile);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder(); 
-        searchSourceBuilder.query(QueryBuilders.termQuery("log_text","error")); 
+        searchSourceBuilder.query(QueryBuilders.matchQuery("log_text","error OR warning")); 
         searchRequest.source(searchSourceBuilder); 
 
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
