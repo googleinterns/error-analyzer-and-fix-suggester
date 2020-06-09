@@ -1,11 +1,8 @@
 /**Copyright 2019 Google LLC
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
     https://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +13,7 @@ package com.google.sps.servlets;
 import com.google.gson.Gson;
 import java.util.*;
 import java.lang.*;
-import com.google.sps.data.ErrorsLogs;
+import com.google.sps.data.SearchErrors;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -46,21 +43,23 @@ public class Pagination extends HttpServlet {
     private final int recordsPerPage = 3;
     private final int noOfPages = 5;
     private final int extraPageInFrontAndBack = 2;
+    private final String field = "name";
     private int noOfRecordsOnLastPage = recordsPerPage;
     private int lastPage = Integer.MAX_VALUE;
-    private ArrayList < Map < String, Object >> data = new ArrayList();
+    private ArrayList < String > data = new ArrayList();
     private RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
     private SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
     // return object 
     private class logOrErrorResponse {
         boolean lastPage;
-        ArrayList < Map < String, Object >> logOrError;
-        public logOrErrorResponse(ArrayList < Map < String, Object >> logOrError, boolean lastPage) {
+        ArrayList < String > logOrError;
+        public logOrErrorResponse(ArrayList < String > logOrError, boolean lastPage) {
             this.logOrError = logOrError;
             this.lastPage = lastPage;
         }
     }
+
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int page = Integer.parseInt(request.getParameter("requestedPage"));
@@ -68,8 +67,8 @@ public class Pagination extends HttpServlet {
         String fileType = request.getParameter("fileType");
         String next = request.getParameter("next");
 
-        ErrorsLogs errLogObj = new ErrorsLogs();
-        HashSet < String > search = errLogObj.getSearchedErrors();
+        SearchErrors searchErrors = new SearchErrors();
+        HashMap < String, String > search = searchErrors.getSearchedErrors();
 
 
         // if file field is empty the user haven't choosen anyfile so return empty object
@@ -85,35 +84,32 @@ public class Pagination extends HttpServlet {
             if (fileType.equals("error"))
                 fileName = "error" + fileName;
             // create window
-            addToData(0, (recordsPerPage * noOfPages) - 1, data, 0, fileName, page);
-            returnResponse(data, 0, recordsPerPage - 1, search, isLastPage, response);
+            addToData(0, (recordsPerPage * noOfPages) - 1, data, 0, fileName, page, search);
+            returnResponse(data, 0, recordsPerPage - 1, isLastPage, response);
         } else {
             int start = recordsPerPage * ((page - 1) % noOfPages);
             int stop = start + recordsPerPage - 1;
             if (page == lastPage)
                 stop = start + noOfRecordsOnLastPage - 1;
-            returnResponse(data, start, stop, search, isLastPage, response);
+            returnResponse(data, start, stop, isLastPage, response);
             // maintain window
-            maintainWindow(recordsPerPage, page, next, extraPageInFrontAndBack, fileName);
+            maintainWindow(recordsPerPage, page, next, extraPageInFrontAndBack, fileName, search);
         }
     }
+
     // picks content from maintained window on the basis of required page and convert it into json format
-    private void returnResponse(ArrayList < Map < String, Object >> data, int startIdx, int stopIdx, HashSet < String > search, boolean isLastPage, HttpServletResponse response) throws IOException{
-        ArrayList < Map < String, Object > > display = new ArrayList();
+    private void returnResponse(ArrayList < String > data, int startIdx, int stopIdx, boolean isLastPage, HttpServletResponse response) throws IOException {
+        ArrayList < String > display = new ArrayList();
         for (int i = startIdx; i <= stopIdx && i < data.size(); i++) {
-            Map < String, Object > element = data.get(i);
-            if (search.contains(element)) {
-                display.add(element);
-            } else {
-                display.add(element);
-            }
+            display.add(data.get(i));
         }
         String json = convertToJson(new logOrErrorResponse(display, isLastPage));
         response.setContentType("application/json");
         response.getWriter().println(json);
     }
+
     // put/change content of data for maintaining continuous window of pages(here window of 5 pages)
-    private void addToData(int start, int size, ArrayList < Map < String, Object >> data, int startIdx, String fileName, int page) throws IOException {
+    private void addToData(int start, int size, ArrayList < String > data, int startIdx, String fileName, int page, HashMap < String, String > search) throws IOException {
         SearchRequest searchRequest = new SearchRequest(fileName);
         searchSourceBuilder.query(QueryBuilders.matchAllQuery()).size(size).from(start);
         searchRequest.source(searchSourceBuilder);
@@ -122,12 +118,18 @@ public class Pagination extends HttpServlet {
         SearchHit[] searchHits = hits.getHits();
         int i = startIdx;
         for (SearchHit hit: searchHits) {
+            String id = hit.getId();
+            String resultString = String.valueOf(hit.getSourceAsMap().get(field));
+            if (search.containsKey(id)) {
+                resultString = search.get(id);
+            }
             if (i >= data.size())
-                data.add(hit.getSourceAsMap());
+                data.add(resultString);
             else
-                data.set(i, hit.getSourceAsMap());
+                data.set(i, resultString);
             i++;
         }
+
         // check if the updated page is the last page  
         if (searchHits.length == 0 || searchHits.length < recordsPerPage) {
             if (page == 1)
@@ -139,28 +141,31 @@ public class Pagination extends HttpServlet {
                 lastPage = page + extraPageInFrontAndBack - 1;
         }
     }
+
     // return json for java object
     private String convertToJson(logOrErrorResponse display) {
         Gson gson = new Gson();
         String json = gson.toJson(display);
         return json;
     }
+
     // return empty object 
     private void returnEmptyObject(HttpServletResponse response) throws IOException {
         String json = convertToJson(new logOrErrorResponse(new ArrayList(), true));
         response.setContentType("application/json");
         response.getWriter().println(json);
     }
+
     // maintains window of size totalpages
-    private void maintainWindow(int recordsPerPage, int page, String next, int extraPageInFrontAndBack, String fileName) throws IOException {
+    private void maintainWindow(int recordsPerPage, int page, String next, int extraPageInFrontAndBack, String fileName, HashMap < String, String > search) throws IOException {
         if (next.equals("true") && page + extraPageInFrontAndBack <= lastPage) {
             int Start = recordsPerPage * (page + extraPageInFrontAndBack - 1);
             int startIdx = recordsPerPage * ((page + extraPageInFrontAndBack - 1) % noOfPages);
-            addToData(Start, recordsPerPage, data, startIdx, fileName, page);
+            addToData(Start, recordsPerPage, data, startIdx, fileName, page, search);
         } else if (next.equals("false") && page - extraPageInFrontAndBack > 0) {
             int Start = recordsPerPage * (page - extraPageInFrontAndBack - 1);
             int startIdx = recordsPerPage * ((page - extraPageInFrontAndBack - 1) % noOfPages);
-            addToData(Start, recordsPerPage, data, startIdx, fileName, page);
+            addToData(Start, recordsPerPage, data, startIdx, fileName, page, search);
         }
     }
 

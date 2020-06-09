@@ -1,5 +1,6 @@
-let currentPage = 1;
+ let currentPage = 1;
 let next = true;
+const fileName = document.getElementById("fileName");
 
 // decrement by 1 on pressing previous button
 function prevPage() {
@@ -17,10 +18,10 @@ function nextPage() {
 
 // change content of page 
 async function changePage(page) {
-    const fileName = document.getElementById("fileName");
+
     const logs = document.getElementById("logs");
     const fileType = logs.checked ? "logs" : "errors";
-    if (page < 1 || page==undefined) page = 1;
+    if (page < 1 || page == undefined) page = 1;
 
     currentPage = page;
     const params = new URLSearchParams();
@@ -36,31 +37,50 @@ async function changePage(page) {
     });
 
     const display = await response.json();
-    const lastPage= display.lastPage;
+    const lastPage = display.lastPage;
 
     console.log(lastPage);
 
-    show(display,page);
-    
-    if(lastPage==true)
-    showAndHideBtn(page,true);
+    show(display, page);
+
+    if (lastPage == true)
+        showAndHideBtn(page, true);
     else
-    showAndHideBtn(page);
-    
-    
+        showAndHideBtn(page);
+
+
 }
-function show( display,page){
+
+// search dataBase for the requested string
+async function search() {
+    const searchString = document.getElementById("searchBar").value;
+    if (fileName.value == "" || searchString == "")
+        return;
+    const params = new URLSearchParams();
+    params.append('searchString', searchString);
+    params.append('fileName', fileName.value);
+    await fetch('/searchString', {
+        method: 'POST',
+        body: params
+    });
+    changePage(1);
+}
+
+
+
+function show(display, page) {
     const listing_table = document.getElementById("listingTable");
     const page_span = document.getElementById("page");
     listing_table.innerHTML = "";
     // dynamically add element to result page
     display.logOrError.forEach((logError) => {
-        listing_table.innerHTML += logError.name + "<br>";
+        listing_table.innerHTML += logError + "<br>";
     })
-    page_span.innerHTML = page ;
+    page_span.innerHTML = page;
 }
-function showAndHideBtn(page,lastPage){
 
+// display next and previous button 
+function showAndHideBtn(page, lastPage) {
     const btnPrev = document.getElementById("btnPrev");
     const btnNext = document.getElementById("btnNext");
 
@@ -71,7 +91,7 @@ function showAndHideBtn(page,lastPage){
         btnPrev.style.visibility = "visible";
     }
     // hide next button when 
-    if (lastPage!=undefined) {
+    if (lastPage != undefined) {
         btnNext.style.visibility = "hidden";
     } else {
         btnNext.style.visibility = "visible";
