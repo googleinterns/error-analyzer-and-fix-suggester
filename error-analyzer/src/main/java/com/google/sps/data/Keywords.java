@@ -17,7 +17,7 @@ package com.google.sps.data;
 import java.util.*;
 
 public class Keywords{
-    // private ArrayList<String> keywordsList = new ArrayList<String>();
+    
     private ArrayList<String> createList(){
         ArrayList<String> keywordsList = new ArrayList<String>();
         keywordsList.add("error");

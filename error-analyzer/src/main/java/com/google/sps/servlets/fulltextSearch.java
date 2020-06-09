@@ -15,6 +15,8 @@
 package com.google.sps.servlets;
 
 import com.google.sps.data.Keywords;
+import com.google.sps.data.ErrorLine;
+
 import com.google.gson.Gson;
 import java.util.*;
 import java.lang.*;
@@ -48,22 +50,17 @@ public class fulltextSearch extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         SearchHits hits = getQueryHits();
-        ArrayList<String> errorMsgs = getLogText(hits);
+        ArrayList<ErrorLine> errorData = getLogData(hits);
         response.setContentType("application/json");
         
         Gson gson = new Gson();
-        String json = gson.toJson(errorMsgs);
+        String json = gson.toJson(errorData);
         response.getWriter().println(json);
-    }
-    // method used only for development phase. the hits are stored later.
-    private String extractLogData(SearchHit hit){
-        String sourceAsString = hit.getSourceAsString();
-        Map<String, Object> sourceAsMap = hit.getSourceAsMap();
-        return (String) sourceAsMap.get("log_text");
     }
     private SearchHits getQueryHits() throws IOException{
         SearchRequest searchRequest = new SearchRequest(indexFile);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder(); 
+
         // kewords class contains all the terms used combined in OR logic.
         Keywords errorKeywords = new Keywords();
         searchSourceBuilder.query(QueryBuilders.matchQuery("log_text",errorKeywords.getQueryString() )); 
@@ -73,11 +70,23 @@ public class fulltextSearch extends HttpServlet {
         SearchHits hits = searchResponse.getHits();
         return hits;
     }
-    private ArrayList<String> getLogText(SearchHits hits){
 
-        ArrayList<String> errorMsgs = new ArrayList();
+    private String extractLogText(SearchHit hit){
+        String sourceAsString = hit.getSourceAsString();
+        Map<String, Object> sourceAsMap = hit.getSourceAsMap();
+        return (String) sourceAsMap.get("log_text");
+    }
+    private String extractLogLineNumber(SearchHit hit){
+        String sourceAsString = hit.getSourceAsString();
+        Map<String, Object> sourceAsMap = hit.getSourceAsMap();
+        return (String)sourceAsMap.get("log_line");
+    }
+    
+    private ArrayList<ErrorLine> getLogData(SearchHits hits){
+
+        ArrayList<ErrorLine> errorMsgs = new ArrayList();
         for (SearchHit hit : hits){
-            errorMsgs.add(extractLogData(hit));
+            errorMsgs.add(new ErrorLine( extractLogText(hit), extractLogLineNumber(hit)) );
         }
         return errorMsgs;
     }
