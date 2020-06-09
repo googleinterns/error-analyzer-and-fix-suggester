@@ -1,0 +1,6 @@
+*.jar
+*.class
+*.lst
+*.war
+
+error-analyzer/target/
