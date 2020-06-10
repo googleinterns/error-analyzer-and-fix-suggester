@@ -2,5 +2,6 @@
 *.class
 *.lst
 *.war
+*.log
 
 error-analyzer/target/

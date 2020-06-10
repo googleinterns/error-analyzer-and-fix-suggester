@@ -26,36 +26,32 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.http.HttpHost;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.SimpleQueryStringBuilder;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @WebServlet("/fulltext_query")
 public class FulltextSearch extends HttpServlet {
     private String indexFile = "trial_index"; //later fetched from request
+    private static final Logger logger = LogManager.getLogger(FulltextSearch.class);
 
-    private RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
+    
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
-        FulltextSearchQuery searchQuery = new FulltextSearchQuery();
+        try{
+            RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
+            FulltextSearchQuery searchQuery = new FulltextSearchQuery();
 
-        ArrayList<ErrorLine> errorData = searchQuery.getErrors(indexFile, client);
-        Gson gson = new Gson();
-        String json = gson.toJson(errorData);
-        response.getWriter().println(json);
+            String errorData = searchQuery.getErrorsAsString(indexFile, client);
+            response.getWriter().println(errorData);
+        }catch(Exception e){
+            logger.error("Could not connect to server." + e);
+            response.getWriter().println("Could not connect to database." );
+        }
+        
     }
 }

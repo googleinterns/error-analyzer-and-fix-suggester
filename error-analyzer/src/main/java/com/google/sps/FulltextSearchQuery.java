@@ -33,15 +33,36 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class FulltextSearchQuery {
+
+    private static final Logger logger = LogManager.getLogger(FulltextSearchQuery.class);
+
     private String logTextField = "logText"; //subject to field name in the field used while storing.
     private String logLineNumberField = "logLineNumber"; //subject to field name in the field used while storing.
 
-    public ArrayList<ErrorLine> getErrors(String indexFile, RestHighLevelClient client) throws IOException{
-        SearchHits hits = getQueryHits(indexFile,client);
-        ArrayList<ErrorLine> errorData = getLogData(hits);
-        return errorData;
+    public String getErrorsAsString(String indexFile, RestHighLevelClient client){
+        ArrayList<ErrorLine> errorData = getErrors(indexFile,client);
+        Gson gson = new Gson();
+        String json = gson.toJson(errorData);
+        return json;
+
+    }
+
+
+    public ArrayList<ErrorLine> getErrors(String indexFile, RestHighLevelClient client){
+        ArrayList<ErrorLine> errorData = new ArrayList<>();
+        try{
+            SearchHits hits = getQueryHits(indexFile,client);
+            errorData = getLogData(hits);
+            return errorData;
+        }catch (IOException e){
+            logger.error("could not complete query request.");
+            return errorData;
+        }
+
     }
     private SearchHits getQueryHits(String indexFile, RestHighLevelClient client) throws IOException{
         SearchRequest searchRequest = new SearchRequest(indexFile);
@@ -68,9 +89,13 @@ public class FulltextSearchQuery {
         //subject to the format logLineNumber is stored in index, string or integer.
         try{
             int lineNumber = Integer.parseInt((String) sourceAsMap.get(logLineNumberField));
+            logger.info("Integer.parseInt successfully = " + lineNumber);
             return lineNumber;
         }catch(NumberFormatException e){
-            // log.error("Integer.parseInt error: " + e);
+            logger.error("Integer.parseInt error: " + e);
+            return -1;
+        }catch(NullPointerException e2){
+            logger.error("null error: " + e2);
             return -1;
         }
         
@@ -83,6 +108,8 @@ public class FulltextSearchQuery {
             int lineNumber = extractLogLineNumber(hit);
             if( lineNumber != -1){
                 errorMsgs.add(new ErrorLine( extractLogText(hit),lineNumber) );
+            }else{
+                logger.error("Could process log line.");
             }
         }
         return errorMsgs;
