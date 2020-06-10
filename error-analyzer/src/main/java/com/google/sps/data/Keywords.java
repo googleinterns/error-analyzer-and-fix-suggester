@@ -37,7 +37,6 @@ public class Keywords{
                 queryString = queryString.concat(" OR " + keyword);
             }
         }
-        System.out.println("--------------------" + queryString);
         return queryString;
     }
     

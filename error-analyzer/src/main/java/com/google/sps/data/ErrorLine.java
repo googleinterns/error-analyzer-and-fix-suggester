@@ -14,13 +14,12 @@
 
 package com.google.sps.data;
 
-import java.util.*;
 
 public class ErrorLine{
 
     private String logText;
-    private String logLineNumber;
-    public ErrorLine (String log_text, String logLineNumber){
+    private int logLineNumber;
+    public ErrorLine (String log_text, int logLineNumber){
         this.logText = log_text;
         this.logLineNumber = logLineNumber;
     } 
