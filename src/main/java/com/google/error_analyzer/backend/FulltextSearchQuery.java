@@ -12,16 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.error_analyzer;
+/**
+* This class is for fulltext search query on a given index file using the keywords query string.
+* Can return Search hits as an Array of Errorline objects or json sring.
+* Depends on the RestHighLevelClientprovided and index filename provided in public functions.
+*/
+package com.google.error_analyzer.backend;
 
 import com.google.error_analyzer.data.Keywords;
 import com.google.error_analyzer.data.ErrorLine;
 
 import com.google.gson.Gson;
-import java.util.*;
-import java.lang.*;
+import java.util.ArrayList;
+import java.util.Map;
 import java.io.IOException;
-
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -40,9 +44,10 @@ public class FulltextSearchQuery {
 
     private static final Logger logger = LogManager.getLogger(FulltextSearchQuery.class);
 
-    private String logTextField = "logText"; //subject to field name in the field used while storing.
-    private String logLineNumberField = "logLineNumber"; //subject to field name in the field used while storing.
+    private String logTextField = "logText"; //subject to field name in the document used while storing.
+    private String logLineNumberField = "logLineNumber"; //subject to field name in the document used while storing.
 
+    //returns an Errorline object array as a json string. 
     public String getErrorsAsString(String indexFile, RestHighLevelClient client){
         ArrayList<ErrorLine> errorData = getErrors(indexFile,client);
         Gson gson = new Gson();
@@ -51,7 +56,7 @@ public class FulltextSearchQuery {
 
     }
 
-
+    //returns all search hits as Errorline object array
     public ArrayList<ErrorLine> getErrors(String indexFile, RestHighLevelClient client){
         ArrayList<ErrorLine> errorData = new ArrayList<>();
         try{
@@ -64,13 +69,17 @@ public class FulltextSearchQuery {
         }
 
     }
+
+    //Make the search request and  return Search hits from match query.
     private SearchHits getQueryHits(String indexFile, RestHighLevelClient client) throws IOException{
         SearchRequest searchRequest = new SearchRequest(indexFile);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder(); 
 
         // kewords class contains all the terms used combined in OR logic.
         Keywords errorKeywords = new Keywords();
-        searchSourceBuilder.query(QueryBuilders.matchQuery(logTextField,errorKeywords.getQueryString() )); 
+        searchSourceBuilder.query(
+            QueryBuilders.matchQuery(
+                logTextField, errorKeywords.getQueryString() )); 
         searchRequest.source(searchSourceBuilder); 
 
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
@@ -78,11 +87,14 @@ public class FulltextSearchQuery {
         return hits;
     }
 
+    // return log text from a hit.
     private String extractLogText(SearchHit hit){
         String sourceAsString = hit.getSourceAsString();
         Map<String, Object> sourceAsMap = hit.getSourceAsMap();
         return (String) sourceAsMap.get(logTextField);
     }
+
+    // return log line number from a hit 
     private int extractLogLineNumber(SearchHit hit){
         String sourceAsString = hit.getSourceAsString();
         Map<String, Object> sourceAsMap = hit.getSourceAsMap();
@@ -98,9 +110,9 @@ public class FulltextSearchQuery {
             logger.error("null error: " + e2);
             return -1;
         }
-        
     }
     
+    //Create Errorline array from search hits.
     private ArrayList<ErrorLine> getLogData(SearchHits hits){
 
         ArrayList<ErrorLine> errorMsgs = new ArrayList<>();

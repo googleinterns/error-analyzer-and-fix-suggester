@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+* Class to test fulltext search query. Mock object for ES to br created later.
+*/
 package com.google.error_analyzer;
 
-import com.google.error_analyzer.FulltextSearchQuery;
+import com.google.error_analyzer.backend.FulltextSearchQuery;
 import com.google.error_analyzer.data.ErrorLine;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;

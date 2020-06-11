@@ -12,9 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/**
+* This class contains all the keywords used in fulltext query.
+* A log line will apear in search hits if one or more of these terms appear in it.
+*/
 package com.google.error_analyzer.data;
 
-import java.util.*;
+import java.util.ArrayList;
 
 public class Keywords{
     
@@ -27,6 +31,8 @@ public class Keywords{
         keywordsList.add("exception");
         return keywordsList;
     }
+
+    //returns kewords as a single string combined together in OR logic.
     public String getQueryString(){
         ArrayList<String> keywordsList = createList();
         String queryString = "";
