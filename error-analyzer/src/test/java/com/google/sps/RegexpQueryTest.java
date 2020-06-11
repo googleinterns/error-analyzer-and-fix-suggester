@@ -26,7 +26,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 @RunWith(JUnit4.class)
-public final class FulltextSearchQueryTest{
+public final class RegexpQueryTest{
     private String indexFile = "trial_index"; //later fetched from request
     RestHighLevelClient client;
     @Before
@@ -37,7 +37,7 @@ public final class FulltextSearchQueryTest{
 @Test
 public void KeywordSearchQuery(){
     
-        FulltextSearchQuery searchQuery = new FulltextSearchQuery();
+        RegexpQuery searchQuery = new RegexpQuery();
         String actual = searchQuery.getResultAsString(indexFile, client);
 
         String expected = "[{\"logText\":\"warn: KeystoreRemoteException\",\"logLineNumber\":24}]";

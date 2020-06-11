@@ -15,7 +15,7 @@
 package com.google.sps;
 
 import com.google.sps.data.ErrorLine;
-
+import com.google.sps.data.RegexExpressions;
 import com.google.gson.Gson;
 import java.util.*;
 import java.lang.*;
@@ -63,7 +63,9 @@ public class RegexpQuery{
     }
     private SearchHits getQueryHits(String indexFile, RestHighLevelClient client) throws IOException{
 
-        RegexpQueryBuilder regexQuery = new RegexpQueryBuilder(logTextField, ".*exception" ); 
+        RegexExpressions regexExpressions = new RegexExpressions();
+        
+        RegexpQueryBuilder regexQuery = new RegexpQueryBuilder(logTextField, regexExpressions.getQueryString() ); 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder(); 
         searchSourceBuilder.query(regexQuery); 
         
