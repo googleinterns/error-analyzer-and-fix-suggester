@@ -11,23 +11,21 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package com.google.sps.data;
+package com.google.error_analyzer.data;
 
-import com.google.gson.Gson;
+// import com.google.gson.Gson;
 import java.util.*;
 import java.lang.*;
-import com.google.sps.data.SearchErrors;
+// import com.google.error_analyzer.data.SearchErrors;
 import java.io.IOException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+// import javax.servlet.annotation.WebServlet;
+// import javax.servlet.http.HttpServlet;
+// import javax.servlet.http.HttpServletRequest;
+// import javax.servlet.http.HttpServletResponse;
 
 import java.security.GeneralSecurityException;
 
 import java.util.*;
-import java.net.*;
-import java.io.*;
 import com.google.api.services.customsearch.Customsearch;
 import com.google.api.services.customsearch.Customsearch.Cse;
 import com.google.api.services.customsearch.CustomsearchRequestInitializer;
@@ -36,39 +34,45 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.customsearch.Customsearch.Cse.List;
 import com.google.api.services.customsearch.model.Result;
 import com.google.api.services.customsearch.model.Search;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-@WebServlet("/fix")
-public class ErrorFixes extends HttpServlet  {
-    // public static String findFixes(String searchQuery) throws GeneralSecurityException, IOException {
-     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+public class ErrorFixes{
+    
+    private static final Logger LOG = LogManager.getLogger(ErrorFixes.class);
+    public static String findFixes(String searchQuery) throws IOException {
+    
         try{
-    String searchQuery=request.getParameter("fix");
-    String searchEngine = "cx"; //Your search engine
+            String searchEngine = "cx"; //Your search engine
 
-    //Instance Customsearch
-    Customsearch customeSearch = new Customsearch.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), null) 
-                   .setApplicationName("errorFixes") 
-                   .setGoogleClientRequestInitializer(new CustomsearchRequestInitializer("your_api_key")) 
-                   .build();
+            //Instance Customsearch
+            Customsearch customeSearch = new Customsearch.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), null) 
+                        .setApplicationName("errorFixes") 
+                        .setGoogleClientRequestInitializer(new CustomsearchRequestInitializer("Api_keys")) 
+                        .build();
 
-    //Set search parameter
-    Customsearch.Cse.List list = customeSearch.cse().list(searchQuery).setCx(searchEngine); 
-    response.setContentType("text/html");
-    //  response.getWriter().println("hi");
-    //Execute search
-    Search result = list.execute();
-    if (result.getItems()!=null){
-        for (Result ri : result.getItems()) {
-            //Get title, link, body etc. from search
-            response.getWriter().println(ri.getTitle() + ", " + ri.getLink());
+            //Set search parameter
+            Customsearch.Cse.List list = customeSearch.cse().list(searchQuery).setCx(searchEngine); 
+            
+            //Execute search
+            Search result = list.execute();
+            
+            if (result.getItems()!=null){
+                Result stackoverflowResult= result.getItems().get(0);
+                String fix= stackoverflowResult.getLink();
+                fix=" <a href="+fix+"> click </a> ";
+                return fix;
+            }else{
+                return new String();
+            }
+        }catch(GeneralSecurityException e ){
+            LOG.error("exception in custom search"+ e);
+            return new String();
         }
-    }else{
-        return new String();
-    }
-    }catch(GeneralSecurityException e){
-        return new String();
-    }
+        catch(IOException e ){
+            LOG.error("exception in custom search"+ e);
+            return new String();
+        }
 
-}
+    }
 }

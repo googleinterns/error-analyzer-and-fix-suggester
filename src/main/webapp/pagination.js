@@ -59,7 +59,7 @@ async function search() {
     const params = new URLSearchParams();
     params.append('searchString', searchString);
     params.append('fileName', fileName.value);
-    await fetch('/searchString', {
+    await fetch('/search', {
         method: 'POST',
         body: params
     });
@@ -72,6 +72,8 @@ function show(display, page) {
     const listing_table = document.getElementById("listingTable");
     const page_span = document.getElementById("page");
     listing_table.innerHTML = "";
+
+    console.log(display);
     // dynamically add element to result page
     display.logOrError.forEach((logError) => {
         listing_table.innerHTML += logError + "<br>";

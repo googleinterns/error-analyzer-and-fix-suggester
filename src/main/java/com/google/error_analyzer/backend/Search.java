@@ -11,6 +11,8 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
+package com.google.error_analyzer.backend;
+
 import com.google.gson.Gson;
 import java.util.*;
 import java.lang.*;
@@ -41,7 +43,7 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder.Field;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 
-@WebServlet("/searchString")
+@WebServlet("/search")
 
 public class Search extends HttpServlet {
     private RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
