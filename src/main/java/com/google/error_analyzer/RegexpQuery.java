@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.sps;
+package com.google.error_analyzer;
 
-import com.google.sps.data.ErrorLine;
-import com.google.sps.data.RegexExpressions;
+import com.google.error_analyzer.data.ErrorLine;
+import com.google.error_analyzer.data.RegexExpressions;
 import com.google.gson.Gson;
 import java.util.*;
 import java.lang.*;

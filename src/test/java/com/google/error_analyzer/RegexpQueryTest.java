@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.sps;
+package com.google.error_analyzer;
 
-import com.google.sps.RegexpQuery;
+import com.google.error_analyzer.RegexpQuery;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.apache.http.HttpHost;
