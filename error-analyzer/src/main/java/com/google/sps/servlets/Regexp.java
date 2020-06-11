@@ -14,9 +14,8 @@
 
 package com.google.sps.servlets;
 
-import com.google.sps.data.Keywords;
 import com.google.sps.data.ErrorLine;
-import com.google.sps.FulltextSearchQuery;
+import com.google.sps.RegexpQuery;
 
 import com.google.gson.Gson;
 import java.util.*;
@@ -32,21 +31,22 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@WebServlet("/fulltext_query")
-public class FulltextSearch extends HttpServlet {
+@WebServlet("/regex_query")
+public class Regexp extends HttpServlet {
     private String indexFile = "trial_index"; //later fetched from request
-    private static final Logger logger = LogManager.getLogger(FulltextSearch.class);
-
+    private static final Logger logger = LogManager.getLogger(Regexp.class);
+    private String logTextField = "logText"; 
     
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         try{
-            RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
-            FulltextSearchQuery searchQuery = new FulltextSearchQuery();
+            RestHighLevelClient client = new RestHighLevelClient(
+                RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
+            RegexpQuery searchQuery = new RegexpQuery();
 
-            String errorData = searchQuery.getErrorsAsString(indexFile, client);
+            String errorData = searchQuery.getResultAsString(indexFile, client);
             response.getWriter().println(errorData);
         }catch(Exception e){
             logger.error("Could not connect to server." + e);

@@ -14,7 +14,6 @@
 
 package com.google.sps;
 
-import com.google.sps.data.Keywords;
 import com.google.sps.data.ErrorLine;
 
 import com.google.gson.Gson;
@@ -25,8 +24,7 @@ import java.io.IOException;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RegexpQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -36,15 +34,14 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class FulltextSearchQuery {
-
-    private static final Logger logger = LogManager.getLogger(FulltextSearchQuery.class);
+public class RegexpQuery{
+    private static final Logger logger = LogManager.getLogger(RegexpQuery.class);
 
     private String logTextField = "logText"; //subject to field name in the field used while storing.
     private String logLineNumberField = "logLineNumber"; //subject to field name in the field used while storing.
 
-    public String getErrorsAsString(String indexFile, RestHighLevelClient client){
-        ArrayList<ErrorLine> errorData = getErrors(indexFile,client);
+    public String getResultAsString(String indexFile, RestHighLevelClient client){
+        ArrayList<ErrorLine> errorData = getResults(indexFile,client);
         Gson gson = new Gson();
         String json = gson.toJson(errorData);
         return json;
@@ -52,28 +49,28 @@ public class FulltextSearchQuery {
     }
 
 
-    public ArrayList<ErrorLine> getErrors(String indexFile, RestHighLevelClient client){
+    public ArrayList<ErrorLine> getResults(String indexFile, RestHighLevelClient client){
         ArrayList<ErrorLine> errorData = new ArrayList<>();
         try{
             SearchHits hits = getQueryHits(indexFile,client);
             errorData = getLogData(hits);
             return errorData;
         }catch (IOException e){
-            logger.error("could not complete query request.");
+            logger.error("could not complete query request." + e);
             return errorData;
         }
 
     }
     private SearchHits getQueryHits(String indexFile, RestHighLevelClient client) throws IOException{
-        SearchRequest searchRequest = new SearchRequest(indexFile);
+
+        RegexpQueryBuilder regexQuery = new RegexpQueryBuilder(logTextField, ".*exception" ); 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder(); 
-
-        // kewords class contains all the terms used combined in OR logic.
-        Keywords errorKeywords = new Keywords();
-        searchSourceBuilder.query(QueryBuilders.matchQuery(logTextField,errorKeywords.getQueryString() )); 
-        searchRequest.source(searchSourceBuilder); 
-
+        searchSourceBuilder.query(regexQuery); 
+        
+        SearchRequest searchRequest = new SearchRequest(indexFile);
+        searchRequest.source(searchSourceBuilder);
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+
         SearchHits hits = searchResponse.getHits();
         return hits;
     }
@@ -102,17 +99,15 @@ public class FulltextSearchQuery {
     }
     
     private ArrayList<ErrorLine> getLogData(SearchHits hits){
-
         ArrayList<ErrorLine> errorMsgs = new ArrayList<>();
         for (SearchHit hit : hits){
             int lineNumber = extractLogLineNumber(hit);
             if( lineNumber != -1){
                 errorMsgs.add(new ErrorLine( extractLogText(hit),lineNumber) );
             }else{
-                logger.error("Could process log line.");
+                logger.error("Could not process log line.");
             }
         }
         return errorMsgs;
     }
-
 }
