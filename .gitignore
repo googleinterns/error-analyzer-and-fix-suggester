@@ -1,7 +1,9 @@
+README-cloudshell.txt
+
 *.jar
 *.class
 *.lst
 *.war
 *.log
 
-error-analyzer/target/
+target/

@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.sps;
+package com.google.error_analyzer;
 
-import com.google.sps.FulltextSearchQuery;
-import com.google.sps.data.ErrorLine;
+import com.google.error_analyzer.FulltextSearchQuery;
+import com.google.error_analyzer.data.ErrorLine;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.apache.http.HttpHost;
@@ -41,7 +41,7 @@ public void KeywordSearchQuery(){
         FulltextSearchQuery searchQuery = new FulltextSearchQuery();
         String actual = searchQuery.getErrorsAsString(indexFile, client);
 
-        String expected = "[{\"logText\":\"ERROR c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":90},{\"logText\":\"ERROR c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":3}]";
+        String expected = "[{\"logText\":\"ERROR c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":90},{\"logText\":\"ERROR c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":3},{\"logText\":\"ERROR: c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":23}]";
         Assert.assertEquals(expected, actual);
 }
 

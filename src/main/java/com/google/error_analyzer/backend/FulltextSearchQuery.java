@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.sps;
+package com.google.error_analyzer;
 
-import com.google.sps.data.Keywords;
-import com.google.sps.data.ErrorLine;
+import com.google.error_analyzer.data.Keywords;
+import com.google.error_analyzer.data.ErrorLine;
 
 import com.google.gson.Gson;
 import java.util.*;
@@ -59,7 +59,7 @@ public class FulltextSearchQuery {
             errorData = getLogData(hits);
             return errorData;
         }catch (IOException e){
-            logger.error("could not complete query request.");
+            logger.error("could not complete query request."+e); 
             return errorData;
         }
 
