@@ -11,12 +11,12 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package com.google.sps.servlets;
+package com.google.error_analyzer.backend;
 
 import com.google.gson.Gson;
 import java.util.*;
 import java.lang.*;
-import com.google.error_analyzer.data.SearchErrors;
+import com.google.error_analyzer.data.SearchErrors; 
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -90,23 +90,28 @@ public class Pagination extends HttpServlet {
     // if user is not on 1st page but someother page just maintain the already created window of pages
 
     public void fetchAndReturnResponse(int page, String fileName, String fileType, String next, HashMap < String, String > search, HttpServletResponse response) throws IOException {
-        boolean isLastPage = page == lastPage ? true : false;
         if (page == 1) {
             // the user won't be knowing the name of error file generated corresponding to his log file so we need to change fileName depending on type of file
-            if (fileType.equals("error"))
-                fileName = "error" + fileName;
+            if (fileType.equals("errors"))
+                fileName = fileName + "error";
             // create window
-            fetchData(0, (recordsPerPage * noOfPages) - 1, 0, fileName, page, search);
-            returnResponse(0, recordsPerPage - 1, isLastPage, response);
+            fetchData(0, (recordsPerPage * noOfPages) - 1, 0, fileName,fileType, page, search);
+            returnResponse(0, recordsPerPage - 1, isLastPage(page), response);
         } else {
             int start = recordsPerPage * ((page - 1) % noOfPages);
             int stop = start + recordsPerPage - 1;
-            if (page == lastPage)
+            if (isLastPage(page))
                 stop = start + noOfRecordsOnLastPage - 1;
-            returnResponse(start, stop, isLastPage, response);
+            returnResponse(start, stop, isLastPage(page), response);
             // maintain window
-            maintainWindow(page, next, fileName, search);
+            maintainWindow(page, next, fileName,fileType, search);
         }
+    }
+    
+
+    // returns true if the asked page is last page
+    public boolean isLastPage(int page){
+        return page == lastPage ? true : false;
     }
 
     // picks content from maintained window on the basis of required page and convert it into json format
@@ -121,7 +126,8 @@ public class Pagination extends HttpServlet {
     }
 
     // put/change content of data for maintaining continuous window of pages(here window of 5 pages)
-    private void fetchData(int start, int size, int startIdx, String fileName, int page, HashMap < String, String > search) throws IOException {
+    private void fetchData(int start, int size, int startIdx, String fileName,String fileType, int page, HashMap < String, String > search) throws IOException {
+
         SearchRequest searchRequest = new SearchRequest(fileName);
         searchSourceBuilder.query(QueryBuilders.matchAllQuery()).size(size).from(start);
         searchRequest.source(searchSourceBuilder);
@@ -132,9 +138,11 @@ public class Pagination extends HttpServlet {
         for (SearchHit hit: searchHits) {
             String id = hit.getId();
             String resultString = String.valueOf(hit.getSourceAsMap().get(field));
+           
             if (search.containsKey(id)) {
                 resultString = search.get(id);
             }
+
             if (i >= data.size())
                 data.add(resultString);
             else
@@ -147,17 +155,17 @@ public class Pagination extends HttpServlet {
 
     // check if the updated page is the last page 
     public void updateLastPage(int searchHitLength, int page) {
-        if (searchHitLength == 0 || searchHitLength < recordsPerPage) {
-            if (page == 1)
-                lastPage = 1;
-            else if (page != 1 && searchHitLength != 0) {
-                lastPage = page + extraPageInFrontAndBack;
-                noOfRecordsOnLastPage = searchHitLength;
-            } else if (page != 1 && searchHitLength == 0) {
-                lastPage = page + extraPageInFrontAndBack - 1;
-                noOfRecordsOnLastPage = recordsPerPage;
-            }
-        }
+        int fetchedPage=page + extraPageInFrontAndBack;
+        if (page == 1 && searchHitLength< fetchedPage*recordsPerPage) {
+            lastPage = (int)Math.ceil((double)searchHitLength/(double)recordsPerPage);
+            noOfRecordsOnLastPage = searchHitLength % recordsPerPage;
+        }else if (page !=1 && searchHitLength == 0) {
+            lastPage = fetchedPage - 1;
+            noOfRecordsOnLastPage = recordsPerPage;
+        }else if (page !=1 && searchHitLength < recordsPerPage) {
+            lastPage = fetchedPage;
+            noOfRecordsOnLastPage = searchHitLength;
+        } 
     }
 
     // return json for java object
@@ -175,17 +183,17 @@ public class Pagination extends HttpServlet {
     }
 
     // maintains window of size totalpages
-    public int[] maintainWindow(int page, String next, String fileName, HashMap < String, String > search) throws IOException {
+    public int[] maintainWindow(int page, String next, String fileName,String fileType, HashMap < String, String > search) throws IOException {
         int Start = 0;
         int startIdx = 0;
         if (next.equals("true") && page + extraPageInFrontAndBack <= lastPage) {
             Start = recordsPerPage * (page + extraPageInFrontAndBack - 1);
             startIdx = recordsPerPage * ((page + extraPageInFrontAndBack - 1) % noOfPages);
-            fetchData(Start, recordsPerPage, startIdx, fileName, page, search);
+            fetchData(Start, recordsPerPage, startIdx, fileName,fileType, page, search);
         } else if (next.equals("false") && page - extraPageInFrontAndBack > 0) {
             Start = recordsPerPage * (page - extraPageInFrontAndBack - 1);
             startIdx = recordsPerPage * ((page - extraPageInFrontAndBack - 1) % noOfPages);
-            fetchData(Start, recordsPerPage, startIdx, fileName, page, search);
+            fetchData(Start, recordsPerPage, startIdx, fileName,fileType, page, search);
         }
         return new int[] {
             Start, startIdx
