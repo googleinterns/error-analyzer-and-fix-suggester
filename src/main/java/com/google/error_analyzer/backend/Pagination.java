@@ -1,11 +1,8 @@
 /**Copyright 2019 Google LLC
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
     https://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +13,8 @@ package com.google.error_analyzer.backend;
 import com.google.gson.Gson;
 import java.util.*;
 import java.lang.*;
-import com.google.error_analyzer.data.SearchErrors; 
+import com.google.error_analyzer.data.SearchErrors;
+import com.google.error_analyzer.data.ErrorFixes;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -48,9 +46,11 @@ public class Pagination extends HttpServlet {
     public int noOfPages = 5;
     public int extraPageInFrontAndBack = noOfPages / 2;
     public String field = "name";
+    public String ERROR="errors";
     public int noOfRecordsOnLastPage = recordsPerPage;
     public int lastPage = Integer.MAX_VALUE;
     public ArrayList < String > data = new ArrayList();
+    private static final Logger LOG = LogManager.getLogger(Pagination.class);
     public RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
     public SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
@@ -92,8 +92,9 @@ public class Pagination extends HttpServlet {
     public void fetchAndReturnResponse(int page, String fileName, String fileType, String next, HashMap < String, String > search, HttpServletResponse response) throws IOException {
         if (page == 1) {
             // the user won't be knowing the name of error file generated corresponding to his log file so we need to change fileName depending on type of file
-            if (fileType.equals("errors"))
+            if (fileType.equals(ERROR))
                 fileName = fileName + "error";
+            lastPage=Integer.MAX_VALUE;
             // create window
             fetchData(0, (recordsPerPage * noOfPages) - 1, 0, fileName,fileType, page, search);
             returnResponse(0, recordsPerPage - 1, isLastPage(page), response);
@@ -120,6 +121,7 @@ public class Pagination extends HttpServlet {
         for (int i = startIdx; i <= stopIdx && i < data.size(); i++) {
             display.add(data.get(i));
         }
+        
         String json = convertToJson(new logOrErrorResponse(display, isLastPage));
         response.setContentType("application/json");
         response.getWriter().println(json);
@@ -134,23 +136,34 @@ public class Pagination extends HttpServlet {
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
         SearchHits hits = searchResponse.getHits();
         SearchHit[] searchHits = hits.getHits();
+       
+        addFetchResultToData(startIdx,fileType,searchHits,search);
+        updateLastPage(searchHits.length, page);
+    }
+
+    // add fetched results to data and apply search results and error-fixes if applicable
+    private void addFetchResultToData(int startIdx,String fileType,SearchHit[] searchHits,HashMap < String, String > search)throws IOException{
         int i = startIdx;
+        ErrorFixes errorFix=new ErrorFixes();
         for (SearchHit hit: searchHits) {
             String id = hit.getId();
             String resultString = String.valueOf(hit.getSourceAsMap().get(field));
+            String fix=new String();
+
+            if(fileType.equals(ERROR))
+                fix = errorFix.findFixes(resultString);
            
             if (search.containsKey(id)) {
                 resultString = search.get(id);
             }
-
+            // append fix to the error string 
+            resultString+=fix;
             if (i >= data.size())
                 data.add(resultString);
             else
                 data.set(i, resultString);
             i++;
         }
-
-        updateLastPage(searchHits.length, page);
     }
 
     // check if the updated page is the last page 
@@ -186,6 +199,7 @@ public class Pagination extends HttpServlet {
     public int[] maintainWindow(int page, String next, String fileName,String fileType, HashMap < String, String > search) throws IOException {
         int Start = 0;
         int startIdx = 0;
+        
         if (next.equals("true") && page + extraPageInFrontAndBack <= lastPage) {
             Start = recordsPerPage * (page + extraPageInFrontAndBack - 1);
             startIdx = recordsPerPage * ((page + extraPageInFrontAndBack - 1) % noOfPages);
@@ -195,6 +209,7 @@ public class Pagination extends HttpServlet {
             startIdx = recordsPerPage * ((page - extraPageInFrontAndBack - 1) % noOfPages);
             fetchData(Start, recordsPerPage, startIdx, fileName,fileType, page, search);
         }
+         LOG.info("indexes and lastpage"+Start+" "+startIdx+" "+(page + extraPageInFrontAndBack));
         return new int[] {
             Start, startIdx
         };

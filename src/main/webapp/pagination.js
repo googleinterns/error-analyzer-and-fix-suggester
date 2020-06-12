@@ -13,6 +13,7 @@ function prevPage() {
 // increment by 1 on pressing next button
 function nextPage() {
     currentPage++;
+    next = true;
     changePage(currentPage);
 }
 
