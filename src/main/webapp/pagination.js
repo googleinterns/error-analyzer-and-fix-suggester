@@ -1,4 +1,4 @@
- let currentPage = 1;
+let currentPage = 1;
 let next = true;
 const fileName = document.getElementById("fileName");
 
@@ -13,6 +13,7 @@ function prevPage() {
 // increment by 1 on pressing next button
 function nextPage() {
     currentPage++;
+    next = true;
     changePage(currentPage);
 }
 

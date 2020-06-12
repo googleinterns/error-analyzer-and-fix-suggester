@@ -48,7 +48,7 @@ public class ErrorFixes{
             //Instance Customsearch
             Customsearch customeSearch = new Customsearch.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), null) 
                         .setApplicationName("errorFixes") 
-                        .setGoogleClientRequestInitializer(new CustomsearchRequestInitializer("Api_keys")) 
+                        .setGoogleClientRequestInitializer(new CustomsearchRequestInitializer("your_api_key")) 
                         .build();
 
             //Set search parameter
@@ -57,6 +57,7 @@ public class ErrorFixes{
             //Execute search
             Search result = list.execute();
             
+            // return url in a tag 
             if (result.getItems()!=null){
                 Result stackoverflowResult= result.getItems().get(0);
                 String fix= stackoverflowResult.getLink();
@@ -67,12 +68,10 @@ public class ErrorFixes{
             }
         }catch(GeneralSecurityException e ){
             LOG.error("exception in custom search"+ e);
-            return new String();
         }
         catch(IOException e ){
             LOG.error("exception in custom search"+ e);
-            return new String();
         }
-
+        return new String();
     }
 }
