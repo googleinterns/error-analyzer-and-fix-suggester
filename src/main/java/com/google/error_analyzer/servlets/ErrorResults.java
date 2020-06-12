@@ -14,11 +14,10 @@
 
 package com.google.error_analyzer.servlets;
 
-import com.google.error_analyzer.data.Keywords;
-import com.google.error_analyzer.data.ErrorLine;
-import com.google.error_analyzer.backend.FulltextSearchQuery;
-
+import com.google.error_analyzer.backend.BooleanQuery;
 import com.google.gson.Gson;
+import java.util.*;
+import java.lang.*;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -30,27 +29,25 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-/**
-* This class contains all the keywords used in fulltext query.
-* A log line will apear in search hits if one or more of these terms appear in it.
-*/
-
-@WebServlet("/fulltext_query")
-public class FulltextSearch extends HttpServlet {
-
+@WebServlet("/errorResults")
+public class ErrorResults extends HttpServlet {
     private String indexFile = "trial_index"; //later fetched from request
-    private static final Logger logger = LogManager.getLogger(FulltextSearch.class);
-    RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
+    private static final Logger logger = LogManager.getLogger(ErrorResults.class);
+    private String logTextField = "logText"; 
     
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         try{
-            FulltextSearchQuery searchQuery = new FulltextSearchQuery();
+            RestHighLevelClient client = new RestHighLevelClient(
+                RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
+            BooleanQuery searchQuery = new BooleanQuery();
+
             String errorData = searchQuery.getErrorsAsString(indexFile, client);
             response.getWriter().println(errorData);
         }catch(Exception e){
-            logger.error("Could not connect to server: " + e);
+            logger.error("Could not connect to server." + e);
             response.getWriter().println("Could not connect to database." );
         }
         
