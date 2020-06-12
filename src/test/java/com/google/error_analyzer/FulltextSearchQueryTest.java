@@ -12,9 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
-* Class to test fulltext search query. Mock object for ES to br created later.
-*/
 package com.google.error_analyzer;
 
 import com.google.error_analyzer.backend.FulltextSearchQuery;
@@ -29,23 +26,27 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+/**
+* Class to test fulltext search query. Mock object for ES to br created later.
+*/
+
 @RunWith(JUnit4.class)
 public final class FulltextSearchQueryTest{
     private String indexFile = "trial_index"; //later fetched from request
     RestHighLevelClient client;
     @Before
     public void setUp() {
-        client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
+        client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
     }
 
 @Test
-public void KeywordSearchQuery(){
-    
-        FulltextSearchQuery searchQuery = new FulltextSearchQuery();
-        String actual = searchQuery.getErrorsAsString(indexFile, client);
+public void keywordSearchQuery(){
+    // Mock object for client will be added soon.
+    FulltextSearchQuery searchQuery = new FulltextSearchQuery();
+    String actual = searchQuery.getErrorsAsString(indexFile, client);
 
-        String expected = "[{\"logText\":\"ERROR c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":90},{\"logText\":\"ERROR c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":3},{\"logText\":\"ERROR: c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":23}]";
-        Assert.assertEquals(expected, actual);
+    String expected = "[{\"logText\":\"ERROR c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":90},{\"logText\":\"ERROR c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":3},{\"logText\":\"ERROR: c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":23}]";
+    Assert.assertEquals(expected, actual);
 }
 
 

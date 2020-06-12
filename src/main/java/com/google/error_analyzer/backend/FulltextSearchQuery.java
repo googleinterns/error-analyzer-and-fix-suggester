@@ -12,11 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
-* This class is for fulltext search query on a given index file using the keywords query string.
-* Can return Search hits as an Array of Errorline objects or json sring.
-* Depends on the RestHighLevelClientprovided and index filename provided in public functions.
-*/
 package com.google.error_analyzer.backend;
 
 import com.google.error_analyzer.data.Keywords;
@@ -40,6 +35,13 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+
+/**
+* This class is for fulltext search query on a given index file using the keywords query string.
+* Can return Search hits as an Array of Errorline objects or json sring.
+* Depends on the RestHighLevelClientprovided and index filename provided in public functions.
+*/
+
 public class FulltextSearchQuery {
 
     private static final Logger logger = LogManager.getLogger(FulltextSearchQuery.class);
@@ -49,25 +51,24 @@ public class FulltextSearchQuery {
 
     //returns an Errorline object array as a json string. 
     public String getErrorsAsString(String indexFile, RestHighLevelClient client){
-        ArrayList<ErrorLine> errorData = getErrors(indexFile,client);
-        Gson gson = new Gson();
-        String json = gson.toJson(errorData);
-        return json;
+        try{
+            ArrayList<ErrorLine> errorData = getErrors(indexFile,client);
+            Gson gson = new Gson();
+            String json = gson.toJson(errorData);
+            return json;
+        }catch(IOException e){
+            logger.error("Could not complete query request: "+e);
+            return "Could not complete request.";
+        }
 
     }
 
     //returns all search hits as Errorline object array
-    public ArrayList<ErrorLine> getErrors(String indexFile, RestHighLevelClient client){
+    public ArrayList<ErrorLine> getErrors(String indexFile, RestHighLevelClient client) throws IOException{
         ArrayList<ErrorLine> errorData = new ArrayList<>();
-        try{
-            SearchHits hits = getQueryHits(indexFile,client);
-            errorData = getLogData(hits);
-            return errorData;
-        }catch (IOException e){
-            logger.error("could not complete query request."+e); 
-            return errorData;
-        }
-
+        SearchHits hits = getQueryHits(indexFile,client);
+        errorData = getLogData(hits);
+        return errorData;
     }
 
     //Make the search request and  return Search hits from match query.
@@ -107,7 +108,7 @@ public class FulltextSearchQuery {
             logger.error("Integer.parseInt error: " + e);
             return -1;
         }catch(NullPointerException e2){
-            logger.error("null error: " + e2);
+            logger.error("Null error: " + e2);
             return -1;
         }
     }

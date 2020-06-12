@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+package com.google.error_analyzer.data;
+
 /**
 * Search hits will be converted to ErrorLine objects and used further to strore in result index.
 */
-package com.google.error_analyzer.data;
-
 
 public class ErrorLine{
 

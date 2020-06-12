@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
-* Servlet used to see the results of fullText search query.
-* Connects to the RestHighLevelClient and stores the name of index file to be queried. 
-*/
 package com.google.error_analyzer.servlets;
 
 import com.google.error_analyzer.data.Keywords;
@@ -34,23 +30,27 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/**
+* This class contains all the keywords used in fulltext query.
+* A log line will apear in search hits if one or more of these terms appear in it.
+*/
+
 @WebServlet("/fulltext_query")
 public class FulltextSearch extends HttpServlet {
 
     private String indexFile = "trial_index"; //later fetched from request
     private static final Logger logger = LogManager.getLogger(FulltextSearch.class);
-
+    RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
+    
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         try{
-            RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
             FulltextSearchQuery searchQuery = new FulltextSearchQuery();
-
             String errorData = searchQuery.getErrorsAsString(indexFile, client);
             response.getWriter().println(errorData);
         }catch(Exception e){
-            logger.error("Could not connect to server." + e);
+            logger.error("Could not connect to server: " + e);
             response.getWriter().println("Could not connect to database." );
         }
         

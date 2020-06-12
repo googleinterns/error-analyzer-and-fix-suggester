@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+package com.google.error_analyzer.data;
+
+import java.util.ArrayList;
+
 /**
 * This class contains all the keywords used in fulltext query.
 * A log line will apear in search hits if one or more of these terms appear in it.
 */
-package com.google.error_analyzer.data;
-
-import java.util.ArrayList;
 
 public class Keywords{
     
