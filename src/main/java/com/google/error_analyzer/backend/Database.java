@@ -29,17 +29,47 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder.Field;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import java.util.*;
  
 public class Database implements DaoInterface {
 
     private static final RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
     private static final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    private final int windowSize=10;
 
     //search db using keywords and return searchHits having highlight field added 
-    public ArrayList<SearchHit> fullTextSearch(String fileName, String SearchString){
-        return new ArrayList();
+    public ArrayList<SearchHit> fullTextSearch(String fileName, String searchString, String field) throws IOException {
+        int offset=0;
+        SearchHit[] searchHits= null;
+        ArrayList<SearchHit>searchResult=new ArrayList();
+        while(searchHits==null || searchHits.length!=0){
+            SearchRequest searchRequest=new SearchRequest(fileName); 
+            SimpleQueryStringBuilder simpleQueryBuilder = QueryBuilders.simpleQueryStringQuery(searchString);
+            searchSourceBuilder.query(simpleQueryBuilder).size(windowSize).from(offset);
+            HighlightBuilder highlightBuilder =addHighLighter(field);
+            searchSourceBuilder.highlighter(highlightBuilder);
+            searchRequest.source(searchSourceBuilder);
+            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+            SearchHits hits = searchResponse.getHits();
+            searchHits= hits.getHits();
+            for(SearchHit hit:searchHits){
+              searchResult.add(hit);
+            }
+            offset+=windowSize;
+        }
+        return searchResult;
     };
+    // highlight searched text
+    private HighlightBuilder addHighLighter(String field){
+        HighlightBuilder highlightBuilder = new HighlightBuilder().preTags("<b>").postTags("</b>");
+        HighlightBuilder.Field highlightTitle =new HighlightBuilder.Field(field); 
+        highlightTitle.highlighterType("unified");  
+        highlightBuilder.field(highlightTitle);
+        return highlightBuilder;
+    }
 
     //search db using user provided regex and return searchHits having highlight field added
     public SearchHit[] regexQuery(String filename, String regex){
@@ -47,7 +77,7 @@ public class Database implements DaoInterface {
     };
 
     //return a section of given index starting from start and of length equal to given size
-    public SearchHit[] getAll(int start, int size, String fileName) throws IOException{
+    public SearchHit[] getAll(int start, int size, String fileName) throws IOException {
         SearchRequest searchRequest = new SearchRequest(fileName);
         searchSourceBuilder.query(QueryBuilders.matchAllQuery()).size(size).from(start);
         searchRequest.source(searchSourceBuilder);
@@ -58,7 +88,7 @@ public class Database implements DaoInterface {
     };
 
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
-    public void errorQuery(String filename){
+    public void errorQuery(String fileName){
         return ;
     };
 

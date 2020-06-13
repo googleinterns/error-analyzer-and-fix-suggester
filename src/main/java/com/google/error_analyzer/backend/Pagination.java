@@ -22,20 +22,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.http.HttpHost;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.SimpleQueryStringBuilder;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
+
 
 @WebServlet("/pagination")
 public class Pagination extends HttpServlet {
@@ -50,8 +39,6 @@ public class Pagination extends HttpServlet {
     public int lastPage = Integer.MAX_VALUE;
     public ArrayList < String > data = new ArrayList();
     private static final Logger LOG = LogManager.getLogger(Pagination.class);
-    public RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
-    public SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
 
     // return object 
     private class logOrErrorResponse {

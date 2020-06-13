@@ -18,7 +18,7 @@ import java.util.*;
 public interface DaoInterface {
 
     //search db using keywords and return searchHits having highlight field added 
-    public ArrayList<SearchHit> fullTextSearch(String fileName, String SearchString);
+    public ArrayList<SearchHit> fullTextSearch(String fileName, String SearchString, String field) throws IOException;
 
     //search db using user provided regex and return searchHits having highlight field added
     public SearchHit[] regexQuery(String filename, String regex);
