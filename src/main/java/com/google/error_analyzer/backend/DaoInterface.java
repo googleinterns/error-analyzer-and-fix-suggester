@@ -11,30 +11,32 @@ limitations under the License.*/
 package com.google.error_analyzer.backend;
 
 import org.elasticsearch.search.SearchHit;
+import java.io.IOException;
+import java.lang.*;
+import java.util.*;
 
-public interface DaoInterface{
+public interface DaoInterface {
 
-//search db using keywords and return searchHits having highlight field added 
-public SearchHit[] fullTextSearch(String fileName,String SearchString);
+    //search db using keywords and return searchHits having highlight field added 
+    public ArrayList<SearchHit> fullTextSearch(String fileName, String SearchString);
 
-//search db using user provided regex and return searchHits having highlight field added
-public SearchHit[] regexQuery(String filename, String regex);
+    //search db using user provided regex and return searchHits having highlight field added
+    public SearchHit[] regexQuery(String filename, String regex);
 
-//return a section of given index starting from start and of length equal to given size
-public SearchHit[] getAll(int start,int size,String fileName);
+    //return a section of given index starting from start and of length equal to given size
+    public SearchHit[] getAll(int start, int size, String fileName) throws IOException;
 
-//search db using regex and keywords and store back in db searchHits sorted by logLineNumber
-public void errorQuery(String filename);
+    //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
+    public void errorQuery(String filename);
 
-//checks whether index with name fileName already exists in the database;
-public boolean FileExists(String fileName);
+    //checks whether index with name fileName already exists in the database;
+    public boolean FileExists(String fileName);
 
 
-//Stores the jsonString at index with name filename and returns the logText of the document stored
-public String storeLogLine(String filename, String jsonString);
+    //Stores the jsonString at index with name filename and returns the logText of the document stored
+    public String storeLogLine(String filename, String jsonString);
 
-//Stores the log into the database if an index with name fileName does not exist in the database and returns a string that contains the status of the log string whether the log string was stored in the database or not.
-public String checkAndStoreLog(String fileName, String log);
+    //Stores the log into the database if an index with name fileName does not exist in the database and returns a string that contains the status of the log string whether the log string was stored in the database or not.
+    public String checkAndStoreLog(String fileName, String log);
 
 }
-

@@ -128,14 +128,8 @@ public class Pagination extends HttpServlet {
 
     // put/change content of data for maintaining continuous window of pages(here window of 5 pages)
     private void fetchData(int start, int size, int startIdx, String fileName,String fileType, int page, HashMap < String, String > search) throws IOException {
-
-        SearchRequest searchRequest = new SearchRequest(fileName);
-        searchSourceBuilder.query(QueryBuilders.matchAllQuery()).size(size).from(start);
-        searchRequest.source(searchSourceBuilder);
-        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-        SearchHits hits = searchResponse.getHits();
-        SearchHit[] searchHits = hits.getHits();
-       
+        Database database = new Database();
+        SearchHit[] searchHits = database.getAll(start,size,fileName);
         addFetchResultToData(startIdx,fileType,searchHits,search);
         updateLastPage(searchHits.length, page);
     }
