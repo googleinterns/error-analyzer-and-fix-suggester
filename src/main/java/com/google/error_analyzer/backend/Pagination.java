@@ -39,6 +39,7 @@ public class Pagination extends HttpServlet {
     public int lastPage = Integer.MAX_VALUE;
     public ArrayList < String > data = new ArrayList();
     private static final Logger LOG = LogManager.getLogger(Pagination.class);
+    private static final Database database = new Database();
 
     // return object 
     private class logOrErrorResponse {
@@ -115,18 +116,20 @@ public class Pagination extends HttpServlet {
 
     // put/change content of data for maintaining continuous window of pages(here window of 5 pages)
     private void fetchData(int start, int size, int startIdx, String fileName,String fileType, int page, HashMap < String, String > search) throws IOException {
-        Database database = new Database();
         SearchHit[] searchHits = database.getAll(start,size,fileName);
-        addFetchResultToData(startIdx,fileType,searchHits,search);
+        ArrayList<String> hitIds = database.hitId(searchHits);
+        ArrayList<String> hitFieldContent = database.hitFieldContent(searchHits,field);
+        addFetchResultToData(startIdx, fileType, hitIds, hitFieldContent, search);
         updateLastPage(searchHits.length, page);
     }
 
     // add fetched results to data and apply search results and error-fixes if applicable
-    private void addFetchResultToData(int startIdx,String fileType,SearchHit[] searchHits,HashMap < String, String > search)throws IOException{
+    private void addFetchResultToData(int startIdx,String fileType,ArrayList<String> hitIds,ArrayList<String> hitFieldContent,HashMap < String, String > search)throws IOException{ 
         int i = startIdx;
-        for (SearchHit hit: searchHits) {
-            String id = hit.getId();
-            String resultString = String.valueOf(hit.getSourceAsMap().get(field));
+        int len = hitIds.size();
+        for (int idx=0;idx<len;idx++) {
+            String id = hitIds.get(idx);
+            String resultString = hitFieldContent.get(idx);
            
             if (search.containsKey(id)) {
                 resultString = search.get(id);

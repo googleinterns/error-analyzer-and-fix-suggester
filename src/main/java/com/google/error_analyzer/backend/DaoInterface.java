@@ -18,13 +18,22 @@ import java.util.*;
 public interface DaoInterface {
 
     //search db using keywords and return searchHits having highlight field added 
-    public ArrayList<SearchHit> fullTextSearch(String fileName, String SearchString, String field) throws IOException;
+    public ArrayList<SearchHit> fullTextSearch(String fileName, String searchString, String field) throws IOException;
+
+    // return ArrayList of hit ids corresponding to given searchhit list
+    public ArrayList<String> hitId(SearchHit[] searchHits) throws IOException;
+
+    // return ArrayList of content of specified field  corresponding to given searchhit list
+    public ArrayList<String> hitFieldContent(SearchHit[] searchHits, String field) throws IOException;
 
     //search db using user provided regex and return searchHits having highlight field added
     public SearchHit[] regexQuery(String filename, String regex);
 
     //return a section of given index starting from start and of length equal to given size
     public SearchHit[] getAll(int start, int size, String fileName) throws IOException;
+
+    //returns hashmap of hit ids and highlighted content 
+    public HashMap<String,String> getHighLightedText(ArrayList<SearchHit> searchHits, String field) throws IOException;
 
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
     public void errorQuery(String filename);

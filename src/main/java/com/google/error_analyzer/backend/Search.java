@@ -33,7 +33,8 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 public class Search extends HttpServlet {
   
     private final String field="name";
-   
+    private static final Database database = new Database();
+    
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String searchString=request.getParameter("searchString");
@@ -41,27 +42,15 @@ public class Search extends HttpServlet {
         SearchErrors SearchErrors= new SearchErrors();
 
        
-        HashMap<String,String> searchResult=new HashMap();
-        searchDataBase(fileName,searchString,searchResult);
-
+        HashMap<String,String> searchResult=searchDataBase(fileName,searchString);
+        
         SearchErrors.setSearchedErrors(searchResult);
     }
 
     // run full-text search for given string 
-    private void searchDataBase(String fileName,String searchString, HashMap<String,String> searchResult)throws IOException{
-        Database database = new Database();
+    private HashMap<String,String> searchDataBase(String fileName,String searchString)throws IOException{
         ArrayList<SearchHit> searchHits = database.fullTextSearch(fileName, searchString, field);
-        for(SearchHit hit : searchHits){
-            addHit(searchResult,hit);
-        }
-    }
-
-    // store search results
-    private void addHit(HashMap<String,String> searchResult,SearchHit hit){
-        Map<String, HighlightField> highlightFields = hit.getHighlightFields();
-        HighlightField highlight = highlightFields.get(field); 
-        String fragmentString = (highlight.fragments())[0].string();
-        searchResult.put(hit.getId(),fragmentString);
+        return database.getHighLightedText(searchHits, field);
     }
 
 }
