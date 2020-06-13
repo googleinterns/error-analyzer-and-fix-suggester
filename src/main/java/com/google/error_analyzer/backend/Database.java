@@ -34,11 +34,20 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder.Field;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import java.util.*;
 
+
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import com.google.error_analyzer.data.Keywords;
+import com.google.error_analyzer.data.RegexExpressions;
+import org.elasticsearch.index.query.RegexpQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+ 
 public class Database implements DaoInterface {
 
     private static final RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
     private static final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-    private final int windowSize = 10;
+    private final int windowSize=10;
+    private static final Logger logger = LogManager.getLogger(Database.class);
+    private final String logTextField = "logText";
 
     //search db using keywords and return searchHits having highlight field added 
     public ArrayList < SearchHit > fullTextSearch(String fileName, String searchString, String field) throws IOException {
@@ -122,6 +131,33 @@ public class Database implements DaoInterface {
     public void errorQuery(String fileName) {
         return;
     }
+    public void errorQuery(String fileName) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(fileName);
+        Keywords errorKeywords = new Keywords();
+        RegexExpressions regexExpressions = new RegexExpressions();
+        RegexpQueryBuilder regexQuery = new RegexpQueryBuilder(logTextField, regexExpressions.getQueryString() ); 
+        QueryBuilder fulltextQuery = QueryBuilders.matchQuery(logTextField, errorKeywords.getQueryString() );
+        QueryBuilder errorQuery = new BoolQueryBuilder()
+            .minimumShouldMatch(1)
+            .should(regexQuery)
+            .should(fulltextQuery);
+        searchSourceBuilder.query(errorQuery); 
+        searchRequest.source(searchSourceBuilder); 
+        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        SearchHits hits = searchResponse.getHits();
+
+        storeErrorLogs(fileName, hits);
+    };
+
+    //store identified errors back in database
+    public void storeErrorLogs(String fileName, SearchHits hits){
+        String errorFile = fileName.concat("errorFile");
+        for(SearchHit hit : hits){
+            String errorJsonString = hit.getSourceAsString();
+            storeLogLine(errorFile, errorJsonString);
+        }
+        logger.info("Error query done successfully");
+    }
 
     //checks whether index with name fileName already exists in the database;
     public boolean FileExists(String fileName) {
@@ -138,4 +174,6 @@ public class Database implements DaoInterface {
     public String checkAndStoreLog(String fileName, String log) {
         return new String();
     }
+    };
+
 }

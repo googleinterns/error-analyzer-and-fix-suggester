@@ -36,7 +36,7 @@ public interface DaoInterface {
     public HashMap<String,String> getHighLightedText(ArrayList<SearchHit> searchHits, String field) throws IOException;
 
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
-    public void errorQuery(String filename);
+    public void errorQuery(String filename)  throws IOException;
 
     //checks whether index with name fileName already exists in the database;
     public boolean FileExists(String fileName);
