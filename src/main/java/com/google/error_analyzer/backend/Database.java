@@ -140,8 +140,10 @@ public class Database implements DaoInterface {
         SearchRequest searchRequest = new SearchRequest(fileName);
         Keywords errorKeywords = new Keywords();
         RegexExpressions regexExpressions = new RegexExpressions();
-        RegexpQueryBuilder regexQuery = new RegexpQueryBuilder(logTextField, regexExpressions.getQueryString() ); 
-        QueryBuilder fulltextQuery = QueryBuilders.matchQuery(logTextField, errorKeywords.getQueryString() );
+        String regexQueryString = regexExpressions.getQueryString();
+        RegexpQueryBuilder regexQuery = new RegexpQueryBuilder(logTextField,regexQueryString);
+        String keywordsQueryString = errorKeywords.getQueryString();
+        QueryBuilder fulltextQuery = QueryBuilders.matchQuery(logTextField, keywordsQueryString);
         QueryBuilder errorQuery = new BoolQueryBuilder()
             .minimumShouldMatch(1)
             .should(regexQuery)
@@ -155,11 +157,14 @@ public class Database implements DaoInterface {
     };
 
     //store identified errors back in database
-    public void storeErrorLogs(String fileName, SearchHits hits){
-        String errorFile = fileName.concat("errorFile");
+    public void storeErrorLogs(String fileName, SearchHits hits) throws IOException {
+        String errorFile = fileName.concat("errors");
+        int logLineNumber = 1;
         for(SearchHit hit : hits){
+            String logLineNumberString = Integer.toString(logLineNumber);
             String errorJsonString = hit.getSourceAsString();
-            storeLogLine(errorFile, errorJsonString);
+            storeLogLine(errorFile, errorJsonString, logLineNumberString);
+            logLineNumber++;
         }
         logger.info("Error query done successfully");
     }
