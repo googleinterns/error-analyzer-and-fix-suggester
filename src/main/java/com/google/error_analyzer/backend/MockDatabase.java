@@ -113,7 +113,7 @@ public class MockDatabase implements DaoInterface {
 
 
     //Stores the jsonString at index with name filename and returns the logText of the document stored
-    public String storeLogLine(String filename, String jsonString) {
+    public String storeLogLine(String filename, String jsonString, String Id) {
         return new String();
     };
 
