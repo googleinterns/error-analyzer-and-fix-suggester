@@ -35,7 +35,6 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import java.util.*;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import com.google.error_analyzer.data.Keywords;
-import com.google.error_analyzer.data.ErrorLine;
 import com.google.error_analyzer.data.RegexExpressions;
 import org.elasticsearch.index.query.RegexpQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
