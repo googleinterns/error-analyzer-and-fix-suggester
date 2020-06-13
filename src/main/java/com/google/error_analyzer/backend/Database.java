@@ -11,7 +11,7 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
-
+import com.google.error_analyzer.backend.StoreLogs;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.http.HttpHost;
@@ -32,7 +32,15 @@ import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder.Field;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
+import  org.elasticsearch.action.get.GetResponse;
+import  org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
+import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import java.util.*;
+import org.elasticsearch.ElasticsearchException;;
+import org.elasticsearch.action.index.IndexRequest;
+import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.common.xcontent.XContentType;
 
 
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -160,20 +168,44 @@ public class Database implements DaoInterface {
     }
 
     //checks whether index with name fileName already exists in the database;
-    public boolean FileExists(String fileName) {
-        return false;
+    public boolean FileExists(String fileName) throws IOException {
+        GetIndexRequest getIndexRequest = new GetIndexRequest();
+        getIndexRequest.indices(fileName);
+        boolean indexExists = client.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
+        return indexExists;
     }
 
 
     //Stores the jsonString at index with name filename and returns the logText of the document stored
-    public String storeLogLine(String filename, String jsonString) {
-        return new String();
+    public String storeLogLine(String Filename, String jsonString, String Id) throws IOException {
+        IndexRequest indexRequest = new IndexRequest(Filename);
+        indexRequest.id(Id); 
+        indexRequest.source(jsonString, XContentType.JSON);
+        IndexResponse indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
+        GetRequest getRequest = new GetRequest(Filename, Id); 
+        GetResponse getResponse = client.get(getRequest, RequestOptions.DEFAULT);
+        return getResponse.getSourceAsString();
     }
 
     //Stores the log into the database if an index with name fileName does not exist in the database and returns a string that contains the status of the log string whether the log string was stored in the database or not.
-    public String checkAndStoreLog(String fileName, String log) {
-        return new String();
-    }
-    };
+    public String checkAndStoreLog(String fileName, String log) throws IOException {
+        if (FileExists(fileName) == true) {
+            return ("\t\t\t<h2> Sorry! the file already exists</h2>");
+        } 
+        else {
+            String splitString = "\\r?\\n";
+            int LogLineNumber = 1;
+            String logLines[] = log.split(splitString);
+            for (String logLine: logLines) {
+                String logLineNumber = Integer.toString(LogLineNumber);
+                StoreLogs storelog = new StoreLogs();
+                String jsonString = storelog.convertToJsonString(logLine, logLineNumber);
+                storeLogLine(fileName, jsonString, logLineNumber);
+                LogLineNumber++;
+            }
+            return ("\t\t\t<h2> File Stored</h2>");
 
-}
+        }
+    }
+    }
+
