@@ -44,12 +44,21 @@ public class MockDatabase implements DaoInterface {
 
      // return ArrayList of hit ids corresponding to given searchhit list
     public ArrayList<String> hitId(SearchHit[] searchHits) throws IOException {
-        return new ArrayList();
+        ArrayList<String> result = new ArrayList();
+        for(SearchHit hit: searchHits){
+            result.add(hit.getId());
+        }
+        return result;
     };
 
     // return ArrayList of content of specified field  corresponding to given searchhit list
     public ArrayList<String> hitFieldContent(SearchHit[] searchHits, String field) throws IOException {
-         return new ArrayList();
+        ArrayList<String> result = new ArrayList();
+        for(SearchHit hit: searchHits){
+            int id=Integer.parseInt(hit.getId());
+            result.add(database[id]);
+        }
+        return result;
     };
 
     //search db using user provided regex and return searchHits having highlight field added
@@ -59,12 +68,37 @@ public class MockDatabase implements DaoInterface {
 
     //return a section of given index starting from start and of length equal to given size
     public SearchHit[] getAll(int start, int size, String fileName) throws IOException {
-        return new SearchHit[0];
+        if(start>=database.length)
+        {
+            return new SearchHit[0];
+        }
+        if(start<0)
+        {
+            start=0;
+        }
+        int len = 0;
+        int databaseLength=database.length;
+        if(start+size-1 < databaseLength)
+            len=size;
+        else
+            len=databaseLength-start;
+        SearchHit[] searchHits = new SearchHit[len];
+        for(int idx=start;idx<len;idx++)
+        {
+            searchHits[idx]=new SearchHit(idx);
+        }
+        return searchHits;
     };
 
     //returns hashmap of hit ids and highlighted content 
     public HashMap<String,String> getHighLightedText(ArrayList<SearchHit> searchHits, String field) throws IOException {
-        return new HashMap();
+        HashMap<String,String> result = new HashMap();
+        for(SearchHit hit: searchHits){
+            String stringId=hit.getId();
+            int id=Integer.parseInt(stringId);
+            result.put(stringId,database[id]);
+        }
+        return result;
     };
 
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
