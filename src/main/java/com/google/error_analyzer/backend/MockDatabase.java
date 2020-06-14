@@ -11,16 +11,17 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
-
 import java.io.IOException;
 import java.lang.*;
 import java.util.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import com.google.error_analyzer.backend.MockErrorQuery;
 
 public class MockDatabase implements DaoInterface {
-    private final String[] database = new String[] {"error: null pointer Exception", "info: start appengine","scheduler shutting down",
-     "WARNING: An illegal reflective access operation has occurred"};
+    private final String[] database = new String[] {"Error: nullPointerException", "info: start appengine","scheduler shutting down",
+     "WARNING: An illegal reflective access operation has occurred", "Severe: Could not find index file", "Warning: "};
+    private ArrayList<String> databaseError;
 
     //search db using keywords and return searchHits having highlight field added 
     public ArrayList<SearchHit> fullTextSearch(String fileName, String searchString, String field) throws IOException {
@@ -103,8 +104,15 @@ public class MockDatabase implements DaoInterface {
 
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
     public void errorQuery(String filename) {
-
-    };
+        MockErrorQuery  mockQuery = new MockErrorQuery();
+        ArrayList<String> searchResults = new ArrayList();
+        for (int i = 0; i < database.length; i++) {
+            String document = database[i];
+            if (mockQuery.matchesCondition(database[i])) {
+                searchResults.add(document);
+            }
+        }
+    }
 
     //checks whether index with name fileName already exists in the database;
     public boolean FileExists(String fileName) {

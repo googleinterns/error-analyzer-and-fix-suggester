@@ -23,7 +23,7 @@ import java.util.ArrayList;
 
 public class Keywords{
     
-    private ArrayList<String> createList(){
+    public ArrayList<String> createList(){
         ArrayList<String> keywordsList = new ArrayList<String>();
         keywordsList.add("error");
         keywordsList.add("fatal");
