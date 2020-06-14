@@ -42,7 +42,7 @@ public class DummyServlet extends HttpServlet {
             MockDatabase searchQuery = new MockDatabase();
             searchQuery.errorQuery(indexFile);
             response.setContentType("application/json");
-            ArrayList<String> errorData = searchQuery.databaseError;
+            ArrayList<String> errorData = searchQuery.errorDatabase;
             Gson gson = new Gson();
             String json = gson.toJson(errorData);
             response.getWriter().println(errorData);
