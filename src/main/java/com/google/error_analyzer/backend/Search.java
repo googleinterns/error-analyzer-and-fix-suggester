@@ -11,10 +11,9 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
-import com.google.gson.Gson;
+import com.google.error_analyzer.data.SearchErrors;
 import java.util.*;
 import java.lang.*;
-import com.google.error_analyzer.data.SearchErrors;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -31,25 +30,22 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 @WebServlet("/searchString")
 
 public class Search extends HttpServlet {
-  
-    private final String field="name";
-    private static final Database database = new Database();
+
+    public static Database database = new Database();
+    private final String field = "name";
     
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        String searchString=request.getParameter("searchString");
-        String fileName=request.getParameter("fileName");
-        SearchErrors SearchErrors= new SearchErrors();
-
-       
-        HashMap<String,String> searchResult=searchDataBase(fileName,searchString);
-        
+        String searchString = request.getParameter("searchString");
+        String fileName = request.getParameter("fileName");
+        SearchErrors SearchErrors = new SearchErrors();
+        HashMap < String, String > searchResult = searchDataBase(fileName, searchString);
         SearchErrors.setSearchedErrors(searchResult);
     }
 
     // run full-text search for given string 
-    private HashMap<String,String> searchDataBase(String fileName,String searchString)throws IOException{
-        ArrayList<SearchHit> searchHits = database.fullTextSearch(fileName, searchString, field);
+    public HashMap < String, String > searchDataBase(String fileName, String searchString) throws IOException {
+        ArrayList < SearchHit > searchHits = database.fullTextSearch(fileName, searchString, field);
         return database.getHighLightedText(searchHits, field);
     }
 

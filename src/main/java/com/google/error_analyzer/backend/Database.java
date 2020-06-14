@@ -136,7 +136,7 @@ public class Database implements DaoInterface {
     }
 
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
-    public void errorQuery(String fileName) throws IOException {
+    public boolean errorQuery(String fileName) throws IOException {
         SearchRequest searchRequest = new SearchRequest(fileName);
         Keywords errorKeywords = new Keywords();
         RegexExpressions regexExpressions = new RegexExpressions();
@@ -154,6 +154,7 @@ public class Database implements DaoInterface {
         SearchHits hits = searchResponse.getHits();
 
         storeErrorLogs(fileName, hits);
+        return true;
     };
 
     //store identified errors back in database

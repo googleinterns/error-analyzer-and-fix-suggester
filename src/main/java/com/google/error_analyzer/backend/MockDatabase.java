@@ -20,8 +20,8 @@ import com.google.error_analyzer.backend.MockErrorQuery;
 
 public class MockDatabase implements DaoInterface {
     private final String[] database = new String[] {"Error: nullPointerException", "info: start appengine","scheduler shutting down",
-     "WARNING: An illegal reflective access operation has occurred", "Severe: Could not find index file", "Warning: "};
-    public ArrayList<String> databaseError;
+     "WARNING: An illegal reflective access operation has occurred", "Severe: Could not find index file", "warning: NullPointerException"};
+    public ArrayList<String> errorDatabase;
 
     //search db using keywords and return searchHits having highlight field added 
     public ArrayList<SearchHit> fullTextSearch(String fileName, String searchString, String field) throws IOException {
@@ -41,7 +41,7 @@ public class MockDatabase implements DaoInterface {
             }
         }
         return searchResults;
-    };
+    }
 
      // return ArrayList of hit ids corresponding to given searchhit list
     public ArrayList<String> hitId(SearchHit[] searchHits) throws IOException {
@@ -50,7 +50,7 @@ public class MockDatabase implements DaoInterface {
             result.add(hit.getId());
         }
         return result;
-    };
+    }
 
     // return ArrayList of content of specified field  corresponding to given searchhit list
     public ArrayList<String> hitFieldContent(SearchHit[] searchHits, String field) throws IOException {
@@ -60,12 +60,12 @@ public class MockDatabase implements DaoInterface {
             result.add(database[id]);
         }
         return result;
-    };
+    }
 
     //search db using user provided regex and return searchHits having highlight field added
     public SearchHit[] regexQuery(String filename, String regex) {
         return new SearchHit[0];
-    };
+    }
 
     //return a section of given index starting from start and of length equal to given size
     public SearchHit[] getAll(int start, int size, String fileName) throws IOException {
@@ -89,21 +89,21 @@ public class MockDatabase implements DaoInterface {
             searchHits[idx]=new SearchHit(idx);
         }
         return searchHits;
-    };
+    }
 
     //returns hashmap of hit ids and highlighted content 
     public HashMap<String,String> getHighLightedText(ArrayList<SearchHit> searchHits, String field) throws IOException {
         HashMap<String,String> result = new HashMap();
         for(SearchHit hit: searchHits){
-            String stringId=hit.getId();
-            int id=Integer.parseInt(stringId);
+            String stringId=hit.docId()+"";
+            int id=hit.docId();
             result.put(stringId,database[id]);
         }
         return result;
-    };
+    }
 
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
-    public void errorQuery(String filename) {
+    public boolean errorQuery(String filename) {
         MockErrorQuery  mockQuery = new MockErrorQuery();
         ArrayList<String> searchResults = new ArrayList();
         for (int i = 0; i < database.length; i++) {
@@ -113,7 +113,8 @@ public class MockDatabase implements DaoInterface {
                 searchResults.add(document);
             }
         }
-        databaseError = searchResults;
+        errorDatabase = searchResults;
+        return true;
     }
 
     //checks whether index with name fileName already exists in the database;
