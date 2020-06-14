@@ -14,8 +14,6 @@ package com.google.error_analyzer.backend;
 import com.google.error_analyzer.data.Keywords; 
 import com.google.error_analyzer.data.RegexExpressions;
 import java.util.*;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,7 +28,8 @@ public class MockErrorQuery {
     
 
 
-    public boolean matchesCondition(String document) {
+    public boolean matchesCondition(String dbenntry) {
+        String document = dbenntry.toLowerCase().replaceAll("[^a-zA-Z0-9]", " ");
         String[] termsList = document.split(" ");
         for (int i = 0; i < termsList.length; i++) {
             String term = termsList[i];
