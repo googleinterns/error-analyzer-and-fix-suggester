@@ -39,7 +39,7 @@ public class Pagination extends HttpServlet {
     public int lastPage = Integer.MAX_VALUE;
     public ArrayList < String > data = new ArrayList();
     private static final Logger LOG = LogManager.getLogger(Pagination.class);
-    private static final Database database = new Database();
+    public static Database database = new Database();
 
     // return object 
     private class logOrErrorResponse {

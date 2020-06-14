@@ -40,7 +40,7 @@ public class MockDatabase implements DaoInterface {
             }
         }
         return searchResults;
-    };
+    }
 
      // return ArrayList of hit ids corresponding to given searchhit list
     public ArrayList<String> hitId(SearchHit[] searchHits) throws IOException {
@@ -49,7 +49,7 @@ public class MockDatabase implements DaoInterface {
             result.add(hit.getId());
         }
         return result;
-    };
+    }
 
     // return ArrayList of content of specified field  corresponding to given searchhit list
     public ArrayList<String> hitFieldContent(SearchHit[] searchHits, String field) throws IOException {
@@ -59,12 +59,12 @@ public class MockDatabase implements DaoInterface {
             result.add(database[id]);
         }
         return result;
-    };
+    }
 
     //search db using user provided regex and return searchHits having highlight field added
     public SearchHit[] regexQuery(String filename, String regex) {
         return new SearchHit[0];
-    };
+    }
 
     //return a section of given index starting from start and of length equal to given size
     public SearchHit[] getAll(int start, int size, String fileName) throws IOException {
@@ -88,7 +88,7 @@ public class MockDatabase implements DaoInterface {
             searchHits[idx]=new SearchHit(idx);
         }
         return searchHits;
-    };
+    }
 
     //returns hashmap of hit ids and highlighted content 
     public HashMap<String,String> getHighLightedText(ArrayList<SearchHit> searchHits, String field) throws IOException {
@@ -99,27 +99,27 @@ public class MockDatabase implements DaoInterface {
             result.put(stringId,database[id]);
         }
         return result;
-    };
+    }
 
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
     public void errorQuery(String filename) {
 
-    };
+    }
 
     //checks whether index with name fileName already exists in the database;
     public boolean FileExists(String fileName) {
         return true;
-    };
+    }
 
 
     //Stores the jsonString at index with name filename and returns the logText of the document stored
     public String storeLogLine(String filename, String jsonString) {
         return new String();
-    };
+    }
 
     //Stores the log into the database if an index with name fileName does not exist in the database and returns a string that contains the status of the log string whether the log string was stored in the database or not.
     public String checkAndStoreLog(String fileName, String log) {
         return new String();
-    };
+    }
 
 }

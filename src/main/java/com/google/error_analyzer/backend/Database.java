@@ -11,7 +11,7 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
-import com.google.error_analyzer.backend.StoreLogs;
+// import com.google.error_analyzer.backend.StoreLogs;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.http.HttpHost;
@@ -49,7 +49,8 @@ import com.google.error_analyzer.data.RegexExpressions;
 import org.elasticsearch.index.query.RegexpQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
  
-public class Database implements DaoInterface {
+public class Database {
+// implements DaoInterface {
 
     private static final RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
     private static final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
@@ -123,7 +124,7 @@ public class Database implements DaoInterface {
         SearchHit[] searchHits = hits.getHits();
         return searchHits;
     }
-    //returns hashmap of hit ids and highlighted content 
+    // returns hashmap of hit ids and highlighted content 
     public HashMap<String,String> getHighLightedText(ArrayList<SearchHit> searchHits, String field) throws IOException {
         HashMap<String,String> searchResult=new HashMap();
         for(SearchHit hit : searchHits){
@@ -156,12 +157,7 @@ public class Database implements DaoInterface {
 
     //store identified errors back in database
     public void storeErrorLogs(String fileName, SearchHits hits){
-        String errorFile = fileName.concat("errorFile");
-        for(SearchHit hit : hits){
-            String errorJsonString = hit.getSourceAsString();
-            storeLogLine(errorFile, errorJsonString);
-        }
-        logger.info("Error query done successfully");
+        return;
     }
 
     //checks whether index with name fileName already exists in the database;
@@ -186,23 +182,7 @@ public class Database implements DaoInterface {
 
     //Stores the log into the database if an index with name fileName does not exist in the database and returns a string that contains the status of the log string whether the log string was stored in the database or not.
     public String checkAndStoreLog(String fileName, String log) throws IOException {
-        if (FileExists(fileName) == true) {
-            return ("\t\t\t<h2> Sorry! the file already exists</h2>");
-        } 
-        else {
-            String splitString = "\\r?\\n";
-            int LogLineNumber = 1;
-            String logLines[] = log.split(splitString);
-            for (String logLine: logLines) {
-                String logLineNumber = Integer.toString(LogLineNumber);
-                StoreLogs storelog = new StoreLogs();
-                String jsonString = storelog.convertToJsonString(logLine, logLineNumber);
-                storeLogLine(fileName, jsonString, logLineNumber);
-                LogLineNumber++;
-            }
-            return ("\t\t\t<h2> File Stored</h2>");
-
-        }
+        return new String();
     }
     }
 
