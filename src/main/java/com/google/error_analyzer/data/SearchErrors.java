@@ -13,18 +13,19 @@ package com.google.error_analyzer.data;
 // class contains hits of latest full-text search
 import java.util.*;
 public class SearchErrors {
-    private static HashMap <String,String> searchedErrors;
+    // map contains hit id as key and highlighted hit content (content of specified field) as value
+    private static HashMap < String, String > searchedErrors;
 
     public SearchErrors() {
-        if(searchedErrors==null)
-        searchedErrors = new HashMap();
+        if (searchedErrors == null)
+            searchedErrors = new HashMap();
     }
     // method to add hits
-    public HashMap <String,String> getSearchedErrors() {
+    public HashMap < String, String > getSearchedErrors() {
         return searchedErrors;
     }
     // method to fetch hits
-    public void setSearchedErrors(HashMap <String,String> list) {
+    public void setSearchedErrors(HashMap < String, String > list) {
         searchedErrors = list;
 
     }

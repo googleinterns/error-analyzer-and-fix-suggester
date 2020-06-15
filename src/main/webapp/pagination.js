@@ -1,4 +1,4 @@
- let currentPage = 1;
+let currentPage = 1;
 let next = true;
 const fileName = document.getElementById("fileName");
 
@@ -22,8 +22,9 @@ async function changePage(page) {
 
     const logs = document.getElementById("logs");
     const fileType = logs.checked ? "logs" : "errors";
-    if (page < 1 || page == undefined) page = 1;
-
+    if (page < 1 || page == undefined) {
+        page = 1;
+    }
     currentPage = page;
     const params = new URLSearchParams();
     params.append('requestedPage', currentPage);
@@ -39,9 +40,6 @@ async function changePage(page) {
 
     const display = await response.json();
     const lastPage = display.lastPage;
-
-    console.log(lastPage);
-
     show(display, page);
 
     if (lastPage == true)
@@ -55,8 +53,9 @@ async function changePage(page) {
 // search dataBase for the requested string
 async function search() {
     const searchString = document.getElementById("searchBar").value;
-    if (fileName.value == "" || searchString == "")
+    if (fileName.value == "" || searchString == "") {
         return;
+    }
     const params = new URLSearchParams();
     params.append('searchString', searchString);
     params.append('fileName', fileName.value);
