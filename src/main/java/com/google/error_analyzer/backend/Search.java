@@ -19,7 +19,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.search.SearchHit;
@@ -33,6 +34,7 @@ public class Search extends HttpServlet {
 
     public static Database database = new Database();
     private final String field = "name";
+    private static final Logger LOG = LogManager.getLogger(Search.class);
     
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -44,9 +46,16 @@ public class Search extends HttpServlet {
     }
 
     // run full-text search for given string 
-    public HashMap < String, String > searchDataBase(String fileName, String searchString) throws IOException {
-        ArrayList < SearchHit > searchHits = database.fullTextSearch(fileName, searchString, field);
-        return database.getHighLightedText(searchHits, field);
+    public HashMap < String, String > searchDataBase(String fileName, String searchString) {
+        try{
+            ArrayList < SearchHit > searchHits = database.fullTextSearch(fileName, searchString, field);
+            return database.getHighLightedText(searchHits, field);
+        } catch(IOException excep) {
+            String exception = new String("error in interacting with dataBase");
+            exception+=excep;
+            LOG.error(exception);
+        }
+        return new HashMap();
     }
 
 }
