@@ -17,17 +17,20 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/** 
+* This class mocks the BooleanQuery of elasticsearch.
+*/
+
 public class MockErrorQuery {
-    Keywords keyWords = new Keywords();
-    String keyWordsQueryString = keyWords.getQueryString();
-    String[] keyWordsList = keyWordsQueryString.split(" OR ");
-    HashSet<String> keyWordSet = new HashSet<>(Arrays.asList(keyWordsList));
-    RegexExpressions regex = new RegexExpressions();
-    String regexQueryString = regex.getQueryString();
-    String[] regexList = regexQueryString.split(Pattern.quote("|"));
+    private final Keywords keyWords = new Keywords();
+    private final String keyWordsQueryString = keyWords.getQueryString();
+    private final String[] keyWordsList = keyWordsQueryString.split(" OR ");
+    private final HashSet<String> keyWordSet = new HashSet<>(Arrays.asList(keyWordsList));
+    private final RegexExpressions regex = new RegexExpressions();
+    private final String regexQueryString = regex.getQueryString();
+    private final String[] regexList = regexQueryString.split(Pattern.quote("|"));
     
-
-
+    //return true if document contains keyword or matches regex
     public boolean matchesCondition(String dbenntry) {
         String document = dbenntry.toLowerCase().replaceAll("[^a-zA-Z0-9]", " ");
         String[] termsList = document.split(" ");

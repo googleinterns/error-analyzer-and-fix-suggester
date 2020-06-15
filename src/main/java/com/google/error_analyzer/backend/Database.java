@@ -156,23 +156,24 @@ public class Database implements DaoInterface {
         return true;
     };
 
-    //store identified errors back in database
+    //store sorted identified errors back in database
     public void storeErrorLogs(String fileName, SearchHits hits) throws IOException {
         String errorFile = fileName.concat("error");
-        int logLineNumber = 1;
+        int newLogLineNumber = 1;
         ArrayList<String> sortErrorDocuments = sortErrorDocuments(hits);
-        for(String sourceString : sortErrorDocuments){
-            String logLineNumberString = Integer.toString(logLineNumber);
+        for (String sourceString : sortErrorDocuments) {
+            String logLineNumberString = Integer.toString(newLogLineNumber);
             storeLogLine(errorFile, sourceString, logLineNumberString);
-            logLineNumber++;
+            newLogLineNumber++;
         }
         logger.info("Error query done successfully");
     }
     
-    private ArrayList<String> sortErrorDocuments(SearchHits hits){
+    //Sort the searchHits acc to ids (which is also logLineNumber) and return document json strings
+    public ArrayList<String> sortErrorDocuments(SearchHits hits) {
         ArrayList<Integer> searchHitIds = new ArrayList<>();
         HashMap<Integer, String> hitsHashMap = new HashMap();
-        for(SearchHit hit : hits){
+        for (SearchHit hit : hits) {
             Integer id = Integer.parseInt(hit.getId());
             searchHitIds.add(id);
             String jsonDocument = hit.getSourceAsString();
@@ -180,13 +181,13 @@ public class Database implements DaoInterface {
         }
         Collections.sort(searchHitIds);
         ArrayList<String> sortedSourceStrings = new ArrayList();
-        for(Integer id : searchHitIds){
+        for (Integer id : searchHitIds) {
             String errorJsonString = hitsHashMap.get(id);
             sortedSourceStrings.add(errorJsonString);
         }
         return sortedSourceStrings;
-
     }
+    
     //checks whether index with name fileName already exists in the database;
     public boolean FileExists(String fileName) throws IOException {
         GetIndexRequest getIndexRequest = new GetIndexRequest();
