@@ -13,90 +13,20 @@
 // limitations under the License.
 
 package com.google.error_analyzer.data;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-import java.io.IOException;
-import org.elasticsearch.ElasticsearchException;;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
-import org.elasticsearch.client.RestHighLevelClient;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.*;
-import javax.servlet.http.*;
-import javax.servlet.ServletException;
 
 public class StoreLogs {
 
-    public void checkAndStorePlainText(HttpServletRequest request, HttpServletResponse response,
-     RestHighLevelClient client, String fileName, String log) throws IOException, ServletException {
-
-        if (FileExists(fileName, client) == true) {
-            response.getWriter().print("\t\t\t<h2> Sorry! the file already exists</h2>");
-            RequestDispatcher rd = request.getRequestDispatcher("/index.html");
-            rd.include(request, response);
-        } 
-        else {
-            StorePlainText(client, fileName, log);
-            response.getWriter().print("\t\t\t<h2> File Stored</h2>");
-            RequestDispatcher rd = request.getRequestDispatcher("/index.html");
-            rd.include(request, response);
-        }
-    }
-
-
-    public void StorePlainText(RestHighLevelClient client, String fileName, String log) 
-    throws IOException {
-
-        String splitString = "\\r?\\n";
-        int LogLineNumber = 1;
-        String logLines[] = log.split(splitString);
-        for (String logLine: logLines) {
-
-            String logLineNumber = Integer.toString(LogLineNumber);
-
-            String jsonString = convertToJsonString(logLine, logLineNumber);
-            StoreLog(client, fileName, jsonString);
-            LogLineNumber++;
-
-        }
-
-    }
-
+    private static final Logger LOG = LogManager.getLogger(StoreLogs.class);
 
     public String convertToJsonString(String logText, String logLineNumber) {
-
+        logText=logText.replaceAll("[^a-zA-Z0-9:\"]", " ");
+        logText=logText.replaceAll("\"","\'");
         String jsonString = String.format("{\"logLineNumber\":\"%1$s\"," +
-            "\"logText\":\"%2$s\" }", logLineNumber, logText);
+            "\"logText\":\"%2$s\"}", logLineNumber, logText);
         return jsonString;
     }
-
-
-
-    public void StoreLog(RestHighLevelClient client, String Filename, String jsonString) throws IOException {
-
-        IndexRequest indexRequest = new IndexRequest(Filename);
-        indexRequest.source(jsonString, XContentType.JSON);
-        IndexResponse indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
-    }
-
-
-    public boolean FileExists(String fileName, RestHighLevelClient client) throws IOException {
-
-        GetIndexRequest getIndexRequest = new GetIndexRequest();
-        getIndexRequest.indices(fileName);
-        boolean indexExists = client.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
-        return indexExists;
-    }
-
 
 }
