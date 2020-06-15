@@ -20,6 +20,8 @@ import com.google.error_analyzer.data.RegexExpressions;
 import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Collections;
 import java.io.IOException;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.search.SearchHit;
@@ -47,7 +49,7 @@ public class BooleanQuery {
     //returns an Errorline object array as a json string. 
     public String getErrorsAsString(String indexFile, RestHighLevelClient client){
         try{
-            ArrayList<ErrorLine> errorData = getErrors(indexFile,client);
+            ArrayList<String> errorData = sortSearchhits(indexFile,client);
             Gson gson = new Gson();
             String json = gson.toJson(errorData);
             return json;
@@ -89,6 +91,23 @@ public class BooleanQuery {
         return hits;
     }
 
+    private ArrayList<String> sortSearchhits (String indexFile, RestHighLevelClient client) throws IOException {
+        SearchHits hits = getQueryHits(indexFile,client);
+        ArrayList<Integer> searchHitIds = new ArrayList<>();
+        HashMap<Integer, String> hitsHashMap = new HashMap();
+        for(SearchHit hit : hits){
+            Integer id = Integer.parseInt(hit.getId());
+            searchHitIds.add(id);
+            String jsonDocument = hit.getSourceAsString();
+            hitsHashMap.put(id, jsonDocument);
+        }
+        ArrayList<String> sourceStrings = new ArrayList();
+        Collections.sort(searchHitIds);
+        for(Integer id : searchHitIds){
+            sourceStrings.add(hitsHashMap.get(id));
+        }
+        return sourceStrings;
+    }
     // return log text from a hit.
     private String extractLogText(SearchHit hit){
         String sourceAsString = hit.getSourceAsString();
