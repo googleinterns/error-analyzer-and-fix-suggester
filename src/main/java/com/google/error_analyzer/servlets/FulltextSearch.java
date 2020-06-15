@@ -41,23 +41,29 @@ public class FulltextSearch extends HttpServlet {
 
     private String indexFile = "trial_index"; //later fetched from request
     private static final Logger logger = LogManager.getLogger(FulltextSearch.class);
-    RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
-    
+    RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
+    FulltextSearchQuery searchQuery = new FulltextSearchQuery();
+
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         try{
-            FulltextSearchQuery searchQuery = new FulltextSearchQuery();
             ArrayList<ErrorLine> errorData = searchQuery.getErrors(indexFile, client);
             Gson gson = new Gson();
             String json = gson.toJson(errorData);
             response.getWriter().println(json);
-        } catch (Exception e) {
+        } catch (IOException e) {
             String errorMsg = "Could not connect to server: ";
             errorMsg.concat(e.toString()); 
             logger.error(errorMsg);
             response.getWriter().println("Could not connect to database." );
-        }
+        } catch (Exception e1) {
+            //catch any other exception
+            String errorMsg = "Could not complete query request: ";
+            errorMsg.concat(e.toString()); 
+            logger.error(errorMsg);
+            response.getWriter().println(errorMsg);
+        } 
         
     }
 }

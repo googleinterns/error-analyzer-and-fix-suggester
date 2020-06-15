@@ -38,7 +38,7 @@ public final class FulltextSearchQueryTest{
     RestHighLevelClient client;
     @Before
     public void setUp() {
-        client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
+        client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
     }
 
     @Test
