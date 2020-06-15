@@ -152,24 +152,41 @@ public class Database implements DaoInterface {
         searchRequest.source(searchSourceBuilder); 
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
         SearchHits hits = searchResponse.getHits();
-
         storeErrorLogs(fileName, hits);
         return true;
     };
 
     //store identified errors back in database
     public void storeErrorLogs(String fileName, SearchHits hits) throws IOException {
-        String errorFile = fileName.concat("errors");
+        String errorFile = fileName.concat("error");
         int logLineNumber = 1;
-        for(SearchHit hit : hits){
+        ArrayList<String> sortErrorDocuments = sortErrorDocuments(hits);
+        for(String sourceString : sortErrorDocuments){
             String logLineNumberString = Integer.toString(logLineNumber);
-            String errorJsonString = hit.getSourceAsString();
-            storeLogLine(errorFile, errorJsonString, logLineNumberString);
+            storeLogLine(errorFile, sourceString, logLineNumberString);
             logLineNumber++;
         }
         logger.info("Error query done successfully");
     }
+    
+    private ArrayList<String> sortErrorDocuments(SearchHits hits){
+        ArrayList<Integer> searchHitIds = new ArrayList<>();
+        HashMap<Integer, String> hitsHashMap = new HashMap();
+        for(SearchHit hit : hits){
+            Integer id = Integer.parseInt(hit.getId());
+            searchHitIds.add(id);
+            String jsonDocument = hit.getSourceAsString();
+            hitsHashMap.put(id, jsonDocument);
+        }
+        Collections.sort(searchHitIds);
+        ArrayList<String> sortedSourceStrings = new ArrayList();
+        for(Integer id : searchHitIds){
+            String errorJsonString = hitsHashMap.get(id);
+            sortedSourceStrings.add(errorJsonString);
+        }
+        return sortedSourceStrings;
 
+    }
     //checks whether index with name fileName already exists in the database;
     public boolean FileExists(String fileName) throws IOException {
         GetIndexRequest getIndexRequest = new GetIndexRequest();

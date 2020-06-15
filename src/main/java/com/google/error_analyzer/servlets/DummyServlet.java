@@ -14,7 +14,7 @@
 
 package com.google.error_analyzer.servlets;
 
-import com.google.error_analyzer.backend.MockDatabase;
+import com.google.error_analyzer.backend.Database;
 import com.google.gson.Gson;
 import java.util.*;
 import java.lang.*;
@@ -39,13 +39,13 @@ public class DummyServlet extends HttpServlet {
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         try{
-            MockDatabase searchQuery = new MockDatabase();
+            Database searchQuery = new Database();
             searchQuery.errorQuery(indexFile);
             response.setContentType("application/json");
-            ArrayList<String> errorData = searchQuery.errorDatabase;
-            Gson gson = new Gson();
-            String json = gson.toJson(errorData);
-            response.getWriter().println(errorData);
+            // ArrayList<String> errorData = searchQuery.errorDatabase;
+            // Gson gson = new Gson();
+            // String json = gson.toJson(errorData);
+            // response.getWriter().println(errorData);
         }catch(Exception e){
             logger.error("Could not connect to server." + e);
             response.getWriter().println("Could not connect to database." );
