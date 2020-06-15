@@ -12,6 +12,7 @@ limitations under the License.*/
 package com.google.error_analyzer.backend;
 
 import com.google.error_analyzer.backend.StoreLogs;
+import com.google.error_analyzer.backend.BooleanQuery;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.http.HttpHost;
@@ -41,8 +42,6 @@ import org.elasticsearch.ElasticsearchException;;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.common.xcontent.XContentType;
-
-
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import com.google.error_analyzer.data.Keywords;
 import com.google.error_analyzer.data.RegexExpressions;
@@ -55,7 +54,6 @@ public class Database implements DaoInterface {
     private static final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     private final int windowSize=10;
     private static final Logger logger = LogManager.getLogger(Database.class);
-    private final String logTextField = "logText";
 
     //search db using keywords and return searchHits having highlight field added 
     public ArrayList < SearchHit > fullTextSearch(String fileName, String searchString, String field) throws IOException {
@@ -137,19 +135,8 @@ public class Database implements DaoInterface {
 
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
     public boolean errorQuery(String fileName) throws IOException {
-        SearchRequest searchRequest = new SearchRequest(fileName);
-        Keywords errorKeywords = new Keywords();
-        RegexExpressions regexExpressions = new RegexExpressions();
-        String regexQueryString = regexExpressions.getQueryString();
-        RegexpQueryBuilder regexQuery = new RegexpQueryBuilder(logTextField,regexQueryString);
-        String keywordsQueryString = errorKeywords.getQueryString();
-        QueryBuilder fulltextQuery = QueryBuilders.matchQuery(logTextField, keywordsQueryString);
-        QueryBuilder errorQuery = new BoolQueryBuilder()
-            .minimumShouldMatch(1)
-            .should(regexQuery)
-            .should(fulltextQuery);
-        searchSourceBuilder.query(errorQuery); 
-        searchRequest.source(searchSourceBuilder); 
+        BooleanQuery booleanQuery = new BooleanQuery();
+        SearchRequest searchRequest = booleanQuery.createSearchRequest(fileName);
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
         SearchHits hits = searchResponse.getHits();
         storeErrorLogs(fileName, hits);
@@ -160,32 +147,14 @@ public class Database implements DaoInterface {
     public void storeErrorLogs(String fileName, SearchHits hits) throws IOException {
         String errorFile = fileName.concat("error");
         int newLogLineNumber = 1;
-        ArrayList<String> sortErrorDocuments = sortErrorDocuments(hits);
+        BooleanQuery booleanQuery = new BooleanQuery();
+        ArrayList<String> sortErrorDocuments = booleanQuery.sortErrorDocuments(hits);
         for (String sourceString : sortErrorDocuments) {
             String logLineNumberString = Integer.toString(newLogLineNumber);
             storeLogLine(errorFile, sourceString, logLineNumberString);
             newLogLineNumber++;
         }
         logger.info("Error query done successfully");
-    }
-    
-    //Sort the searchHits acc to ids (which is also logLineNumber) and return document json strings
-    public ArrayList<String> sortErrorDocuments(SearchHits hits) {
-        ArrayList<Integer> searchHitIds = new ArrayList<>();
-        HashMap<Integer, String> hitsHashMap = new HashMap();
-        for (SearchHit hit : hits) {
-            Integer id = Integer.parseInt(hit.getId());
-            searchHitIds.add(id);
-            String jsonDocument = hit.getSourceAsString();
-            hitsHashMap.put(id, jsonDocument);
-        }
-        Collections.sort(searchHitIds);
-        ArrayList<String> sortedSourceStrings = new ArrayList();
-        for (Integer id : searchHitIds) {
-            String errorJsonString = hitsHashMap.get(id);
-            sortedSourceStrings.add(errorJsonString);
-        }
-        return sortedSourceStrings;
     }
     
     //checks whether index with name fileName already exists in the database;
