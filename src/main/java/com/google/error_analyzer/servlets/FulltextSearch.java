@@ -60,7 +60,7 @@ public class FulltextSearch extends HttpServlet {
         } catch (Exception e1) {
             //catch any other exception
             String errorMsg = "Could not complete query request: ";
-            errorMsg.concat(e.toString()); 
+            errorMsg.concat(e1.toString()); 
             logger.error(errorMsg);
             response.getWriter().println(errorMsg);
         } 
