@@ -207,25 +207,5 @@ public class Database implements DaoInterface {
         return getResponse.getSourceAsString();
     }
 
-    //Stores the log into the database if an index with name fileName does not exist in the database and returns a string that contains the status of the log string whether the log string was stored in the database or not.
-    public String checkAndStoreLog(String fileName, String log) throws IOException {
-        if (FileExists(fileName) == true) {
-            return ("\t\t\t<h2> Sorry! the file already exists</h2>");
-        } 
-        else {
-            String splitString = "\\r?\\n";
-            int LogLineNumber = 1;
-            String logLines[] = log.split(splitString);
-            for (String logLine: logLines) {
-                String logLineNumber = Integer.toString(LogLineNumber);
-                StoreLogs storelog = new StoreLogs();
-                String jsonString = storelog.convertToJsonString(logLine, logLineNumber);
-                storeLogLine(fileName, jsonString, logLineNumber);
-                LogLineNumber++;
-            }
-            return ("\t\t\t<h2> File Stored</h2>");
-
-        }
-    }
     }
 

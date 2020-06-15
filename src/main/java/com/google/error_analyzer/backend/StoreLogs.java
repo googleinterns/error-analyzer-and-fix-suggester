@@ -13,13 +13,14 @@
 // limitations under the License.
 
 package com.google.error_analyzer.backend;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
+import java.io.IOException;
 
 public class StoreLogs {
-
-    private static final Logger LOG = LogManager.getLogger(StoreLogs.class);
+    
+    public static Database database = new Database();
 
     public String convertToJsonString(String logText, String logLineNumber) {
         logText=logText.replaceAll("[^a-zA-Z0-9:\"]", " ");
@@ -29,4 +30,24 @@ public class StoreLogs {
         return jsonString;
     }
 
+    //Stores the log into the database if an index with name fileName does not exist in the database and returns a string that contains the status of the log string whether the log string was stored in the database or not.
+    public String checkAndStoreLog(String fileName, String log) throws IOException {
+        if (database.FileExists(fileName) == true) {
+            return ();
+        } 
+        else {
+            String splitString = "\\r?\\n";
+            int LogLineNumber = 1;
+            String logLines[] = log.split(splitString);
+            for (String logLine: logLines) {
+                String logLineNumber = Integer.toString(LogLineNumber);
+                String jsonString = convertToJsonString(logLine, logLineNumber);
+                database.storeLogLine(fileName, jsonString, logLineNumber);
+                LogLineNumber++;
+            }
+            return ("\t\t\t<h2> File Stored</h2>");
+
+        }
+    }
+    
 }

@@ -17,11 +17,14 @@ import java.util.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import com.google.error_analyzer.backend.MockErrorQuery;
+import com.google.error_analyzer.data.Document;
+import com.google.error_analyzer.data.Index;
 
 public class MockDatabase implements DaoInterface {
     private final String[] database = new String[] {"Error: nullPointerException", "info: start appengine","scheduler shutting down",
      "WARNING: An illegal reflective access operation has occurred", "Severe: Could not find index file", "warning: NullPointerException"};
     public ArrayList<String> errorDatabase;
+    private ArrayList<Index> LogDatabase=new ArrayList<Index>();
 
     //search db using keywords and return searchHits having highlight field added 
     public ArrayList<SearchHit> fullTextSearch(String fileName, String searchString, String field) throws IOException {
@@ -119,18 +122,34 @@ public class MockDatabase implements DaoInterface {
 
     //checks whether index with name fileName already exists in the database;
     public boolean FileExists(String fileName) {
-        return true;
-    };
+        Iterator<Index> iter = LogDatabase.iterator();
+        while (iter.hasNext()) { 
+            if(fileName.equals((iter.next()).getIndexName())){
+                return true;
+            }
+        }
+        return false;
+    }
 
 
     //Stores the jsonString at index with name filename and returns the logText of the document stored
-    public String storeLogLine(String filename, String jsonString, String Id) {
-        return new String();
-    };
+    public String storeLogLine(String fileName, String jsonString, String Id) {
+        String result = new String();
+        Index index=new Index();
+        index.setIndexName(fileName);
+        Document document = new Document (Id, jsonString);
+        index.addDocument(document);
+        LogDatabase.add(index);
+        ArrayList <Document> DocList = index.getDocumentList();
+        Iterator<Document> it = DocList.iterator();
+            while (it.hasNext()){
+                Document doc = it.next();
+                if(Id.equals(doc.getID())){
+                    result = doc.getJsonString();
+                }
+            }
+        return result;
+    }
 
-    //Stores the log into the database if an index with name fileName does not exist in the database and returns a string that contains the status of the log string whether the log string was stored in the database or not.
-    public String checkAndStoreLog(String fileName, String log) {
-        return new String();
-    };
 
 }
