@@ -28,7 +28,7 @@ input[name="log"]{
 
 
 
-input[name="filebutton"]{
+input[name="filebutton"],input[name="urlbutton"]{
   background-color: #4CAF50;
   border: none;
   color:  white;
@@ -36,6 +36,31 @@ input[name="filebutton"]{
   text-decoration: none;
   margin: 2px 1px;
   cursor: pointer;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  color: #fff;
+  text-align: center;
+  color: red;
+  background-color: white;
+  border-radius: 4px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
 }
 
 body
@@ -53,8 +78,21 @@ h2 {
   color: red;
 }
 
+h5 {
+  color: red;
+}
+
 h4 {
   text-align: center;
   color: white;
 }
 
+ input[name="resultbutton"] {
+  background-color: #4CAF50;;
+  border: none;
+  color: white;
+  padding: 16px 32px;
+  text-decoration: none;
+  margin: 6px 3px;
+  cursor: pointer;
+}
