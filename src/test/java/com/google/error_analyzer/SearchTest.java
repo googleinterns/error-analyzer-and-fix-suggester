@@ -28,6 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.*;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Mockito.*;
@@ -37,6 +38,8 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.mockito.InjectMocks;
+import org.springframework.test.util.ReflectionTestUtils;
+import java.lang.reflect.Method;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -59,21 +62,26 @@ public final class SearchTest {
     @Before
     public void setUp() {
         search = new Search();
-        search.database = database;
+        ReflectionTestUtils.setField(search, "database", database);
         mockdb = new MockDatabase();
     }
 
     // maintaining window of given length
     @Test
-    public void fullTextSearch() throws IOException {
+    public void fullTextSearch() throws Exception {
         ArrayList < SearchHit > searchHits = mockdb.fullTextSearch(fileName, searchString, field);
         HashMap < String, String > highlights = mockdb.getHighLightedText(searchHits, field);
         when(database.fullTextSearch(fileName, searchString, field)).thenReturn(searchHits);
         when(database.getHighLightedText(searchHits, field)).thenReturn(highlights);
-        HashMap < String, String > actual = search.searchDataBase(fileName, searchString);
+        HashMap < String, String > actual =(HashMap<String,String>)(getPrivateMethodSearchDataBase());
         HashMap < String, String > expected = new HashMap();
         expected.put("1", "info: start appengine");
         expected.put("2", "scheduler shutting down");
         Assert.assertTrue(expected.equals(actual));
+    }
+    public Object getPrivateMethodSearchDataBase() throws Exception  {
+        Method m = Search.class.getDeclaredMethod("searchDataBase",new Class[]{String.class, String.class}); 
+        m.setAccessible(true); 
+        return m.invoke(search,fileName,searchString);
     }
 }

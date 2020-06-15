@@ -32,7 +32,7 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 
 public class Search extends HttpServlet {
 
-    public static Database database = new Database();
+    private static Database database = new Database();
     private final String field = "name";
     private static final Logger LOG = LogManager.getLogger(Search.class);
     
@@ -46,7 +46,7 @@ public class Search extends HttpServlet {
     }
 
     // run full-text search for given string 
-    public HashMap < String, String > searchDataBase(String fileName, String searchString) {
+    private HashMap < String, String > searchDataBase(String fileName, String searchString) {
         try{
             ArrayList < SearchHit > searchHits = database.fullTextSearch(fileName, searchString, field);
             return database.getHighLightedText(searchHits, field);
