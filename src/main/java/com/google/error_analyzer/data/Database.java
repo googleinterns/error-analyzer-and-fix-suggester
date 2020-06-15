@@ -26,19 +26,23 @@ import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.RestClient;
 import org.apache.http.HttpHost;
-import  org.elasticsearch.action.get.GetResponse;
-import  org.elasticsearch.action.get.GetRequest;
+import org.elasticsearch.action.get.GetResponse;
+import org.elasticsearch.action.get.GetRequest;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class Database{
-    private static final String HOSTNAME ="localhost";
+/*This class contains the methods that are making a call to elasticsearch 
+to store the logs to elasticsearch*/
+
+
+public class Database {
+
+    private static final String HOSTNAME = "35.194.181.238";
     private static final int PORT = 9200;
     private static final String SCHEME = "http";
     private RestHighLevelClient client = new RestHighLevelClient(
-            RestClient.builder(new HttpHost(HOSTNAME, PORT, SCHEME)));
-    private static final Logger logger = LogManager.getLogger(Database.class);
-             
+        RestClient.builder(new HttpHost(HOSTNAME, PORT, SCHEME)));
+
 
     //checks whether index with name fileName already exists in the database;
     public boolean FileExists(String fileName) throws IOException {
@@ -49,40 +53,16 @@ public class Database{
     }
 
 
-    //Stores the jsonString at index with name filename and returns the logText of the document stored
-    public String storeLogLine(String Filename, String jsonString,String Id) throws IOException {
-        IndexRequest indexRequest = new IndexRequest(Filename);
-        indexRequest.id(Id); 
+    //Stores the jsonString at index with name filename and returns the stored string
+    public String storeLogLine(String filename, String jsonString, String Id) throws IOException {
+        IndexRequest indexRequest = new IndexRequest(filename);
+        indexRequest.id(Id);
         indexRequest.source(jsonString, XContentType.JSON);
-        IndexResponse indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
-        GetRequest getRequest = new GetRequest(Filename, Id); 
+        client.index(indexRequest, RequestOptions.DEFAULT);
+        GetRequest getRequest = new GetRequest(filename, Id);
         GetResponse getResponse = client.get(getRequest, RequestOptions.DEFAULT);
         return getResponse.getSourceAsString();
     }
 
-    //Stores the log into the database if an index with name fileName does not exist in the database and returns a string that contains the status of the log string whether the log string was stored in the database or not.
-    public String checkAndStoreLog(String fileName, String log) throws IOException {
-        if (FileExists(fileName) == true) {
-            logger.info("File already exists");
-            return ("\t\t\t<h2> Sorry! the file already exists</h2>");
-        } 
-        else {
-            String splitString = "\\r?\\n";
-            int LogLineNumber = 1;
-            String logLines[] = log.split(splitString);
-            for (String logLine: logLines) {
-                if(!(logLine.equals(""))){
-                String logLineNumber = Integer.toString(LogLineNumber);
-                StoreLogs storelog = new StoreLogs();
-                String jsonString = storelog.convertToJsonString(logLine, logLineNumber);
-                storeLogLine(fileName, jsonString, logLineNumber);
-                LogLineNumber++;}
-            }
-            logger.info("File Stored");
-            return ("\t\t\t<h2> File Stored</h2>");
 
-        }
-
-
-    }
-    }
+}
