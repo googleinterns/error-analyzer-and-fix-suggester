@@ -11,7 +11,7 @@
 
 package com.google.error_analyzer.backend;
 
-import com.google.error_analyzer.data.Database;
+import com.google.error_analyzer.data.StoreLogs;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.action.ActionListener;
 import org.apache.http.HttpHost;
@@ -34,24 +34,26 @@ import javax.servlet.http.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@WebServlet("/textServlet")
+
+/*This class is for storing the logs entered by the user as 
+plain text to the database*/
+
+@WebServlet("/StorePlainTextLogServlet")
 public class TextServlet extends HttpServlet {
-  
-    private static final Logger logger = LogManager.getLogger(textServlet.class);  
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response)
-    throws IOException ,ServletException{
+    throws IOException, ServletException {
 
         response.setContentType("text/html;");
-        String logText = "Log";
+        final String logText = "Log";
         String log = request.getParameter(logText);
-        String Filename="filename";
-        String fileName= request.getParameter(Filename);
-        Database storeLog=new Database();
-        String  status=storeLog.checkAndStoreLog(fileName,log);
+        final String filename = "filename";
+        String fileName = request.getParameter(filename);
+        StoreLogs storeLog = new StoreLogs();
+        String status = storeLog.checkAndStoreLog(fileName, log);
         response.getWriter().println(status);
         RequestDispatcher requestDispatcher = request.getRequestDispatcher("/index.html");
         requestDispatcher.include(request, response);
-     }
+    }
 }
