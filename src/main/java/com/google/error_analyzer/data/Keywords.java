@@ -21,9 +21,9 @@ import java.util.ArrayList;
 * A log line will apear in search hits if one or more of these terms appear in it.
 */
 
-public class Keywords{
+public class Keywords {
     
-    private ArrayList<String> createList(){
+    private ArrayList<String> createList() {
         ArrayList<String> keywordsList = new ArrayList<String>();
         keywordsList.add("error");
         keywordsList.add("fatal");
@@ -34,13 +34,13 @@ public class Keywords{
     }
 
     //returns kewords as a single string combined together in OR logic.
-    public String getQueryString(){
+    public String getQueryString() {
         ArrayList<String> keywordsList = createList();
         String queryString = "";
-        for(String keyword : keywordsList){
-            if(queryString.length() == 0){
+        for (String keyword : keywordsList) {
+            if (queryString.length() == 0){
                 queryString = queryString.concat(keyword);
-            }else{
+            } else {
                 queryString = queryString.concat(" OR " + keyword);
             }
         }

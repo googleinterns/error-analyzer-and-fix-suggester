@@ -18,11 +18,11 @@ package com.google.error_analyzer.data;
 * Search hits will be converted to ErrorLine objects and used further to strore in result index.
 */
 
-public class ErrorLine{
+public class ErrorLine {
 
     private String logText;
     private int logLineNumber;
-    public ErrorLine (String log_text, int logLineNumber){
+    public ErrorLine (String log_text, int logLineNumber) {
         this.logText = log_text;
         this.logLineNumber = logLineNumber;
     } 

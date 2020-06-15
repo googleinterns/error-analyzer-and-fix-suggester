@@ -45,7 +45,7 @@ public void keywordSearchQuery(){
     FulltextSearchQuery searchQuery = new FulltextSearchQuery();
     String actual = searchQuery.getErrorsAsString(indexFile, client);
 
-    String expected = "[{\"logText\":\"ERROR c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":90},{\"logText\":\"ERROR c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":3},{\"logText\":\"ERROR: c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":23}]";
+    String expected = "[{\"logText\":\"ERROR c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":2}]";
     Assert.assertEquals(expected, actual);
 }
 

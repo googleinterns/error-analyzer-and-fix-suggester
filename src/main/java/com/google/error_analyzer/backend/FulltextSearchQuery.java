@@ -50,29 +50,31 @@ public class FulltextSearchQuery {
     private String logLineNumberField = "logLineNumber"; //subject to field name in the document used while storing.
 
     //returns an Errorline object array as a json string. 
-    public String getErrorsAsString(String indexFile, RestHighLevelClient client){
-        try{
-            ArrayList<ErrorLine> errorData = getErrors(indexFile,client);
+    public String getErrorsAsString (String indexFile, RestHighLevelClient client) {
+        try {
+            ArrayList<ErrorLine> errorData = getErrors(indexFile, client);
             Gson gson = new Gson();
             String json = gson.toJson(errorData);
             return json;
-        }catch(IOException e){
-            logger.error("Could not complete query request: "+e);
+        } catch (IOException e) {
+            String errorMsg = "Could not complete query request:";
+            errorMsg = errorMsg.concat(e.toString()); 
+            logger.error(errorMsg);
             return "Could not complete request.";
         }
 
     }
 
     //returns all search hits as Errorline object array
-    public ArrayList<ErrorLine> getErrors(String indexFile, RestHighLevelClient client) throws IOException{
+    public ArrayList<ErrorLine> getErrors(String indexFile, RestHighLevelClient client) throws IOException {
         ArrayList<ErrorLine> errorData = new ArrayList<>();
-        SearchHits hits = getQueryHits(indexFile,client);
+        SearchHits hits = getQueryHits(indexFile, client);
         errorData = getLogData(hits);
         return errorData;
     }
 
     //Make the search request and  return Search hits from match query.
-    private SearchHits getQueryHits(String indexFile, RestHighLevelClient client) throws IOException{
+    private SearchHits getQueryHits(String indexFile, RestHighLevelClient client) throws IOException {
         SearchRequest searchRequest = new SearchRequest(indexFile);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder(); 
 
@@ -80,7 +82,7 @@ public class FulltextSearchQuery {
         Keywords errorKeywords = new Keywords();
         searchSourceBuilder.query(
             QueryBuilders.matchQuery(
-                logTextField, errorKeywords.getQueryString() )); 
+                logTextField, errorKeywords.getQueryString())); 
         searchRequest.source(searchSourceBuilder); 
 
         SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
@@ -89,39 +91,42 @@ public class FulltextSearchQuery {
     }
 
     // return log text from a hit.
-    private String extractLogText(SearchHit hit){
-        String sourceAsString = hit.getSourceAsString();
+    private String extractLogText(SearchHit hit) {
         Map<String, Object> sourceAsMap = hit.getSourceAsMap();
         return (String) sourceAsMap.get(logTextField);
     }
 
     // return log line number from a hit 
-    private int extractLogLineNumber(SearchHit hit){
-        String sourceAsString = hit.getSourceAsString();
+    private int extractLogLineNumber(SearchHit hit) { 
         Map<String, Object> sourceAsMap = hit.getSourceAsMap();
         //subject to the format logLineNumber is stored in index, string or integer.
         try{
             int lineNumber = Integer.parseInt((String) sourceAsMap.get(logLineNumberField));
-            logger.info("Integer.parseInt successfully = " + lineNumber);
+            String loggerInfo = "Integer.parseInt successfully = ";
+            loggerInfo.concat(Integer.toString(lineNumber)); 
+            logger.info(loggerInfo);
             return lineNumber;
-        }catch(NumberFormatException e){
-            logger.error("Integer.parseInt error: " + e);
+        } catch (NumberFormatException e) {
+            String errorMsg = "Integer.parseInt error: ";
+            errorMsg.concat(e.toString());
+            logger.error(errorMsg);
             return -1;
-        }catch(NullPointerException e2){
-            logger.error("Null error: " + e2);
+        } catch (NullPointerException e2) {
+            String errorMsg = "Integer.parseInt error: ";
+            errorMsg.concat(e2.toString());
+            logger.error(errorMsg);
             return -1;
         }
     }
     
     //Create Errorline array from search hits.
-    private ArrayList<ErrorLine> getLogData(SearchHits hits){
-
+    private ArrayList<ErrorLine> getLogData(SearchHits hits) {
         ArrayList<ErrorLine> errorMsgs = new ArrayList<>();
-        for (SearchHit hit : hits){
+        for (SearchHit hit : hits) {
             int lineNumber = extractLogLineNumber(hit);
-            if( lineNumber != -1){
-                errorMsgs.add(new ErrorLine( extractLogText(hit),lineNumber) );
-            }else{
+            if ( lineNumber != -1) {
+                errorMsgs.add(new ErrorLine( extractLogText(hit), lineNumber));
+            } else {
                 logger.error("Could process log line.");
             }
         }

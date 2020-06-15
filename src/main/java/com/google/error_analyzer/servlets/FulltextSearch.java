@@ -49,8 +49,10 @@ public class FulltextSearch extends HttpServlet {
             FulltextSearchQuery searchQuery = new FulltextSearchQuery();
             String errorData = searchQuery.getErrorsAsString(indexFile, client);
             response.getWriter().println(errorData);
-        }catch(Exception e){
-            logger.error("Could not connect to server: " + e);
+        } catch (Exception e) {
+            String errorMsg = "Could not connect to server: ";
+            errorMsg.concat(e.toString()); 
+            logger.error(errorMsg);
             response.getWriter().println("Could not connect to database." );
         }
         
