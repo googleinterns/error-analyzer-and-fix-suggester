@@ -14,6 +14,7 @@ import com.google.gson.Gson;
 import java.util.*;
 import java.lang.*;
 import com.google.error_analyzer.data.SearchErrors;
+import com.google.error_analyzer.data.ErrorFixes;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -129,15 +130,24 @@ public class Pagination extends HttpServlet {
 
     // add fetched results to data and apply search results and error-fixes if applicable
     private void addFetchResultToData(int startIdx, String fileType, ArrayList < String > hitIds, ArrayList < String > hitFieldContent, HashMap < String, String > search) throws IOException {
+        ErrorFixes errorFix=new ErrorFixes();
         int i = startIdx;
         int len = hitIds.size();
         for (int idx = 0; idx < len; idx++) {
             String id = hitIds.get(idx);
             String resultString = hitFieldContent.get(idx);
+            String fix=new String();
 
+            if(fileType.equals(ERROR))
+                fix = errorFix.findFixes(resultString);
+           
             if (search.containsKey(id)) {
                 resultString = search.get(id);
             }
+
+            // append fix to the error string 
+            resultString+=fix;
+
             if (i >= data.size())
                 data.add(resultString);
             else
