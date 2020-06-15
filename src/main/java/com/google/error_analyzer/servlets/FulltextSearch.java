@@ -29,6 +29,7 @@ import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import java.util.ArrayList;
 
 /**
 * This class contains all the keywords used in fulltext query.
@@ -40,15 +41,17 @@ public class FulltextSearch extends HttpServlet {
 
     private String indexFile = "trial_index"; //later fetched from request
     private static final Logger logger = LogManager.getLogger(FulltextSearch.class);
-    RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
+    RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
     
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         try{
             FulltextSearchQuery searchQuery = new FulltextSearchQuery();
-            String errorData = searchQuery.getErrorsAsString(indexFile, client);
-            response.getWriter().println(errorData);
+            ArrayList<ErrorLine> errorData = searchQuery.getErrors(indexFile, client);
+            Gson gson = new Gson();
+            String json = gson.toJson(errorData);
+            response.getWriter().println(json);
         } catch (Exception e) {
             String errorMsg = "Could not connect to server: ";
             errorMsg.concat(e.toString()); 

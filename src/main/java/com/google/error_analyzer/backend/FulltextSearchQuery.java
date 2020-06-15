@@ -49,22 +49,6 @@ public class FulltextSearchQuery {
     private String logTextField = "logText"; //subject to field name in the document used while storing.
     private String logLineNumberField = "logLineNumber"; //subject to field name in the document used while storing.
 
-    //returns an Errorline object array as a json string. 
-    public String getErrorsAsString (String indexFile, RestHighLevelClient client) {
-        try {
-            ArrayList<ErrorLine> errorData = getErrors(indexFile, client);
-            Gson gson = new Gson();
-            String json = gson.toJson(errorData);
-            return json;
-        } catch (IOException e) {
-            String errorMsg = "Could not complete query request:";
-            errorMsg = errorMsg.concat(e.toString()); 
-            logger.error(errorMsg);
-            return "Could not complete request.";
-        }
-
-    }
-
     //returns all search hits as Errorline object array
     public ArrayList<ErrorLine> getErrors(String indexFile, RestHighLevelClient client) throws IOException {
         ArrayList<ErrorLine> errorData = new ArrayList<>();

@@ -13,6 +13,9 @@
 // limitations under the License.
 
 package com.google.error_analyzer.data;
+import java.util.Comparator;
+import java.util.*;
+import java.lang.Object;
 
 /**
 * Search hits will be converted to ErrorLine objects and used further to strore in result index.
@@ -26,5 +29,9 @@ public class ErrorLine {
         this.logText = log_text;
         this.logLineNumber = logLineNumber;
     } 
-    
+
+    public boolean equals(ErrorLine other) {
+        return (other.logText.equals(this.logText) && (other.logLineNumber == this.logLineNumber)) ;
+    }
+
 }

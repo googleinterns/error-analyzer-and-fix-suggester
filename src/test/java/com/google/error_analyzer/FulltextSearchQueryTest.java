@@ -25,6 +25,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import java.io.IOException;
+import java.util.ArrayList;
 
 /**
 * Class to test fulltext search query. Mock object for ES to br created later.
@@ -36,18 +38,20 @@ public final class FulltextSearchQueryTest{
     RestHighLevelClient client;
     @Before
     public void setUp() {
-        client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
+        client = new RestHighLevelClient(RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
     }
 
-@Test
-public void keywordSearchQuery(){
-    // Mock object for client will be added soon.
-    FulltextSearchQuery searchQuery = new FulltextSearchQuery();
-    String actual = searchQuery.getErrorsAsString(indexFile, client);
-
-    String expected = "[{\"logText\":\"ERROR c.g.s.FulltextSearchQuery could not complete query request\",\"logLineNumber\":2}]";
-    Assert.assertEquals(expected, actual);
-}
-
-
+    @Test
+    public void keywordSearchQuery() throws IOException {
+        // Mock object for client will be added soon.
+        FulltextSearchQuery searchQuery = new FulltextSearchQuery();
+        ArrayList<ErrorLine> actual = searchQuery.getErrors(indexFile, client);
+        ArrayList<ErrorLine> expected = new ArrayList();
+        expected.add(new ErrorLine("ERROR c.g.s.FulltextSearchQuery could not complete query request", 2));
+        Assert.assertEquals(expected.size(), actual.size());
+        int size = expected.size();
+        for (int i = 0; i < size; i++) {
+            Assert.assertTrue(expected.get(i).equals(actual.get(i)));
+        }
+    }
 }
