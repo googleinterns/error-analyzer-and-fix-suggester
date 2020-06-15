@@ -44,27 +44,29 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(JUnit4.class)
-public final class StoreTest {
+public final class StoreLogsTest {
 
     private StoreLogs Storelogs;
   
 
     @Before
     public void setUp() throws Exception {
-        Storelogs=new StoreLogs();
+        Storelogs = new StoreLogs();
     }
  
 
     @Test
      public void convertToJsonStringTest(){
-         String result=Storelogs.convertToJsonString("Error1:\"index not found\"","5" );
-         assertEquals(result, new String("{\"logLineNumber\":\"5\",\"logText\":\"Error1:'index not found'\"}"));
+         String actual = Storelogs.convertToJsonString("Error1:\"index not found\"","5" );
+         String expected = new String("{\"logLineNumber\":\"5\",\"logText\":\"Error1:'index not found'\"}");
+         assertEquals(expected, actual);
      }
 
     @Test
      public void RemoveSpecialCharactersTest(){
-         String result=Storelogs.convertToJsonString("Error1:\"^&index not found?/,*\"","5" );
-         assertEquals(result, new String("{\"logLineNumber\":\"5\",\"logText\":\"Error1:'  index not found    '\"}"));
+         String actual = Storelogs.convertToJsonString("Error1:\"^&index not found?/,*\"","5" );
+         String expected = new String("{\"logLineNumber\":\"5\",\"logText\":\"Error1:'  index not found    '\"}");
+         assertEquals(expected, actual);
      }    
 
 }
