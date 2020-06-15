@@ -33,7 +33,7 @@ public class StoreLogs {
     //Stores the log into the database if an index with name fileName does not exist in the database and returns a string that contains the status of the log string whether the log string was stored in the database or not.
     public String checkAndStoreLog(String fileName, String log) throws IOException {
         if (database.FileExists(fileName) == true) {
-            return ();
+            return ("\t\t\t<h2> Sorry! the file already exists</h2>");
         } 
         else {
             String splitString = "\\r?\\n";
