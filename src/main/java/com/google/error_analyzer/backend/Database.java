@@ -42,10 +42,6 @@ import org.elasticsearch.ElasticsearchException;;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import com.google.error_analyzer.data.Keywords;
-import com.google.error_analyzer.data.RegexExpressions;
-import org.elasticsearch.index.query.RegexpQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
  
 public class Database implements DaoInterface {
