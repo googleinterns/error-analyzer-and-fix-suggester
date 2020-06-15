@@ -3,4 +3,4 @@
 *.lst
 *.war
 
-error-analyzer/target/
+target/
