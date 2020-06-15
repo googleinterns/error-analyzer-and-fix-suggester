@@ -13,18 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package com.google.error_analyzer.data;
 
-// import com.google.gson.Gson;
 import java.util.*;
 import java.lang.*;
-// import com.google.error_analyzer.data.SearchErrors;
 import java.io.IOException;
-// import javax.servlet.annotation.WebServlet;
-// import javax.servlet.http.HttpServlet;
-// import javax.servlet.http.HttpServletRequest;
-// import javax.servlet.http.HttpServletResponse;
-
 import java.security.GeneralSecurityException;
-
 import java.util.*;
 import com.google.api.services.customsearch.Customsearch;
 import com.google.api.services.customsearch.Customsearch.Cse;
@@ -40,7 +32,7 @@ import org.apache.logging.log4j.Logger;
 public class ErrorFixes{
     
     private static final Logger LOG = LogManager.getLogger(ErrorFixes.class);
-    public static String findFixes(String searchQuery) throws IOException {
+    public static String findFixes(String searchQuery) {
     
         try{
             String searchEngine = "cx"; //Your search engine
@@ -61,16 +53,20 @@ public class ErrorFixes{
             if (result.getItems()!=null){
                 Result stackoverflowResult= result.getItems().get(0);
                 String fix= stackoverflowResult.getLink();
-                fix=" <a href="+fix+"> click </a> ";
+                fix=" <a href="+fix+"> click </a>";
                 return fix;
             }else{
                 return new String();
             }
-        }catch(GeneralSecurityException e ){
-            LOG.error("exception in custom search"+ e);
+        }catch(GeneralSecurityException excep ){
+            String exception = new String("error in interacting with google API");
+            exception+=excep;
+            LOG.error(exception);
         }
-        catch(IOException e ){
-            LOG.error("exception in custom search"+ e);
+        catch(IOException excep ){
+            String exception = new String("error in interacting with google API");
+            exception+=excep;
+            LOG.error(exception);
         }
         return new String();
     }
