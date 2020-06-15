@@ -1,37 +1,37 @@
 /* Body Header */
 
-#body - header {
+#body-header {
     height: 18vh;
-    padding - top: 1.2rem;
+    padding-top: 1.2rem;
     color: white;
-    margin - bottom: 2vh;
+    margin-bottom: 2vh;
 }
 
-#body - header div {
+#body-header div {
     display: flex;
-    flex - direction: column;
-    align - items: center;
-    padding - bottom: 20px;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 20px;
 }
 
 button {
     height: 4vh;
-    border - radius: 2rem;
-    background - color: white;
-    min - width: 6vw;
+    border-radius: 2rem;
+    background-color: white;
+    min-width: 6vw;
     padding: 2px;
 }
 .inputDimension {
     width: 50vw;
     height: 4vh;
-    border - radius: 2rem;
+    border-radius: 2rem;
     padding: 5px;
-    font - family: cursive;
+    font-family: cursive;
 }
 
 /*common classes */
 
-.text - highlight {
+.text-highlight {
     color: #2857a4;
     font-weight: 600;
 
@@ -71,7 +71,7 @@ footer a {
 
 #navigation {
     display: flex;
-    justify - content: space - between;
-    font - weight: bold;
+    justify-content: space-between;
+    font-weight: bold;
 }
 
