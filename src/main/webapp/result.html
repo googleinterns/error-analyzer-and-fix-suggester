@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <!--info for browser -->
+	<!--info for browser -->
 	<meta charset="UTF-8">
 	<meta name="keywords" content="error, logs, search, stacktrace">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,41 +19,41 @@
 </head>
 
 <body onload="changePage()">
-    <header id="body-header" class="backgroundColor">
-	<div>
-        <span>
-        <input type="text" id="searchBar" class="shadow inputDimension font" name="searchBar">
-        <button onclick="search()" ><i class="fas fa-search"></i></button>
-        </span>
-    </div>
-    <!-- choose file  -->
-    <div>
-        <span>
-		<input type="text"  id="fileName" class="shadow inputDimension font" name="fileName">
-        <!-- if user is changing file then show results starting from 1st page -->
-        <button onclick="changePage()" >submit</button>
-        </span>
-        <!-- log or error container -->
-        <span>
-		<input type="radio" id="logs" name="display" value="logs" checked>logs
-		<input type="radio" id="errors" name="display" value="errors">errors
-        </span>
-    </div>
+	<header id="body-header" class="backgroundColor">
+		<div>
+			<span>
+                <input type="text" id="searchBar" class="shadow inputDimension font" name="searchBar">
+                <button onclick="search()" ><i class="fas fa-search"></i></button>
+            </span>
+		</div>
+		<!-- choose file  -->
+		<div>
+			<span>
+                <input type="text"  id="fileName" class="shadow inputDimension font" name="fileName">
+                <!-- if user is changing file then show results starting from 1st page -->
+                <button onclick="changePage()" >submit</button>
+            </span>
+			<!-- log or error container -->
+			<span>
+                <input type="radio" id="logs" name="display" value="logs" checked>logs
+                <input type="radio" id="errors" name="display" value="errors">errors
+            </span>
+		</div>
 	</header>
 	<!-- header -->
-    
-    <!-- show result -->
+
+	<!-- show result -->
 	<div>
 		<div id="listingTable"></div>
 	</div>
-    <!-- navigate between pages -->
-    <footer class="backgroundColor text-center">
-        <div id="navigation">
-		<a href="javascript:prevPage()" id="btnPrev">Prev</a>
-        <span>page: <span id="page"></span></span>
-		<a href="javascript:nextPage()" id="btnNext">Next</a>
-        </div>
-    </footer>
+	<!-- navigate between pages -->
+	<footer class="backgroundColor text-center">
+		<div id="navigation">
+			<a href="javascript:prevPage()" id="btnPrev">Prev</a>
+			<span>page: <span id="page"></span></span>
+			<a href="javascript:nextPage()" id="btnNext">Next</a>
+		</div>
+	</footer>
 	<script src="pagination.js"></script>
 </body>
 
