@@ -44,7 +44,8 @@ import org.elasticsearch.index.query.QueryBuilder;
 
 public class Database implements DaoInterface {
 
-    private static final RestHighLevelClient client = new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
+    private static final RestHighLevelClient client = 
+    new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
     private static final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     private static final int windowSize = 10;
     private static final Logger logger = LogManager.getLogger(Database.class);
@@ -116,7 +117,9 @@ public class Database implements DaoInterface {
         return searchHits;
     }
     //returns hashmap of hit ids and highlighted content 
-    public HashMap < String, String > getHighLightedText(ArrayList < SearchHit > searchHits, String field) throws IOException {
+    public HashMap < String, String > getHighLightedText(ArrayList < SearchHit > searchHits, String field)
+    throws IOException
+    {
         HashMap < String, String > searchResult = new HashMap();
         for (SearchHit hit: searchHits) {
             Map < String, HighlightField > highlightFields = hit.getHighlightFields();
@@ -148,7 +151,8 @@ public class Database implements DaoInterface {
         return new String();
     }
 
-    //Stores the log into the database if an index with name fileName does not exist in the database and returns a string that contains the status of the log string whether the log string was stored in the database or not.
+    //Stores the log into the database if an index with name fileName does not exist in the database and returns a 
+    //string that contains the status of the log string whether the log string was stored in the database or not.
     public String checkAndStoreLog(String fileName, String log) throws IOException {
         return new String();
     }

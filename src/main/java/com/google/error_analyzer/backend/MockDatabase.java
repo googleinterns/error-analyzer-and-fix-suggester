@@ -18,8 +18,9 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
 public class MockDatabase implements DaoInterface {
-    private final String[] database = new String[] {"Error: nullPointerException", "info: start appengine","scheduler shutting down",
-     "WARNING: An illegal reflective access operation has occurred", "Severe: Could not find index file", "warning: NullPointerException"};
+    private final String[] database = new String[] {"Error: nullPointerException", "info: start appengine",
+    "scheduler shutting down","WARNING: An illegal reflective access operation has occurred", 
+    "Severe: Could not find index file", "warning: NullPointerException"};
 
     //search db using keywords and return searchHits having highlight field added 
     public ArrayList < SearchHit > fullTextSearch(String fileName, String searchString, String field) throws IOException {
@@ -89,7 +90,7 @@ public class MockDatabase implements DaoInterface {
     }
 
     //returns hashmap of hit ids and highlighted content 
-    public HashMap < String, String > getHighLightedText(ArrayList < SearchHit > searchHits, String field) throws IOException {
+    public HashMap < String,String > getHighLightedText(ArrayList <SearchHit> searchHits, String field) throws IOException {
         HashMap < String, String > result = new HashMap();
         for (SearchHit hit: searchHits) {
             String stringId = String.valueOf(hit.docId());
@@ -115,7 +116,8 @@ public class MockDatabase implements DaoInterface {
         return new String();
     }
 
-    //Stores the log into the database if an index with name fileName does not exist in the database and returns a string that contains the status of the log string whether the log string was stored in the database or not.
+    //Stores the log into the database if an index with name fileName does not exist in the database and returns 
+    // a string that contains the status of the log string whether the log string was stored in the database or not.
     public String checkAndStoreLog(String fileName, String log) {
         return new String();
     }
