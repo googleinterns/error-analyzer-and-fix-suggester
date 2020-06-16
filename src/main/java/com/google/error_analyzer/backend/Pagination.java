@@ -68,7 +68,7 @@ public class Pagination extends HttpServlet {
 
         // if file field is empty the user haven't choosen anyfile so return empty object
         if (fileName.length() == 0) {
-            String json = returnEmptyObject(response);
+            String json = returnEmptyObject();
             response.getWriter().println(json);
             return;
         }
@@ -76,7 +76,7 @@ public class Pagination extends HttpServlet {
         // if fileName is not empty fetch the data from database
         int[] indices = fetchAndStoreData(page, fileName, fileType, next, search);
         // return response to the user
-        String json = returnResponse(indices[0], indices[1], isLastPage(page), response);
+        String json = returnResponse(indices[0], indices[1], isLastPage(page));
         response.getWriter().println(json);
     }
 
@@ -117,7 +117,7 @@ public class Pagination extends HttpServlet {
     }
 
     // picks content from maintained window on the basis of required page and convert it into json format
-    private String returnResponse(int startIdx, int stopIdx, boolean isLastPage, HttpServletResponse response) throws IOException {
+    private String returnResponse(int startIdx, int stopIdx, boolean isLastPage) {
         ArrayList < String > display = new ArrayList();
         for (int i = startIdx; i <= stopIdx && i < data.size(); i++) {
             display.add(data.get(i));
@@ -128,7 +128,9 @@ public class Pagination extends HttpServlet {
     }
 
     // put/change content of data for maintaining continuous window of pages(here window of 5 pages)
-    private void fetchData(int start, int size, int startIdx, String fileName, String fileType, int page, HashMap < String, String > search) {
+    private void fetchData(int start, int size, int startIdx, String fileName,
+    String fileType, int page, HashMap < String, String > search)
+    {
         try{ 
             SearchHit[] searchHits = database.getAll(start, size, fileName);
             ArrayList < String > hitIds = database.hitId(searchHits);
@@ -201,13 +203,15 @@ public class Pagination extends HttpServlet {
     }
 
     // return empty object 
-    private String returnEmptyObject(HttpServletResponse response) {
+    private String returnEmptyObject() {
         String json = convertToJson(new logOrErrorResponse(new ArrayList(), true));
         return json;
     }
 
     // maintains window of size totalpages
-    private int[] maintainWindow (int page, String next, String fileName, String fileType, HashMap < String, String > search) {
+    private int[] maintainWindow (int page, String next, String fileName,
+    String fileType, HashMap < String, String > search)
+    {
         int Start = 0;
         int startIdx = 0;
 
