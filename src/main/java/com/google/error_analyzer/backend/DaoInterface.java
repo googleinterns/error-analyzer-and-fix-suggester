@@ -39,7 +39,7 @@ public interface DaoInterface {
     public boolean errorQuery (String filename) throws IOException;
 
     //checks whether index with name fileName already exists in the database;
-    public boolean FileExists (String fileName) throws IOException;
+    public boolean fileExists (String fileName) throws IOException;
 
 
     //Stores the jsonString at index with name filename and returns the logText of the document stored

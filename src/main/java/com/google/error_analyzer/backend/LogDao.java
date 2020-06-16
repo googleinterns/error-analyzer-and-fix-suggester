@@ -42,15 +42,16 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
 
-public class Database implements DaoInterface {
+public class LogDao implements DaoInterface {
 
     private static final RestHighLevelClient client = 
-    new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
+        new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
     private static final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
     private static final int windowSize = 10;
-    private static final Logger logger = LogManager.getLogger(Database.class);
+    private static final Logger logger = LogManager.getLogger(LogDao.class);
 
     //search db using keywords and return searchHits having highlight field added 
+    @Override 
     public ArrayList < SearchHit > fullTextSearch(String fileName, String searchString, String field) throws IOException {
         int offset = 0;
         SearchHit[] searchHits = null;
@@ -82,6 +83,7 @@ public class Database implements DaoInterface {
     }
 
     // return ArrayList of hit ids corresponding to given searchhit list
+    @Override 
     public ArrayList < String > hitId(SearchHit[] searchHits) throws IOException {
         ArrayList < String > ids = new ArrayList();
         for (SearchHit hit: searchHits) {
@@ -92,6 +94,7 @@ public class Database implements DaoInterface {
     }
 
     // return ArrayList of content for specified field  corresponding to given searchhit list
+    @Override 
     public ArrayList < String > hitFieldContent(SearchHit[] searchHits, String field) throws IOException {
         ArrayList < String > fieldContent = new ArrayList();
         for (SearchHit hit: searchHits) {
@@ -102,11 +105,13 @@ public class Database implements DaoInterface {
     }
 
     //search db using user provided regex and return searchHits having highlight field added
+    @Override 
     public SearchHit[] regexQuery(String filename, String regex) {
         return new SearchHit[0];
     }
 
     //return a section of given index starting from start and of length equal to given size
+    @Override 
     public SearchHit[] getAll(int start, int size, String fileName) throws IOException {
         SearchRequest searchRequest = new SearchRequest(fileName);
         searchSourceBuilder.query(QueryBuilders.matchAllQuery()).size(size).from(start);
@@ -117,6 +122,7 @@ public class Database implements DaoInterface {
         return searchHits;
     }
     //returns hashmap of hit ids and highlighted content 
+    @Override 
     public HashMap < String, String > getHighLightedText(ArrayList < SearchHit > searchHits, String field)
     throws IOException
     {
@@ -131,6 +137,7 @@ public class Database implements DaoInterface {
     }
 
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
+    @Override 
     public boolean errorQuery(String fileName) throws IOException {
         return true;
     }
@@ -141,18 +148,20 @@ public class Database implements DaoInterface {
     }
     
     //checks whether index with name fileName already exists in the database;
-    public boolean FileExists(String fileName) throws IOException {
+    public boolean fileExists(String fileName) throws IOException {
         return true;
     }
 
 
     //Stores the jsonString at index with name filename and returns the logText of the document stored
+    @Override 
     public String storeLogLine(String Filename, String jsonString, String Id) throws IOException {
         return new String();
     }
 
     //Stores the log into the database if an index with name fileName does not exist in the database and returns a 
     //string that contains the status of the log string whether the log string was stored in the database or not.
+    @Override 
     public String checkAndStoreLog(String fileName, String log) throws IOException {
         return new String();
     }

@@ -17,12 +17,13 @@ import java.util.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
-public class MockDatabase implements DaoInterface {
+public class MockLogDao implements DaoInterface {
     private final String[] database = new String[] {"Error: nullPointerException", "info: start appengine",
     "scheduler shutting down","WARNING: An illegal reflective access operation has occurred", 
     "Severe: Could not find index file", "warning: NullPointerException"};
 
     //search db using keywords and return searchHits having highlight field added 
+    @Override 
     public ArrayList < SearchHit > fullTextSearch(String fileName, String searchString, String field) throws IOException {
         ArrayList < SearchHit > searchResults = new ArrayList();
         String[] keyWords = searchString.split(" ");
@@ -42,6 +43,7 @@ public class MockDatabase implements DaoInterface {
     }
 
     // return ArrayList of hit ids corresponding to given searchhit list
+    @Override 
     public ArrayList < String > hitId(SearchHit[] searchHits) throws IOException {
         ArrayList < String > result = new ArrayList();
         for (SearchHit hit: searchHits) {
@@ -52,6 +54,7 @@ public class MockDatabase implements DaoInterface {
     }
 
     // return ArrayList of content of specified field  corresponding to given searchhit list
+    @Override 
     public ArrayList < String > hitFieldContent(SearchHit[] searchHits, String field) throws IOException {
         ArrayList < String > result = new ArrayList();
         for (SearchHit hit: searchHits) {
@@ -62,11 +65,13 @@ public class MockDatabase implements DaoInterface {
     }
 
     //search db using user provided regex and return searchHits having highlight field added
+    @Override 
     public SearchHit[] regexQuery(String filename, String regex) {
         return new SearchHit[0];
     }
 
     //return a section of given index starting from start and of length equal to given size
+    @Override 
     public SearchHit[] getAll(int start, int size, String fileName) throws IOException {
         if (start >= database.length) {
             return new SearchHit[0];
@@ -90,6 +95,7 @@ public class MockDatabase implements DaoInterface {
     }
 
     //returns hashmap of hit ids and highlighted content 
+    @Override 
     public HashMap < String,String > getHighLightedText(ArrayList <SearchHit> searchHits, String field) throws IOException {
         HashMap < String, String > result = new HashMap();
         for (SearchHit hit: searchHits) {
@@ -101,23 +107,27 @@ public class MockDatabase implements DaoInterface {
     }
 
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
+    @Override 
     public boolean errorQuery(String filename) {
         return true;
     }
 
     //checks whether index with name fileName already exists in the database;
-    public boolean FileExists(String fileName) {
+    @Override 
+    public boolean fileExists(String fileName) {
         return true;
     }
 
 
     //Stores the jsonString at index with name filename and returns the logText of the document stored
+    @Override 
     public String storeLogLine(String filename, String jsonString, String Id) {
         return new String();
     }
 
     //Stores the log into the database if an index with name fileName does not exist in the database and returns 
     // a string that contains the status of the log string whether the log string was stored in the database or not.
+    @Override 
     public String checkAndStoreLog(String fileName, String log) {
         return new String();
     }
