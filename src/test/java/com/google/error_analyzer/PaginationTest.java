@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package com.google.error_analyzer;
 
-import com.google.error_analyzer.backend.Database;
+import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.Pagination;
 import java.util.*;
 import org.junit.Assert;
@@ -58,7 +58,7 @@ public final class PaginationTest {
     private int page9 = 9;
 
     @Mock
-    Database database;
+    LogDao database;
 
     @InjectMocks
     Pagination pagination;
@@ -75,7 +75,7 @@ public final class PaginationTest {
 
     // database related mocked functions
     public void databaseHelper() throws IOException {
-        when(database.getAll(0, 0, fileName)).thenReturn(new SearchHit[0]);
+        when(database.getAll(fileName, 0, 0)).thenReturn(new SearchHit[0]);
         when(database.hitId(new SearchHit[0])).thenReturn(new ArrayList());
         when(database.hitFieldContent(new SearchHit[0], fileName)).thenReturn(new ArrayList());
     }

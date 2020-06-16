@@ -39,7 +39,7 @@ public class Pagination extends HttpServlet {
     private int extraPageInFrontAndBack = noOfPages / 2;
     private int noOfRecordsOnLastPage = recordsPerPage;
     private int lastPage = Integer.MAX_VALUE;
-    private static Database database = new Database();
+    private static LogDao database = new LogDao();
 
     // return object 
     private class logOrErrorResponse {
@@ -132,7 +132,7 @@ public class Pagination extends HttpServlet {
     String fileType, int page, HashMap < String, String > search)
     {
         try{ 
-            SearchHit[] searchHits = database.getAll(start, size, fileName);
+            SearchHit[] searchHits = database.getAll( fileName, start, size);
             ArrayList < String > hitIds = database.hitId(searchHits);
             ArrayList < String > hitFieldContent = database.hitFieldContent(searchHits, field);
             addFetchResultToData(startIdx, fileType, hitIds, hitFieldContent, search);
