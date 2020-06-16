@@ -19,14 +19,18 @@ import com.google.error_analyzer.backend.MockDatabase;
 import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.After;
 import org.junit.Test;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import java.io.IOException;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -47,16 +51,21 @@ public final class ErrorQueryTest {
     public void setUp() {
         mockDatabase = new MockDatabase();
     }
-
+    // @After
+    // public void validate() {
+    //     validateMockitoUsage();
+    // }
     @Test
     public void errorQueryTest() throws IOException {
         mockDatabase.errorQuery(filename);
         ArrayList<String> actual = mockDatabase.errorDatabase;
         when(database.errorQuery(filename)).thenReturn(true);
+        database.errorQuery(filename);
         ArrayList<String> expected = new ArrayList<String>();
         expected.add("Error: nullPointerException");
         expected.add("Severe: Could not find index file");
         expected.add("warning: NullPointerException");
+        verify(database, times(1)).errorQuery(filename);
         Assert.assertEquals(expected, actual);
     }
 }
