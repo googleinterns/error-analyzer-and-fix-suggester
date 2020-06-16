@@ -32,7 +32,7 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 
 public class Search extends HttpServlet {
 
-    private static Database database = new Database();
+    private static LogDao database = new LogDao();
     private final String field = "name";
     private static final Logger LOG = LogManager.getLogger(Search.class);
     

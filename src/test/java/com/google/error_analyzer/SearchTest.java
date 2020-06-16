@@ -13,8 +13,8 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package com.google.error_analyzer;
 
-import com.google.error_analyzer.backend.Database;
-import com.google.error_analyzer.backend.MockDatabase;
+import com.google.error_analyzer.backend.LogDao;
+import com.google.error_analyzer.backend.MockLogDao;
 import com.google.error_analyzer.backend.Search;
 import java.util.*;
 import org.junit.Assert;
@@ -47,11 +47,11 @@ public final class SearchTest {
 
     private String searchString = "scheduler appengine";
     private String field = "name";
-    private MockDatabase mockdb;
+    private MockLogDao mockdb;
     private String fileName = "file";
 
     @Mock
-    Database database;
+    LogDao database;
 
     @InjectMocks
     Search search;
@@ -63,7 +63,7 @@ public final class SearchTest {
     public void setUp() {
         search = new Search();
         ReflectionTestUtils.setField(search, "database", database);
-        mockdb = new MockDatabase();
+        mockdb = new MockLogDao();
     }
 
     // maintaining window of given length
