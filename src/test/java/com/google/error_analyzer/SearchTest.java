@@ -80,8 +80,8 @@ public final class SearchTest {
         Assert.assertTrue(expected.equals(actual));
     }
     public Object getPrivateMethodSearchDataBase() throws Exception  {
-        Method m = Search.class.getDeclaredMethod("searchDataBase",new Class[]{String.class, String.class}); 
-        m.setAccessible(true); 
-        return m.invoke(search,fileName,searchString);
+        Method method = Search.class.getDeclaredMethod("searchDataBase",new Class[]{String.class, String.class}); 
+        method.setAccessible(true); 
+        return method.invoke(search,fileName,searchString);
     }
 }
