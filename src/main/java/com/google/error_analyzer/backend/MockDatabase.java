@@ -16,25 +16,24 @@ import java.lang.*;
 import java.util.*;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-import com.google.error_analyzer.backend.MockErrorQuery;
 
 public class MockDatabase implements DaoInterface {
-    private final String[] database = new String[] {"Error: nullPointerException", "info: start appengine","scheduler shutting down",
-     "WARNING: An illegal reflective access operation has occurred", "Severe: Could not find index file", "warning: NullPointerException"};
-    public ArrayList<String> errorDatabase;
+    private final String[] database = new String[] {
+        "Error: nullPointerException", "info: start appengine", "scheduler shutting down",
+            "WARNING: An illegal reflective access operation has occurred", "Severe: Could not find index file", "warning: NullPointerException"
+    };
 
     //search db using keywords and return searchHits having highlight field added 
-    public ArrayList<SearchHit> fullTextSearch(String fileName, String searchString, String field) throws IOException {
-        ArrayList<SearchHit> searchResults = new ArrayList();
-        String[] keyWords = searchString.split(" "); 
-        for(int i=0; i < database.length; i++) {
+    public ArrayList < SearchHit > fullTextSearch(String fileName, String searchString, String field) throws IOException {
+        ArrayList < SearchHit > searchResults = new ArrayList();
+        String[] keyWords = searchString.split(" ");
+        for (int i = 0; i < database.length; i++) {
             String dbEntry = database[i];
             String[] dbKeyWordsArray = dbEntry.split(" ");
-            HashSet<String> dbKeyWordsSet = new HashSet<>(Arrays.asList(dbKeyWordsArray)); 
-            for(int j=0; j< keyWords.length; j++) {
+            HashSet < String > dbKeyWordsSet = new HashSet < > (Arrays.asList(dbKeyWordsArray));
+            for (int j = 0; j < keyWords.length; j++) {
                 String keyWord = keyWords[j];
-                if(dbKeyWordsSet.contains(keyWord))
-                {
+                if (dbKeyWordsSet.contains(keyWord)) {
                     searchResults.add(new SearchHit(i));
                     break;
                 }
@@ -43,20 +42,21 @@ public class MockDatabase implements DaoInterface {
         return searchResults;
     }
 
-     // return ArrayList of hit ids corresponding to given searchhit list
-    public ArrayList<String> hitId(SearchHit[] searchHits) throws IOException {
-        ArrayList<String> result = new ArrayList();
-        for(SearchHit hit: searchHits){
-            result.add(hit.getId());
+    // return ArrayList of hit ids corresponding to given searchhit list
+    public ArrayList < String > hitId(SearchHit[] searchHits) throws IOException {
+        ArrayList < String > result = new ArrayList();
+        for (SearchHit hit: searchHits) {
+            String id = String.valueOf(hit.docId());
+            result.add(id);
         }
         return result;
     }
 
     // return ArrayList of content of specified field  corresponding to given searchhit list
-    public ArrayList<String> hitFieldContent(SearchHit[] searchHits, String field) throws IOException {
-        ArrayList<String> result = new ArrayList();
-        for(SearchHit hit: searchHits){
-            int id=Integer.parseInt(hit.getId());
+    public ArrayList < String > hitFieldContent(SearchHit[] searchHits, String field) throws IOException {
+        ArrayList < String > result = new ArrayList();
+        for (SearchHit hit: searchHits) {
+            int id = hit.docId();
             result.add(database[id]);
         }
         return result;
@@ -69,68 +69,57 @@ public class MockDatabase implements DaoInterface {
 
     //return a section of given index starting from start and of length equal to given size
     public SearchHit[] getAll(int start, int size, String fileName) throws IOException {
-        if(start>=database.length)
-        {
+        if (start >= database.length) {
             return new SearchHit[0];
         }
-        if(start<0)
-        {
-            start=0;
+        if (start < 0) {
+            start = 0;
         }
         int len = 0;
-        int databaseLength=database.length;
-        if(start+size-1 < databaseLength)
-            len=size;
-        else
-            len=databaseLength-start;
+        int databaseLength = database.length;
+        if (start + size - 1 < databaseLength) {
+            len = size;
+        }
+        else {
+            len = databaseLength - start;
+        }
         SearchHit[] searchHits = new SearchHit[len];
-        for(int idx=start;idx<len;idx++)
-        {
-            searchHits[idx]=new SearchHit(idx);
+        for (int idx = start; idx < len; idx++) {
+            searchHits[idx] = new SearchHit(idx);
         }
         return searchHits;
     }
 
     //returns hashmap of hit ids and highlighted content 
-    public HashMap<String,String> getHighLightedText(ArrayList<SearchHit> searchHits, String field) throws IOException {
-        HashMap<String,String> result = new HashMap();
-        for(SearchHit hit: searchHits){
-            String stringId=hit.docId()+"";
-            int id=hit.docId();
-            result.put(stringId,database[id]);
+    public HashMap < String, String > getHighLightedText(ArrayList < SearchHit > searchHits, String field) throws IOException {
+        HashMap < String, String > result = new HashMap();
+        for (SearchHit hit: searchHits) {
+            String stringId = String.valueOf(hit.docId());
+            int id = hit.docId();
+            result.put(stringId, database[id]);
         }
         return result;
     }
 
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
     public boolean errorQuery(String filename) {
-        MockErrorQuery  mockQuery = new MockErrorQuery();
-        ArrayList<String> searchResults = new ArrayList();
-        for (int i = 0; i < database.length; i++) {
-            
-            String document = database[i];
-            if (mockQuery.matchesCondition(database[i])) {
-                searchResults.add(document);
-            }
-        }
-        errorDatabase = searchResults;
         return true;
     }
 
     //checks whether index with name fileName already exists in the database;
     public boolean FileExists(String fileName) {
         return true;
-    };
+    }
 
 
     //Stores the jsonString at index with name filename and returns the logText of the document stored
     public String storeLogLine(String filename, String jsonString, String Id) {
         return new String();
-    };
+    }
 
     //Stores the log into the database if an index with name fileName does not exist in the database and returns a string that contains the status of the log string whether the log string was stored in the database or not.
     public String checkAndStoreLog(String fileName, String log) {
         return new String();
-    };
+    }
 
 }
