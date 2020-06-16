@@ -35,11 +35,11 @@ public class Pagination extends HttpServlet {
     private static final Logger LOG = LogManager.getLogger(Pagination.class);
     public int recordsPerPage = 3;
     // keep it a odd no so that there are equal pages in front and back 
-    public int noOfPages = 5;
-    public int extraPageInFrontAndBack = noOfPages / 2;
-    public int noOfRecordsOnLastPage = recordsPerPage;
-    public int lastPage = Integer.MAX_VALUE;
-    public static Database database = new Database();
+    private int noOfPages = 5;
+    private int extraPageInFrontAndBack = noOfPages / 2;
+    private int noOfRecordsOnLastPage = recordsPerPage;
+    private int lastPage = Integer.MAX_VALUE;
+    private static Database database = new Database();
 
     // return object 
     private class logOrErrorResponse {
@@ -83,16 +83,17 @@ public class Pagination extends HttpServlet {
     //  if user is asking for 1st page return that page and make a window of fully finished and ready to use data for that file
     // if user is not on 1st page but someother page just maintain the already created window of pages
 
-    public int[] fetchAndStoreData(int page, String fileName, String fileType, String next, HashMap < String, String > search) {
+    private int[] fetchAndStoreData(int page, String fileName, String fileType, String next, HashMap < String, String > search) {
         int start = 0;
         int stop = recordsPerPage - 1;
+        // the user won't be knowing the name of error file generated corresponding to his log file so we need to change fileName 
+        // depending on type of file
+        if (fileType.equals(ERROR)){
+            fileName = fileName + "error";
+        }
         if (page == 1) {
 
             lastPage = Integer.MAX_VALUE;
-            // the user won't be knowing the name of error file generated corresponding to his log file so we need to change fileName depending on type of file
-            if (fileType.equals(ERROR)){
-                fileName = fileName + "error";
-            }
             // create window
             fetchData(0, (recordsPerPage * noOfPages) - 1, 0, fileName, fileType, page, search);
         } else {
@@ -143,7 +144,9 @@ public class Pagination extends HttpServlet {
     }
 
     // add fetched results to data and apply search results and error-fixes if applicable
-    private void addFetchResultToData(int startIdx, String fileType, ArrayList < String > hitIds, ArrayList < String > hitFieldContent, HashMap < String, String > search) {
+    private void addFetchResultToData(int startIdx, String fileType, ArrayList < String > hitIds,
+     ArrayList < String > hitFieldContent, HashMap < String, String > search) 
+    {
         ErrorFixes errorFix=new ErrorFixes();
         int i = startIdx;
         int len = hitIds.size();
@@ -173,7 +176,7 @@ public class Pagination extends HttpServlet {
     }
 
     // check if the updated page is the last page 
-    public void updateLastPage(int searchHitLength, int page) {
+    private void updateLastPage(int searchHitLength, int page) {
         int fetchedPage = page + extraPageInFrontAndBack;
         if (page == 1 && searchHitLength < fetchedPage * recordsPerPage) {
             lastPage = (int) Math.ceil((double) searchHitLength / (double) recordsPerPage);
@@ -204,7 +207,7 @@ public class Pagination extends HttpServlet {
     }
 
     // maintains window of size totalpages
-    public int[] maintainWindow (int page, String next, String fileName, String fileType, HashMap < String, String > search) {
+    private int[] maintainWindow (int page, String next, String fileName, String fileType, HashMap < String, String > search) {
         int Start = 0;
         int startIdx = 0;
 
