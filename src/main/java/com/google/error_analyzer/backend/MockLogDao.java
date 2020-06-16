@@ -72,7 +72,7 @@ public class MockLogDao implements DaoInterface {
 
     //return a section of given index starting from start and of length equal to given size
     @Override 
-    public SearchHit[] getAll(int start, int size, String fileName) throws IOException {
+    public SearchHit[] getAll(String fileName, int start, int size) throws IOException {
         if (start >= database.length) {
             return new SearchHit[0];
         }

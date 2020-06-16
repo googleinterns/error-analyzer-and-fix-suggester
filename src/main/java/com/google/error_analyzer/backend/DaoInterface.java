@@ -30,7 +30,7 @@ public interface DaoInterface {
     public SearchHit[] regexQuery (String filename, String regex);
 
     //return a section of given index starting from start and length equal to given size
-    public SearchHit[] getAll (int start, int size, String fileName) throws IOException;
+    public SearchHit[] getAll (String fileName, int start, int size) throws IOException;
 
     //returns hashmap of hit ids and highlighted content 
     public HashMap < String,String > getHighLightedText (ArrayList < SearchHit > searchHits, String field) throws IOException;
