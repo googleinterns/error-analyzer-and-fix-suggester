@@ -38,7 +38,8 @@ public class ErrorFixes{
             String searchEngine = "cx"; //Your search engine
 
             //Instance Customsearch
-            Customsearch customeSearch = new Customsearch.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), null) 
+            Customsearch customeSearch = 
+                new Customsearch.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), null) 
                         .setApplicationName("errorFixes") 
                         .setGoogleClientRequestInitializer(new CustomsearchRequestInitializer("your_api_key")) 
                         .build();
@@ -55,15 +56,15 @@ public class ErrorFixes{
                 String fix= stackoverflowResult.getLink();
                 fix=" <a href="+fix+"> click </a>";
                 return fix;
-            }else{
+            } else {
                 return new String();
             }
-        }catch(GeneralSecurityException excep ){
+        } catch(GeneralSecurityException excep ) {
             String exception = new String("error in interacting with google API");
             exception+=excep;
             LOG.error(exception);
         }
-        catch(IOException excep ){
+        catch(IOException excep ) {
             String exception = new String("error in interacting with google API");
             exception+=excep;
             LOG.error(exception);
