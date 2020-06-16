@@ -40,8 +40,6 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.RegexpQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 
 public class Database implements DaoInterface {
@@ -134,11 +132,11 @@ public class Database implements DaoInterface {
         return true;
     }
 
-    //store identified errors back in database
+    //store sorted identified errors back in database
     public void storeErrorLogs(String fileName, SearchHits hits) throws IOException {
         return;
     }
-
+    
     //checks whether index with name fileName already exists in the database;
     public boolean FileExists(String fileName) throws IOException {
         return true;

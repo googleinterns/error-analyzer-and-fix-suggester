@@ -18,10 +18,8 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
 public class MockDatabase implements DaoInterface {
-    private final String[] database = new String[] {
-        "Error: nullPointerException", "info: start appengine", "scheduler shutting down",
-            "WARNING: An illegal reflective access operation has occurred", "Severe: Could not find index file", "warning: NullPointerException"
-    };
+    private final String[] database = new String[] {"Error: nullPointerException", "info: start appengine","scheduler shutting down",
+     "WARNING: An illegal reflective access operation has occurred", "Severe: Could not find index file", "warning: NullPointerException"};
 
     //search db using keywords and return searchHits having highlight field added 
     public ArrayList < SearchHit > fullTextSearch(String fileName, String searchString, String field) throws IOException {
@@ -121,5 +119,4 @@ public class MockDatabase implements DaoInterface {
     public String checkAndStoreLog(String fileName, String log) {
         return new String();
     }
-
 }
