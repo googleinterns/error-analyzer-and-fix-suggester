@@ -13,6 +13,7 @@ package com.google.error_analyzer.backend;
 
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import java.io.IOException;
 import java.util.*;
 import org.apache.http.HttpHost;
@@ -51,12 +52,11 @@ public class LogDao implements DaoInterface {
 
     //search db using keywords and return searchHits having highlight field added  
     @Override 
-    public ImmutableList < SearchHit > fullTextSearch
-    (String fileName, String searchString, String field)throws IOException 
-    {
+    public ImmutableList < SearchHit > fullTextSearch(
+    String fileName, String searchString, String field)throws IOException {
         int offset = 0;
         SearchHit[] searchHits = null;
-        ArrayList < SearchHit > searchResult = new ArrayList();
+        Builder<SearchHit> searchResultBuilder = ImmutableList.<SearchHit>builder();
 
         // we check for matching keywords in a specific windowsize in each 
         // iteration and do this until the the end of index .this way we 
@@ -78,11 +78,11 @@ public class LogDao implements DaoInterface {
                 break;
             }
             for (SearchHit hit: searchHits) {
-                searchResult.add(hit);
+                searchResultBuilder.add(hit);
             }
             offset += windowSize;
         }
-        return ImmutableList.<SearchHit>builder() .addAll(searchResult) .build();
+        return searchResultBuilder.build();
     }
 
     //return a section of given index starting from start and of 

@@ -28,10 +28,9 @@ public class MockLogDao implements DaoInterface {
 
     //search db using keywords and return searchHits having highlight field added 
     @Override 
-    public ImmutableList < SearchHit > fullTextSearch
-    (String fileName, String searchString, String field) throws IOException 
-    {
-        ArrayList < SearchHit > searchResults = new ArrayList();
+    public ImmutableList < SearchHit > fullTextSearch(
+    String fileName, String searchString, String field) throws IOException {
+        Builder<SearchHit> searchResultBuilder = ImmutableList.<SearchHit>builder();
         String[] keyWords = searchString.split(" ");
         for (int i = 0; i < database.length; i++) {
             String dbEntry = database[i];
@@ -47,12 +46,12 @@ public class MockLogDao implements DaoInterface {
                     HashMap <String,HighlightField> highlight = new HashMap();
                     highlight.put(field,new HighlightField(field,text));
                     hit.highlightFields(highlight);
-                    searchResults.add(hit);
+                    searchResultBuilder.add(hit);
                     break;
                 }
             }
         }
-        return ImmutableList.<SearchHit>builder() .addAll(searchResults) .build();
+        return searchResultBuilder.build();
     }
 
     //return a section of given index starting from start and of length equal
