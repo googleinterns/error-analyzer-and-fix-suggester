@@ -15,39 +15,52 @@ import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.lang.*;
 import java.util.*;
+import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 
 public class MockLogDao implements DaoInterface {
-    private final String[] database = new String[] {"Error: nullPointerException", "info: start appengine",
-    "scheduler shutting down","WARNING: An illegal reflective access operation has occurred", 
+    private final String[] database = new String[] {"Error: nullPointerException", 
+    "info: start appengine","scheduler shutting down",
+    "WARNING: An illegal reflective access operation has occurred", 
     "Severe: Could not find index file", "warning: NullPointerException"};
 
     //search db using keywords and return searchHits having highlight field added 
     @Override 
-    public ImmutableList < SearchHit > fullTextSearch(String fileName, String searchString, String field) 
-    throws IOException 
+    public ImmutableList < SearchHit > fullTextSearch
+    (String fileName, String searchString, String field) throws IOException 
     {
         ArrayList < SearchHit > searchResults = new ArrayList();
         String[] keyWords = searchString.split(" ");
         for (int i = 0; i < database.length; i++) {
             String dbEntry = database[i];
             String[] dbKeyWordsArray = dbEntry.split(" ");
-            HashSet < String > dbKeyWordsSet = new HashSet < > (Arrays.asList(dbKeyWordsArray));
+            HashSet < String > dbKeyWordsSet 
+                = new HashSet < > (Arrays.asList(dbKeyWordsArray));
             for (int j = 0; j < keyWords.length; j++) {
                 String keyWord = keyWords[j];
                 if (dbKeyWordsSet.contains(keyWord)) {
-                    searchResults.add(new SearchHit(i));
+                    SearchHit hit = new SearchHit
+                        (i,String.valueOf(i),null,new HashMap());
+                    Text [] text = new Text[]{new Text(database[i])};
+                    HashMap <String,HighlightField> highlight = new HashMap();
+                    highlight.put(field,new HighlightField(field,text));
+                    hit.highlightFields(highlight);
+                    searchResults.add(hit);
                     break;
                 }
             }
         }
-        return ImmutableList.copyOf(searchResults);
+        return ImmutableList.<SearchHit>builder() .addAll(searchResults) .build();
     }
 
-    //return a section of given index starting from start and of length equal to given size
+    //return a section of given index starting from start and of length equal
+    //  to given size
     @Override 
-    public SearchHit[] getAll(String fileName, int start, int size) throws IOException {
+    public SearchHit[] getAll(String fileName, int start, int size) 
+    throws IOException 
+    {
         if (start >= database.length) {
             return new SearchHit[0];
         }
@@ -69,7 +82,8 @@ public class MockLogDao implements DaoInterface {
         return searchHits;
     }
 
-    //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
+    //search db using regex and keywords and store back in db searchHits 
+    // sorted by logLineNumber
     @Override 
     public boolean errorQuery(String filename) {
         return true;
@@ -81,15 +95,16 @@ public class MockLogDao implements DaoInterface {
         return true;
     }
 
-    //Stores the jsonString at index with name filename and returns the logText of the document stored
+    //Stores the jsonString at index with name filename and returns the logText 
+    // of the document stored
     @Override 
     public String storeLogLine(String filename, String jsonString, String Id) {
         return new String();
     }
 
-    //Stores the log into the database if an index with name fileName does not exist in the database 
-    //and returns a string that contains the status of the log string whether the log string was 
-    //stored in the database or not.
+    //Stores the log into the database if an index with name fileName does not 
+    // exist in the database and returns a string that contains the status of the 
+    // log string whether the log string was stored in the database or not.
     @Override 
     public String checkAndStoreLog(String fileName, String log) {
         return new String();

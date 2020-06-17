@@ -11,9 +11,10 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
+
+import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.util.*;
-import com.google.common.collect.ImmutableList;
 import org.apache.http.HttpHost;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -41,30 +42,26 @@ import org.elasticsearch.search.SearchHits;
 
 public class LogDao implements DaoInterface {
 
-    private static final RestHighLevelClient client = 
-        new RestHighLevelClient(RestClient.builder(new HttpHost("localhost", 9200, "http")));
-    private static final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+    private static final RestHighLevelClient client = new RestHighLevelClient
+        (RestClient.builder(new HttpHost("localhost", 9200, "http")));
+    private static final SearchSourceBuilder searchSourceBuilder 
+        = new SearchSourceBuilder();
     private static final int windowSize = 10;
     private static final Logger logger = LogManager.getLogger(LogDao.class);
 
-    // highlight searched text
-    private HighlightBuilder addHighLighter(String field) {
-        HighlightBuilder highlightBuilder = new HighlightBuilder().preTags("<b>").postTags("</b>");
-        HighlightBuilder.Field highlightTitle = new HighlightBuilder.Field(field);
-        highlightTitle.highlighterType("unified");
-        highlightBuilder.field(highlightTitle);
-        return highlightBuilder;
-    }
-
-    //search db using keywords and return searchHits having highlight field added 
+    //search db using keywords and return searchHits having highlight field added  
     @Override 
-    public ImmutableList < SearchHit > fullTextSearch(String fileName, String searchString, String field)
-    throws IOException 
+    public ImmutableList < SearchHit > fullTextSearch
+    (String fileName, String searchString, String field)throws IOException 
     {
         int offset = 0;
         SearchHit[] searchHits = null;
         ArrayList < SearchHit > searchResult = new ArrayList();
-        while (searchHits == null || searchHits.length != 0) {
+
+        // we check for matching keywords in a specific windowsize in each 
+        // iteration and do this until the the end of index .this way we 
+        // have traverse whole index 
+        while (true) {
             SearchRequest searchRequest = new SearchRequest(fileName);
             SimpleQueryStringBuilder simpleQueryBuilder = 
                 QueryBuilders.simpleQueryStringQuery(searchString);
@@ -76,27 +73,36 @@ public class LogDao implements DaoInterface {
                 client.search(searchRequest, RequestOptions.DEFAULT);
             SearchHits hits = searchResponse.getHits();
             searchHits = hits.getHits();
+
+            if( searchHits.length == 0) {
+                break;
+            }
             for (SearchHit hit: searchHits) {
                 searchResult.add(hit);
             }
             offset += windowSize;
         }
-        return ImmutableList.copyOf(searchResult);
+        return ImmutableList.<SearchHit>builder() .addAll(searchResult) .build();
     }
 
-    //return a section of given index starting from start and of length equal to given size
+    //return a section of given index starting from start and of 
+    // length equal to given size
     @Override 
-    public SearchHit[] getAll(String fileName, int start, int size) throws IOException {
+    public SearchHit[] getAll(String fileName, int start, int size) 
+    throws IOException {
         SearchRequest searchRequest = new SearchRequest(fileName);
-        searchSourceBuilder.query(QueryBuilders.matchAllQuery()).size(size).from(start);
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery())
+            .size(size).from(start);
         searchRequest.source(searchSourceBuilder);
-        SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
+        SearchResponse searchResponse = 
+            client.search(searchRequest, RequestOptions.DEFAULT);
         SearchHits hits = searchResponse.getHits();
         SearchHit[] searchHits = hits.getHits();
         return searchHits;
     }
 
-    //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
+    //search db using regex and keywords and store back in db searchHits
+    //  sorted by logLineNumber
     @Override 
     public boolean errorQuery(String fileName) throws IOException {
         return true;
@@ -112,18 +118,30 @@ public class LogDao implements DaoInterface {
         return true;
     }
 
-    //Stores the jsonString at index with name filename and returns the logText of the document stored
+    //Stores the jsonString at index with name filename and returns the logText 
+    // of the document stored
     @Override 
-    public String storeLogLine(String Filename, String jsonString, String Id) throws IOException {
+    public String storeLogLine(String Filename, String jsonString, String Id)
+    throws IOException {
         return new String();
     }
 
-    //Stores the log into the database if an index with name fileName does not exist in the database 
-    //and returns a string that contains the status of the log string whether the log string was 
-    //stored in the database or not.
+    //Stores the log into the database if an index with name fileName does not exist
+    //  in the database and returns a string that contains the status of the log 
+    // string whether the log string was stored in the database or not.
     @Override 
     public String checkAndStoreLog(String fileName, String log) throws IOException {
         return new String();
+    }
+
+    // highlight searched text
+    private HighlightBuilder addHighLighter(String field) {
+        HighlightBuilder highlightBuilder = new HighlightBuilder()
+            .preTags("<b>").postTags("</b>");
+        HighlightBuilder.Field highlightTitle = new HighlightBuilder.Field(field);
+        highlightTitle.highlighterType("unified");
+        highlightBuilder.field(highlightTitle);
+        return highlightBuilder;
     }
 }
 
