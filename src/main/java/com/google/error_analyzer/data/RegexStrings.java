@@ -16,7 +16,7 @@ package com.google.error_analyzer.data;
 
 import java.util.*;
 
-public class RegexExpressions{
+public class RegexStrings{
 
     private ArrayList<String> createList(){
         ArrayList<String> regexList = new ArrayList<String>();

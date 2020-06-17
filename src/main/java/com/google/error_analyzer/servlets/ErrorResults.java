@@ -16,8 +16,9 @@ package com.google.error_analyzer.servlets;
 
 import com.google.error_analyzer.backend.BooleanQuery;
 import com.google.gson.Gson;
-import java.util.*;
 import java.lang.*;
+import java.util.*;
+
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -30,6 +31,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.client.RequestOptions;
 
@@ -48,7 +50,7 @@ public class ErrorResults extends HttpServlet {
             BooleanQuery searchQuery = new BooleanQuery();
             SearchRequest searchRequest = searchQuery.createSearchRequest(indexFile);
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHits hits = searchResponse.getHits();
+            SearchHit[] hits = searchResponse.getHits().getHits();
             ArrayList<String> errorData = searchQuery.sortErrorDocuments(hits);
             response.getWriter().println(errorData);
             String infoMsg = "Completed Boolean query successfully on ";

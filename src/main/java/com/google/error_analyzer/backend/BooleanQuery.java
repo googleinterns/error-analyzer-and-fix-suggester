@@ -11,23 +11,22 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
+import com.google.error_analyzer.data.Keywords;
+import com.google.error_analyzer.data.RegexStrings;
+import java.util.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.action.search.SearchRequest;
-import java.util.*;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-import com.google.error_analyzer.data.Keywords;
-import com.google.error_analyzer.data.RegexExpressions;
-import org.elasticsearch.index.query.RegexpQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
- 
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RegexpQueryBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+
+
 public class BooleanQuery {
     private static final Logger logger = LogManager.getLogger(BooleanQuery.class);
     private final String logTextField = "logText";
@@ -37,7 +36,7 @@ public class BooleanQuery {
         SearchRequest searchRequest = new SearchRequest(fileName);
         Keywords errorKeywords = new Keywords();
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        RegexExpressions regexExpressions = new RegexExpressions();
+        RegexStrings regexExpressions = new RegexStrings();
         String regexQueryString = regexExpressions.getQueryString();
         RegexpQueryBuilder regexQuery = new RegexpQueryBuilder(logTextField,regexQueryString);
         String keywordsQueryString = errorKeywords.getQueryString();
@@ -51,15 +50,20 @@ public class BooleanQuery {
         return searchRequest;
     }
     
-    //Sort the searchHits acc to ids (which is also logLineNumber) and return document json strings
-    public ArrayList<String> sortErrorDocuments(SearchHits hits) {
+    //Sort the searchHits acc to ids and return document json strings
+    public ArrayList<String> sortErrorDocuments(SearchHit[] hits) {
         ArrayList<Integer> searchHitIds = new ArrayList<>();
         HashMap<Integer, String> hitsHashMap = new HashMap();
         for (SearchHit hit : hits) {
-            Integer id = Integer.parseInt(hit.getId());
-            searchHitIds.add(id);
-            String jsonDocument = hit.getSourceAsString();
-            hitsHashMap.put(id, jsonDocument);
+            try {
+                Integer id = Integer.parseInt(hit.getId());
+                searchHitIds.add(id);
+                String jsonDocument = hit.getSourceAsString();
+                hitsHashMap.put(id, jsonDocument);
+            } catch(NumberFormatException e) {
+                String errorMsg = "Could not parse: ";
+                logger.error(errorMsg.concat(e.toString()));
+            }
         }
         Collections.sort(searchHitIds);
         ArrayList<String> sortedSourceStrings = new ArrayList();

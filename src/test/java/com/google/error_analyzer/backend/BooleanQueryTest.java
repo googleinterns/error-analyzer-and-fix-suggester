@@ -12,53 +12,58 @@ limitations under the License.*/
 package com.google.error_analyzer;
 
 import com.google.error_analyzer.backend.BooleanQuery;
+import com.google.error_analyzer.data.Keywords;
+import com.google.error_analyzer.data.RegexStrings;
+import java.io.IOException;
+import java.util.ArrayList;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.search.SearchHits;
-import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
-import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import java.io.IOException;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.times;
+import org.junit.Rule;
+import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public final class BooleanQueryTest {
 
     private final String filename = "file";
-    SearchRequest searchRequest = null;
-    SearchHits hits = null;
-    
-    @Mock BooleanQuery boolQuery;
-    @Mock 
+
+    @Mock
+    BooleanQuery boolQuery = new BooleanQuery();
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
-    @Before
-    public void setUp() {
-        searchRequest = new SearchRequest();
-    }
-
     @Test
     public void createSearchRequetTest() {
-        when(boolQuery.createSearchRequest(filename)).thenReturn(searchRequest);
         SearchRequest searchRequest = boolQuery.createSearchRequest(filename);
         verify(boolQuery, times(1)).createSearchRequest(filename);
     }
 
     @Test
-    public void sortErrorDocumentsTest {
+    public void keyWordQueryString() {
+        Keywords keywords = new Keywords(); 
+        String actual = keywords.getQueryString();
+        String expected = "error OR fatal OR severe OR exit OR exception";
+        Assert.assertEquals(expected, actual);
+    }
 
-        when(boolQuery.sortErrorDocuments(hits)).thenReturn()
+    @Test
+    public void regexpQueryString() {
+        RegexStrings regex = new RegexStrings();
+        String actual = regex.getQueryString();
+        String expected = ".*exception";
+        Assert.assertEquals(expected, actual);
     }
 }

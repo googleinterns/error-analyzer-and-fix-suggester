@@ -7,3 +7,4 @@ README*
 *.log
 
 target/
+logs/
