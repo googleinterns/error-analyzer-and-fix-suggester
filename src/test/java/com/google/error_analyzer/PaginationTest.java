@@ -14,32 +14,34 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package com.google.error_analyzer;
 
+import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.backend.LogDao;
+import com.google.error_analyzer.backend.LogDaoHelper;
 import com.google.error_analyzer.backend.Pagination;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
+import javax.servlet.http.HttpServletResponse;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.Rule;
-import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.junit.runner.RunWith;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.Mock;
+import org.mockito.Mockito.*;
+import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Mockito.*;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.mockito.InjectMocks;
-import org.springframework.test.util.ReflectionTestUtils;
-import java.lang.reflect.Method;
-import java.lang.reflect.Field;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -56,9 +58,13 @@ public final class PaginationTest {
     private int page1 = 1;
     private int page2 = 2;
     private int page9 = 9;
+    // private LogDaoHelper databaseHelper = new LogDaoHelper();
 
     @Mock
     LogDao database;
+
+    @Mock
+    LogDaoHelper databaseHelper;
 
     @InjectMocks
     Pagination pagination;
@@ -70,24 +76,26 @@ public final class PaginationTest {
     public void setUp() {
         pagination = new Pagination();
         ReflectionTestUtils.setField(pagination, "database", database);
+        ReflectionTestUtils.setField(pagination, "databaseHelper", databaseHelper);
         MockitoAnnotations.initMocks(this);
     }
 
     // database related mocked functions
-    public void databaseHelper() throws IOException {
+    private void databaseHelper() throws IOException {
         when(database.getAll(fileName, 0, 0)).thenReturn(new SearchHit[0]);
-        when(database.hitId(new SearchHit[0])).thenReturn(new ArrayList());
-        when(database.hitFieldContent(new SearchHit[0], fileName)).thenReturn(new ArrayList());
+        ImmutableList<String> immutableList = ImmutableList.of();
+        when(databaseHelper.hitId(new SearchHit[0])).thenReturn(immutableList);
+        when(databaseHelper.hitFieldContent(new SearchHit[0], fileName)).thenReturn(immutableList);
     }
     // return private class variable object
-    public Object getPrivateVariable(String variableName) throws Exception {
+    private Object getPrivateVariable(String variableName) throws Exception {
         Field privateVariable = Pagination.class.getDeclaredField(variableName);
         privateVariable.setAccessible(true);
         return privateVariable.get(pagination);
     }
 
     // access private method maintainWindow
-    public Object getPrivateMethodMaintainWindow(int page, String next, String fileName, 
+    private Object getPrivateMethodMaintainWindow(int page, String next, String fileName, 
     String fileType, HashMap < String, String > search) throws Exception 
     {
         Method method = Pagination.class.getDeclaredMethod("maintainWindow", new Class[] {
@@ -98,7 +106,7 @@ public final class PaginationTest {
     }
 
     // access private method fetchAndStoreData
-    public Object getPrivateMethodFetchAndStoreData(int page, String fileName, String fileType,
+    private Object getPrivateMethodFetchAndStoreData(int page, String fileName, String fileType,
     String next, HashMap < String, String > search) throws Exception 
     {
         Method method = Pagination.class.getDeclaredMethod("fetchAndStoreData", new Class[] {
@@ -107,8 +115,9 @@ public final class PaginationTest {
         method.setAccessible(true);
         return method.invoke(pagination, page, fileName, fileType, next, search);
     }
+
     // access private method updateLastPage
-    public Object getPrivateMethodUpdateLastPage(int searchHitLength, int page) throws Exception {
+    private Object getPrivateMethodUpdateLastPage(int searchHitLength, int page) throws Exception {
         Method method = Pagination.class.getDeclaredMethod("updateLastPage", new Class[] {
             int.class, int.class
         });

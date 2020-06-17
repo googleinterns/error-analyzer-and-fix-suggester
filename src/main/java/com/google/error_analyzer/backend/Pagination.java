@@ -10,18 +10,19 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package com.google.error_analyzer.backend;
 
-import com.google.gson.Gson;
-import java.util.*;
-import java.lang.*;
-import com.google.error_analyzer.data.SearchErrors;
+import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.data.ErrorFixes;
+import com.google.error_analyzer.data.SearchErrors;
+import com.google.gson.Gson;
 import java.io.IOException;
+import java.lang.*;
+import java.util.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
@@ -34,12 +35,13 @@ public class Pagination extends HttpServlet {
     private ArrayList < String > data = new ArrayList();
     private static final Logger LOG = LogManager.getLogger(Pagination.class);
     public int recordsPerPage = 3;
-    // keep it a odd no so that there are equal pages in front and back 
+    // keep noOfPages a odd no so that there are equal pages in front and back 
     private int noOfPages = 5;
     private int extraPageInFrontAndBack = noOfPages / 2;
     private int noOfRecordsOnLastPage = recordsPerPage;
     private int lastPage = Integer.MAX_VALUE;
     private static LogDao database = new LogDao();
+    private static LogDaoHelper databaseHelper = new LogDaoHelper();
 
     // return object 
     private class logOrErrorResponse {
@@ -82,7 +84,6 @@ public class Pagination extends HttpServlet {
 
     //  if user is asking for 1st page return that page and make a window of fully finished and ready to use data for that file
     // if user is not on 1st page but someother page just maintain the already created window of pages
-
     private int[] fetchAndStoreData(int page, String fileName, String fileType, String next, HashMap < String, String > search) {
         int start = 0;
         int stop = recordsPerPage - 1;
@@ -110,7 +111,6 @@ public class Pagination extends HttpServlet {
         };
     }
 
-
     // returns true if the asked page is last page
     private boolean isLastPage(int page) {
         return page == lastPage ? true : false;
@@ -133,8 +133,11 @@ public class Pagination extends HttpServlet {
     {
         try{ 
             SearchHit[] searchHits = database.getAll( fileName, start, size);
-            ArrayList < String > hitIds = database.hitId(searchHits);
-            ArrayList < String > hitFieldContent = database.hitFieldContent(searchHits, field);
+            ImmutableList < String > hitIds = databaseHelper.hitId(searchHits);
+            ImmutableList < String > hitFieldContent = databaseHelper.hitFieldContent(searchHits, field);
+            if(hitIds == null) {
+                return;
+            }
             addFetchResultToData(startIdx, fileType, hitIds, hitFieldContent, search);
             updateLastPage(hitIds.size(), page);
         } catch(IOException excep) {
@@ -146,8 +149,8 @@ public class Pagination extends HttpServlet {
     }
 
     // add fetched results to data and apply search results and error-fixes if applicable
-    private void addFetchResultToData(int startIdx, String fileType, ArrayList < String > hitIds,
-     ArrayList < String > hitFieldContent, HashMap < String, String > search) 
+    private void addFetchResultToData(int startIdx, String fileType, ImmutableList < String > hitIds,
+    ImmutableList < String > hitFieldContent, HashMap < String, String > search) 
     {
         ErrorFixes errorFix=new ErrorFixes();
         int i = startIdx;
