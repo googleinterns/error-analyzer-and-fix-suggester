@@ -11,36 +11,33 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.apache.http.HttpHost;
 import java.io.IOException;
 import java.util.*;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.SimpleQueryStringBuilder;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder.Field;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
-import org.elasticsearch.action.get.GetResponse;
+import com.google.common.collect.ImmutableList;
+import org.apache.http.HttpHost;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
-import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.RestClient;
+import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.SimpleQueryStringBuilder;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
+
 
 public class LogDao implements DaoInterface {
 
@@ -50,29 +47,6 @@ public class LogDao implements DaoInterface {
     private static final int windowSize = 10;
     private static final Logger logger = LogManager.getLogger(LogDao.class);
 
-    //search db using keywords and return searchHits having highlight field added 
-    @Override 
-    public ArrayList < SearchHit > fullTextSearch(String fileName, String searchString, String field) throws IOException {
-        int offset = 0;
-        SearchHit[] searchHits = null;
-        ArrayList < SearchHit > searchResult = new ArrayList();
-        while (searchHits == null || searchHits.length != 0) {
-            SearchRequest searchRequest = new SearchRequest(fileName);
-            SimpleQueryStringBuilder simpleQueryBuilder = QueryBuilders.simpleQueryStringQuery(searchString);
-            searchSourceBuilder.query(simpleQueryBuilder).size(windowSize).from(offset);
-            HighlightBuilder highlightBuilder = addHighLighter(field);
-            searchSourceBuilder.highlighter(highlightBuilder);
-            searchRequest.source(searchSourceBuilder);
-            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHits hits = searchResponse.getHits();
-            searchHits = hits.getHits();
-            for (SearchHit hit: searchHits) {
-                searchResult.add(hit);
-            }
-            offset += windowSize;
-        }
-        return searchResult;
-    }
     // highlight searched text
     private HighlightBuilder addHighLighter(String field) {
         HighlightBuilder highlightBuilder = new HighlightBuilder().preTags("<b>").postTags("</b>");
@@ -82,32 +56,32 @@ public class LogDao implements DaoInterface {
         return highlightBuilder;
     }
 
-    // return ArrayList of hit ids corresponding to given searchhit list
+    //search db using keywords and return searchHits having highlight field added 
     @Override 
-    public ArrayList < String > hitId(SearchHit[] searchHits) throws IOException {
-        ArrayList < String > ids = new ArrayList();
-        for (SearchHit hit: searchHits) {
-            String id = hit.getId();
-            ids.add(id);
+    public ImmutableList < SearchHit > fullTextSearch(String fileName, String searchString, String field)
+    throws IOException 
+    {
+        int offset = 0;
+        SearchHit[] searchHits = null;
+        ArrayList < SearchHit > searchResult = new ArrayList();
+        while (searchHits == null || searchHits.length != 0) {
+            SearchRequest searchRequest = new SearchRequest(fileName);
+            SimpleQueryStringBuilder simpleQueryBuilder = 
+                QueryBuilders.simpleQueryStringQuery(searchString);
+            searchSourceBuilder.query(simpleQueryBuilder)
+                .size(windowSize).from(offset);
+            searchSourceBuilder.highlighter(addHighLighter(field));
+            searchRequest.source(searchSourceBuilder);
+            SearchResponse searchResponse = 
+                client.search(searchRequest, RequestOptions.DEFAULT);
+            SearchHits hits = searchResponse.getHits();
+            searchHits = hits.getHits();
+            for (SearchHit hit: searchHits) {
+                searchResult.add(hit);
+            }
+            offset += windowSize;
         }
-        return ids;
-    }
-
-    // return ArrayList of content for specified field  corresponding to given searchhit list
-    @Override 
-    public ArrayList < String > hitFieldContent(SearchHit[] searchHits, String field) throws IOException {
-        ArrayList < String > fieldContent = new ArrayList();
-        for (SearchHit hit: searchHits) {
-            String resultString = String.valueOf(hit.getSourceAsMap().get(field));
-            fieldContent.add(resultString);
-        }
-        return fieldContent;
-    }
-
-    //search db using user provided regex and return searchHits having highlight field added
-    @Override 
-    public SearchHit[] regexQuery(String filename, String regex) {
-        return new SearchHit[0];
+        return ImmutableList.copyOf(searchResult);
     }
 
     //return a section of given index starting from start and of length equal to given size
@@ -120,20 +94,6 @@ public class LogDao implements DaoInterface {
         SearchHits hits = searchResponse.getHits();
         SearchHit[] searchHits = hits.getHits();
         return searchHits;
-    }
-    //returns hashmap of hit ids and highlighted content 
-    @Override 
-    public HashMap < String, String > getHighLightedText(ArrayList < SearchHit > searchHits, String field)
-    throws IOException
-    {
-        HashMap < String, String > searchResult = new HashMap();
-        for (SearchHit hit: searchHits) {
-            Map < String, HighlightField > highlightFields = hit.getHighlightFields();
-            HighlightField highlight = highlightFields.get(field);
-            String fragmentString = (highlight.fragments())[0].string();
-            searchResult.put(hit.getId(), fragmentString);
-        }
-        return searchResult;
     }
 
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
@@ -152,15 +112,15 @@ public class LogDao implements DaoInterface {
         return true;
     }
 
-
     //Stores the jsonString at index with name filename and returns the logText of the document stored
     @Override 
     public String storeLogLine(String Filename, String jsonString, String Id) throws IOException {
         return new String();
     }
 
-    //Stores the log into the database if an index with name fileName does not exist in the database and returns a 
-    //string that contains the status of the log string whether the log string was stored in the database or not.
+    //Stores the log into the database if an index with name fileName does not exist in the database 
+    //and returns a string that contains the status of the log string whether the log string was 
+    //stored in the database or not.
     @Override 
     public String checkAndStoreLog(String fileName, String log) throws IOException {
         return new String();
