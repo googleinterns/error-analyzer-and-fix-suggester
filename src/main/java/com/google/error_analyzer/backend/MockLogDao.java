@@ -58,8 +58,7 @@ public class MockLogDao implements DaoInterface {
     //  to given size
     @Override 
     public SearchHit[] getAll(String fileName, int start, int size) 
-    throws IOException 
-    {
+    throws IOException {
         if (start >= database.length) {
             return new SearchHit[0];
         }
