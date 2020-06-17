@@ -11,16 +11,15 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
+import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.data.SearchErrors;
-import java.util.*;
-import java.lang.*;
 import java.io.IOException;
+import java.lang.*;
+import java.util.*;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.elasticsearch.search.SearchHit;
@@ -33,6 +32,7 @@ import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 public class Search extends HttpServlet {
 
     private static LogDao database = new LogDao();
+    private static LogDaoHelper databaseHelper= new LogDaoHelper();
     private final String field = "name";
     private static final Logger LOG = LogManager.getLogger(Search.class);
     
@@ -43,16 +43,15 @@ public class Search extends HttpServlet {
         SearchErrors SearchErrors = new SearchErrors();
         HashMap < String, String > searchResult = searchDataBase(fileName, searchString);
         SearchErrors.setSearchedErrors(searchResult);
+        
     }
 
     // run full-text search for given string 
     private HashMap < String, String > searchDataBase(String fileName, String searchString) {
         try{
-            ArrayList < SearchHit > searchHits = database.fullTextSearch(fileName, searchString, field);
-            return database.getHighLightedText(searchHits, field);
-        } catch(IOException excep) {
-            String exception = new String("error in interacting with dataBase");
-            exception+=excep;
+            ImmutableList < SearchHit > searchHits = database.fullTextSearch(fileName, searchString, field);
+            return databaseHelper.getHighLightedText(searchHits, field);
+        } catch(IOException exception) {
             LOG.error(exception);
         }
         return new HashMap();

@@ -13,34 +13,36 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package com.google.error_analyzer;
 
+import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.MockLogDao;
+import com.google.error_analyzer.backend.Pagination;
 import com.google.error_analyzer.backend.Search;
+import java.io.*;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
+import javax.servlet.http.HttpServletResponse;
+import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.SearchHits;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Test;
 import org.junit.Rule;
-import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.junit.runner.RunWith;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+import org.mockito.Mock;
+import org.mockito.Mockito.*;
+import org.mockito.MockitoAnnotations;
+import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.test.util.ReflectionTestUtils;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.*;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.Mockito.*;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.mockito.InjectMocks;
-import org.springframework.test.util.ReflectionTestUtils;
-import java.lang.reflect.Method;
-
 
 @RunWith(MockitoJUnitRunner.class)
 public final class SearchTest {
@@ -69,10 +71,8 @@ public final class SearchTest {
     // maintaining window of given length
     @Test
     public void fullTextSearch() throws Exception {
-        ArrayList < SearchHit > searchHits = mockdb.fullTextSearch(fileName, searchString, field);
-        HashMap < String, String > highlights = mockdb.getHighLightedText(searchHits, field);
+        ImmutableList < SearchHit > searchHits = mockdb.fullTextSearch(fileName, searchString, field);
         when(database.fullTextSearch(fileName, searchString, field)).thenReturn(searchHits);
-        when(database.getHighLightedText(searchHits, field)).thenReturn(highlights);
         HashMap < String, String > actual =(HashMap<String,String>)(getPrivateMethodSearchDataBase());
         HashMap < String, String > expected = new HashMap();
         expected.put("1", "info: start appengine");
