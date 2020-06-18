@@ -73,7 +73,8 @@ public final class LogDaoHelperTest {
         SearchHit[] searchHits=new SearchHit[]{hit1, hit2};
         when(hit1.getSourceAsMap()).thenReturn(getSource("error1"));
         when(hit2.getSourceAsMap()).thenReturn(getSource("error2"));
-        ImmutableList <String> actual = logDaoHelper.hitFieldContent(searchHits,field);
+        ImmutableList <String> actual = 
+            logDaoHelper.hitFieldContent(searchHits,field);
         ImmutableList<String> expected = ImmutableList.<String>builder() 
                                           .add("error1","error2") 
                                           .build();  
@@ -86,10 +87,12 @@ public final class LogDaoHelperTest {
         when(hit1.getHighlightFields()).thenReturn(highlight("error1"));
         when(hit2.getHighlightFields()).thenReturn(highlight("error2"));
         getHitId();
-        ImmutableList<SearchHit> searchHits = ImmutableList.<SearchHit>builder() 
+        ImmutableList<SearchHit> searchHits = ImmutableList
+                                          .<SearchHit>builder() 
                                           .add(hit1, hit2) 
                                           .build(); 
-        HashMap < String, String >actual = logDaoHelper.getHighLightedText(searchHits, field);
+        HashMap < String, String >actual = 
+            logDaoHelper.getHighLightedText(searchHits, field);
         HashMap < String, String > expected =new HashMap(); 
         expected.put("1","error1");
         expected.put("2","error2");

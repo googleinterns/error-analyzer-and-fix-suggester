@@ -14,7 +14,8 @@ package com.google.error_analyzer.backend;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import java.util.*;
-import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder.Field;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder
+                                                        .Field;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -37,7 +38,8 @@ public class LogDaoHelper {
     SearchHit[] searchHits, String field) {
         Builder<String> fieldContent = ImmutableList.<String>builder();
         for (SearchHit hit: searchHits) {
-            String resultString = String.valueOf(hit.getSourceAsMap().get(field));
+            String resultString = 
+                String.valueOf(hit.getSourceAsMap().get(field));
             fieldContent.add(resultString);
         }
         return fieldContent.build();
