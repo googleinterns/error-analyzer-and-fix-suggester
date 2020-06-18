@@ -113,25 +113,29 @@ public class LogDao implements DaoInterface {
         return;
     }
     
-    //checks whether index with name fileName already exists in the database;
+    //checks whether index with name fileName already exists in the database; 
+    @Override
     public boolean fileExists(String fileName) throws IOException {
-        return true;
+        GetIndexRequest getIndexRequest = new GetIndexRequest();
+        getIndexRequest.indices(fileName);
+        boolean indexExists = 
+            client.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
+        return indexExists;
     }
 
-    //Stores the jsonString at index with name filename and returns the logText 
-    // of the document stored
-    @Override 
-    public String storeLogLine(String Filename, String jsonString, String Id)
+    //Stores the jsonString at index with name filename and returns the stored
+    // string
+    @Override
+    public String storeLogLine(String fileName, String jsonString, String id)
     throws IOException {
-        return new String();
-    }
-
-    //Stores the log into the database if an index with name fileName does not exist
-    //  in the database and returns a string that contains the status of the log 
-    // string whether the log string was stored in the database or not.
-    @Override 
-    public String checkAndStoreLog(String fileName, String log) throws IOException {
-        return new String();
+        IndexRequest indexRequest = new IndexRequest(fileName);
+        indexRequest.id(id);
+        indexRequest.source(jsonString, XContentType.JSON);
+        client.index(indexRequest, RequestOptions.DEFAULT);
+        GetRequest getRequest = new GetRequest(fileName, id);
+        GetResponse getResponse =
+            client.get(getRequest, RequestOptions.DEFAULT);
+        return getResponse.getSourceAsString();
     }
 
     // highlight searched text
