@@ -17,9 +17,7 @@ import java.util.ArrayList;
 /*this class contains all the methods related to the indices of the mock 
 database. The Index class has attributes indexName and documentList.
 documentList is an Arraylist of objects of Document class.*/
-
 public class Index {
-
     private String indexName;
     private ArrayList < Document > documentList = new ArrayList < Document > ();
 

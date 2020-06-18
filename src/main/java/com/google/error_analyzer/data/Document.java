@@ -16,8 +16,7 @@ import java.util.ArrayList;
 /*The document class has attributes id and jsonString.
  id represents the document id in the mock database.
  Data will be stored as json strings in the documents*/
- 
-public class Document {
+ public class Document {
     private String id;
     private String jsonString;
 
