@@ -14,8 +14,8 @@ package com.google.error_analyzer.data;
 import java.util.ArrayList;
 
 public class Document {
-    String id;
-    String jsonString;
+    private String id;
+    private String jsonString;
 
     public Document(String id, String jsonString) {
         this.id = id;
