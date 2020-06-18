@@ -34,14 +34,9 @@ public interface DaoInterface {
     //checks whether index with name fileName already exists in the database;
     public boolean fileExists (String fileName) throws IOException;
 
-    //Stores the jsonString at index with name filename and returns the logText 
-    // of the document stored
-    public String storeLogLine (String filename, String jsonString, String Id) 
+    //Stores the jsonString at index with name filename and returns the stored 
+    // string
+    public String storeLogLine (String filename, String jsonString, String id) 
     throws IOException;
-
-    //Stores the log into the database if an index with name fileName does not exist in the 
-    // database  and returns a string that contains the status of the log string whether the 
-    // log string was stored in the database or not.
-    public String checkAndStoreLog (String fileName, String log) throws IOException;
 
 }

@@ -11,6 +11,8 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
+import com.google.error_analyzer.data.Document;
+import com.google.error_analyzer.data.Index;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import java.io.IOException;
@@ -26,6 +28,7 @@ public class MockLogDao implements DaoInterface {
     "info: start appengine","scheduler shutting down",
     "WARNING: An illegal reflective access operation has occurred", 
     "Severe: Could not find index file", "warning: NullPointerException"};
+    private ArrayList < Index > logDatabase = new ArrayList < Index >();
 
     //search db using keywords and return searchHits having highlight field added 
     @Override 
@@ -89,23 +92,44 @@ public class MockLogDao implements DaoInterface {
     }
 
     //checks whether index with name fileName already exists in the database;
-    @Override 
+    @Override
     public boolean fileExists(String fileName) {
-        return true;
+        Iterator < Index > indexListIterator = logDatabase.iterator();
+        while (indexListIterator.hasNext()) {
+            String indexName = (indexListIterator.next()).getIndexName();
+            if (fileName.equals(indexName)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    //Stores the jsonString at index with name filename and returns the logText 
-    // of the document stored
-    @Override 
-    public String storeLogLine(String filename, String jsonString, String Id) {
-        return new String();
+    //stores the jsonString at index with name filename and returns the stored 
+    //string
+    @Override
+    public String storeLogLine(String fileName, String jsonString, String id) {
+        String result = new String();
+        Index index = new Index();
+        index.setIndexName(fileName);
+        Document document = new Document(id, jsonString);
+        index.addDocument(document);
+        logDatabase.add(index);
+        Iterator < Index > indexListIterator = logDatabase.iterator();
+        while (indexListIterator.hasNext()) {
+            Index searchIndex = indexListIterator.next();
+            if (fileName.equals(searchIndex.getIndexName())) {
+                ArrayList < Document > DocList = searchIndex.getDocumentList();
+                Iterator < Document > docListIterator = DocList.iterator();
+                while (docListIterator.hasNext()) {
+                    Document doc = docListIterator.next();
+                    if (id.equals(doc.getID())) {
+                        result = doc.getJsonString();
+                    }
+                }
+            }
+        }
+        return result;
     }
 
-    //Stores the log into the database if an index with name fileName does not 
-    // exist in the database and returns a string that contains the status of the 
-    // log string whether the log string was stored in the database or not.
-    @Override 
-    public String checkAndStoreLog(String fileName, String log) {
-        return new String();
-    }
+
 }
