@@ -18,7 +18,6 @@ import com.google.error_analyzer.backend.BooleanQuery;
 import com.google.gson.Gson;
 import java.lang.*;
 import java.util.*;
-
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -37,7 +36,7 @@ import org.elasticsearch.client.RequestOptions;
 
 @WebServlet("/errorResults")
 public class ErrorResults extends HttpServlet {
-    private String indexFile = "trial_index"; //later fetched from request
+    private String indexFile = "stack"; //later fetched from request
     private static final Logger logger = LogManager.getLogger(ErrorResults.class);
     private String logTextField = "logText"; 
     RestHighLevelClient client = new RestHighLevelClient(

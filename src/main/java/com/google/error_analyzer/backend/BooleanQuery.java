@@ -30,7 +30,7 @@ import org.elasticsearch.search.SearchHits;
 public class BooleanQuery {
     private static final Logger logger = LogManager.getLogger(BooleanQuery.class);
     private final String logTextField = "logText";
-
+    private final String logLineNumberField = "logLineumber";
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
     public SearchRequest createSearchRequest(String fileName) {
         SearchRequest searchRequest = new SearchRequest(fileName);
@@ -45,6 +45,8 @@ public class BooleanQuery {
             .minimumShouldMatch(1)
             .should(regexQuery)
             .should(fulltextQuery);
+        searchSourceBuilder.size(1000);
+        searchSourceBuilder.sort(logLineNumberField);
         searchSourceBuilder.query(errorQuery); 
         searchRequest.source(searchSourceBuilder);
         return searchRequest;
@@ -57,6 +59,7 @@ public class BooleanQuery {
         for (SearchHit hit : hits) {
             try {
                 Integer id = Integer.parseInt(hit.getId());
+                logger.info("-------------------------------"+id);
                 searchHitIds.add(id);
                 String jsonDocument = hit.getSourceAsString();
                 hitsHashMap.put(id, jsonDocument);
