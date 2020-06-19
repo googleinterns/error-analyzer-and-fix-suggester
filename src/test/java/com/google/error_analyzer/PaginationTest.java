@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.LogDaoHelper;
 import com.google.error_analyzer.backend.Pagination;
+import com.google.error_analyzer.data.SearchErrors;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -31,6 +32,7 @@ import org.junit.Rule;
 import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -42,29 +44,29 @@ import org.springframework.test.util.ReflectionTestUtils;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.BDDMockito.any;
 
 
 @RunWith(MockitoJUnitRunner.class)
 public final class PaginationTest {
 
-    private int recordsPerPage1 = 1;
-    private int recordsPerPage8 = 8;
-    private int noOfPages1 = 1;
     private String fileName = "file";
     private String fileType1 = "errors";
     private String filetType2 = "logs";
-    private String nextPage = "true";
-    private String prevPage = "false";
     private int page1 = 1;
     private int page2 = 2;
-    private int page9 = 9;
-    // private LogDaoHelper databaseHelper = new LogDaoHelper();
 
     @Mock
     LogDao database;
 
     @Mock
     LogDaoHelper databaseHelper;
+
+    @Mock
+    ImmutableList<String> immutableListIds;
+
+    @Mock
+    ImmutableList<String> immutableListContent;
 
     @InjectMocks
     Pagination pagination;
@@ -83,181 +85,61 @@ public final class PaginationTest {
     // database related mocked functions
     private void databaseHelper() throws IOException {
         when(database.getAll(fileName, 0, 0)).thenReturn(new SearchHit[0]);
-        ImmutableList<String> immutableList = ImmutableList.of();
-        when(databaseHelper.hitId(new SearchHit[0])).thenReturn(immutableList);
-        when(databaseHelper.hitFieldContent(new SearchHit[0], fileName)).thenReturn(immutableList);
-    }
-    // return private class variable object
-    private Object getPrivateVariable(String variableName) throws Exception {
-        Field privateVariable = Pagination.class.getDeclaredField(variableName);
-        privateVariable.setAccessible(true);
-        return privateVariable.get(pagination);
+        when(databaseHelper.hitId(any(SearchHit[].class))).thenReturn(immutableListIds);
+        when(databaseHelper.hitFieldContent(new SearchHit[0], fileName)).thenReturn(immutableListContent);
+        when(immutableListIds.size()).thenReturn(2);
+        when(immutableListIds.get(0)).thenReturn("1");
+        when(immutableListIds.get(1)).thenReturn("2");
+        when(immutableListContent.get(0)).thenReturn("error1");
+        when(immutableListContent.get(1)).thenReturn("error2");
     }
 
-    // access private method maintainWindow
-    private Object getPrivateMethodMaintainWindow(int page, String next, String fileName, 
-    String fileType, HashMap < String, String > search) throws Exception 
+    // access private method addFetchResultToData
+    private Object getPrivateAddFetchResultToData(String fileType, ImmutableList < String > hitIds,
+    ImmutableList < String > hitFieldContent) throws Exception 
     {
-        Method method = Pagination.class.getDeclaredMethod("maintainWindow", new Class[] {
-            int.class, String.class, String.class, String.class, HashMap.class
-        });
+        Method method = Pagination.class.getDeclaredMethod("addFetchResultToData", new Class[] {
+            String.class, ImmutableList.class, ImmutableList.class});
         method.setAccessible(true);
-        return method.invoke(pagination, page, next, fileName, fileType, search);
+        return method.invoke(pagination, fileType, hitIds, hitFieldContent);
     }
 
-    // access private method fetchAndStoreData
-    private Object getPrivateMethodFetchAndStoreData(int page, String fileName, String fileType,
-    String next, HashMap < String, String > search) throws Exception 
-    {
-        Method method = Pagination.class.getDeclaredMethod("fetchAndStoreData", new Class[] {
-            int.class, String.class, String.class, String.class, HashMap.class
-        });
+    // access private method fetchAndReturnResponse
+    private Object getPrivateMethodFetchAndReturnResponse(int page, String fileName, String fileType, int recordsPerPage)
+     throws Exception {
+        Method method = Pagination.class.getDeclaredMethod("fetchAndReturnResponse", new Class[] {
+            int.class, String.class, String.class, int.class});
         method.setAccessible(true);
-        return method.invoke(pagination, page, fileName, fileType, next, search);
+        return method.invoke(pagination, page, fileName, fileType, recordsPerPage);
     }
 
-    // access private method updateLastPage
-    private Object getPrivateMethodUpdateLastPage(int searchHitLength, int page) throws Exception {
-        Method method = Pagination.class.getDeclaredMethod("updateLastPage", new Class[] {
-            int.class, int.class
-        });
-        method.setAccessible(true);
-        return method.invoke(pagination, searchHitLength, page);
-    }
-
-    // maintaining window of given length
+    // addFetchResultToData
     @Test
-    public void equalstartingIdxForDataBaseAndArray() throws Exception {
-        databaseHelper();
-        int[] actual = (int[]) getPrivateMethodMaintainWindow(page2, nextPage, fileName, fileType1, new HashMap());
-        int[] expected = new int[] {
-            9, 9
-        };
-        Assert.assertArrayEquals(expected, actual);
-    }
-    
-    @Test
-    public void differentstartingIdxForDataBaseAndArray() throws Exception {
-        databaseHelper();
-        int[] actual = (int[]) getPrivateMethodMaintainWindow(page9, nextPage, fileName, fileType1, new HashMap());
-        int[] expected = new int[] {
-            30, 0
-        };
-        Assert.assertArrayEquals(expected, actual);
-    }
-    
-    @Test
-    public void onepageWindow() throws Exception {
-        databaseHelper();
-        ReflectionTestUtils.setField(pagination, "noOfPages", noOfPages1);
-        int[] actual = (int[]) getPrivateMethodMaintainWindow(page9, nextPage, fileName, fileType1, new HashMap());
-        int[] expected = new int[] {
-            30, 0
-        };
-
-        Assert.assertArrayEquals(expected, actual);
-    }
-    
-    @Test
-    public void onepageOneRecord() throws Exception {
-        databaseHelper();
-        ReflectionTestUtils.setField(pagination, "recordsPerPage", recordsPerPage1);
-        int[] actual = (int[]) getPrivateMethodMaintainWindow(page9, nextPage, fileName, fileType1, new HashMap());
-        int[] expected = new int[] {
-            10, 0
-        };
-
-        Assert.assertArrayEquals(expected, actual);
-    }
-
-    @Test
-    public void userPressPrevButton() throws Exception {
-        databaseHelper();
-        int[] actual = (int[]) getPrivateMethodMaintainWindow(page9, prevPage, fileName, fileType1, new HashMap());
-        int[] expected = new int[] {
-            18, 3
-        };
-
-        Assert.assertArrayEquals(expected, actual);
-    }
-    
-    @Test
-    public void pageToBeFetchedIsNegative() throws Exception {
-        databaseHelper();
-        int[] actual = (int[]) getPrivateMethodMaintainWindow(page2, prevPage, fileName, fileType1, new HashMap());
-        int[] expected = new int[] {
-            0, 0
-        };
-
-        Assert.assertArrayEquals(expected, actual);
-    }
-
-    //  lastpage  
-    @Test
-    public void lastPageHaveLessRecords() throws Exception {
-        ReflectionTestUtils.setField(pagination, "recordsPerPage", recordsPerPage8);
-        getPrivateMethodUpdateLastPage(3, page9);
-        int actual = (int) getPrivateVariable("lastPage");
-        int expected = 11;
-
+    public void addresult() throws Exception {
+        HashMap<String,String>searches=new HashMap();
+        searches.put("1","searchError");
+        SearchErrors searchErrors = new SearchErrors();
+        searchErrors.setSearchedErrors(searches);
+        ImmutableList<String> hitIds = ImmutableList.<String>builder() 
+                                                    .add("1","2")
+                                                    .build();
+            
+        ImmutableList<String> hitContent = ImmutableList.<String>builder() 
+                                                    .add("error1","error2")
+                                                    .build();
+        String actual = (String)getPrivateAddFetchResultToData(fileType1,hitIds,hitContent);
+        String expected = new String("[\"searchError\",\"error2\"]");
         Assert.assertEquals(expected, actual);
 
-        actual = (int) getPrivateVariable("noOfRecordsOnLastPage");
-        expected = 3;
-        Assert.assertEquals(expected, actual);
     }
+
+    // fetchAndReturnResponse
+    // @Test
+    // public void returnRequestedPageFromDb() throws Exception {
+    //     databaseHelper();
+    //     String actual = (String) getPrivateMethodFetchAndReturnResponse(2, fileName, fileType1, 1);
+    //     String expected = new String ("[\"error2\"]");
+    //     Assert.assertEquals(expected, actual);
+    // }
     
-    @Test
-    public void lastPageHaveEqualRecords() throws Exception {
-        ReflectionTestUtils.setField(pagination, "recordsPerPage", recordsPerPage8);
-        getPrivateMethodUpdateLastPage(0, page9);
-        int actual = (int) getPrivateVariable("lastPage");
-        int expected = 10;
-
-        Assert.assertEquals(expected, actual);
-
-        actual = (int) getPrivateVariable("noOfRecordsOnLastPage");
-        expected = recordsPerPage8;
-        Assert.assertEquals(expected, actual);
-    }
-    
-    @Test
-    public void lastPageNotFoundYet() throws Exception {
-        ReflectionTestUtils.setField(pagination, "recordsPerPage", recordsPerPage8);
-        getPrivateMethodUpdateLastPage(recordsPerPage8, page9);
-        int actual = (int) getPrivateVariable("lastPage");
-        int expected = Integer.MAX_VALUE;
-
-        Assert.assertEquals(expected, actual);
-
-        actual = (int) getPrivateVariable("noOfRecordsOnLastPage");
-        expected = recordsPerPage8;
-        Assert.assertEquals(expected, actual);
-    }
-
-    // fetchAndStoreData
-    @Test
-    public void onFirstPage() throws Exception {
-        databaseHelper();
-        int[] actual = (int[]) getPrivateMethodFetchAndStoreData(page1, fileName, fileType1, nextPage, new HashMap());
-        int[] expected = new int[] {
-            0, 2
-        };
-
-        Assert.assertArrayEquals(expected, actual);
-    }
-
-    @Test
-    public void onLastPage() throws Exception {
-        ReflectionTestUtils.setField(pagination, "lastPage", page9);
-        ReflectionTestUtils.setField(pagination, "noOfRecordsOnLastPage", recordsPerPage1);
-        databaseHelper();
-        int[] actual = (int[]) getPrivateMethodFetchAndStoreData(page9, fileName, fileType1, nextPage, new HashMap());
-        int[] expected = new int[] {
-            9, 9
-        };
-
-        Assert.assertArrayEquals(expected, actual);
-    }
-
 }

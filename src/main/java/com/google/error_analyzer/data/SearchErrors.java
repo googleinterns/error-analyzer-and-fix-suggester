@@ -31,6 +31,5 @@ public class SearchErrors {
     // method to fetch hits
     public void setSearchedErrors(HashMap < String, String > list) {
         searchedErrors = list;
-
     }
 }
