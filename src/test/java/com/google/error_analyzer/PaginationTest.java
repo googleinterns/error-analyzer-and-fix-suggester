@@ -39,6 +39,7 @@ import org.mockito.junit.MockitoRule;
 import org.mockito.Mock;
 import org.mockito.Mockito.*;
 import org.mockito.MockitoAnnotations;
+import org.mockito.quality.Strictness;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import static org.mockito.Mockito.times;
@@ -62,12 +63,6 @@ public final class PaginationTest {
     @Mock
     LogDaoHelper databaseHelper;
 
-    @Mock
-    ImmutableList<String> immutableListIds;
-
-    @Mock
-    ImmutableList<String> immutableListContent;
-
     @InjectMocks
     Pagination pagination;
 
@@ -84,14 +79,11 @@ public final class PaginationTest {
 
     // database related mocked functions
     private void databaseHelper() throws IOException {
-        when(database.getAll(fileName, 0, 0)).thenReturn(new SearchHit[0]);
-        when(databaseHelper.hitId(any(SearchHit[].class))).thenReturn(immutableListIds);
-        when(databaseHelper.hitFieldContent(new SearchHit[0], fileName)).thenReturn(immutableListContent);
-        when(immutableListIds.size()).thenReturn(2);
-        when(immutableListIds.get(0)).thenReturn("1");
-        when(immutableListIds.get(1)).thenReturn("2");
-        when(immutableListContent.get(0)).thenReturn("error1");
-        when(immutableListContent.get(1)).thenReturn("error2");
+        
+        ImmutableList<String> immutableListId = ImmutableList.of("2");
+        ImmutableList<String> immutableListContent = ImmutableList.of("error2");
+        when(databaseHelper.hitId(any())).thenReturn(immutableListId);
+        when(databaseHelper.hitFieldContent(any(),any())).thenReturn(immutableListContent);
     }
 
     // access private method addFetchResultToData
@@ -134,12 +126,12 @@ public final class PaginationTest {
     }
 
     // fetchAndReturnResponse
-    // @Test
-    // public void returnRequestedPageFromDb() throws Exception {
-    //     databaseHelper();
-    //     String actual = (String) getPrivateMethodFetchAndReturnResponse(2, fileName, fileType1, 1);
-    //     String expected = new String ("[\"error2\"]");
-    //     Assert.assertEquals(expected, actual);
-    // }
+    @Test
+    public void returnRequestedPageFromDb() throws Exception {
+        databaseHelper();
+        String actual = (String) getPrivateMethodFetchAndReturnResponse(2, fileName, fileType1, 1);
+        String expected = new String ("[\"error2\"]");
+        Assert.assertEquals(expected, actual);
+    }
     
 }

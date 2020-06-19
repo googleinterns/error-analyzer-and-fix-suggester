@@ -75,9 +75,9 @@ public class Pagination extends HttpServlet {
             SearchHit[] searchHits = database.getAll( fileName, start, size);
             ImmutableList < String > hitIds = databaseHelper.hitId(searchHits);
             ImmutableList < String > hitFieldContent = databaseHelper.hitFieldContent(searchHits, field);
-            // if(hitIds == null) {
-            //     return convertToJson(new ArrayList());
-            // }
+            if(hitIds == null) {
+                return convertToJson(new ArrayList());
+            }
             return addFetchResultToData(fileType, hitIds, hitFieldContent);
         } catch(IOException exception) {
             LOG.error(exception);
@@ -98,9 +98,9 @@ public class Pagination extends HttpServlet {
             String resultString = hitFieldContent.get(idx);
             String fix=new String();
 
-            if(fileType.equals(ERROR)) {
-                fix = errorFix.findFixes(resultString);
-            } 
+            // if(fileType.equals(ERROR)) {
+            //     fix = errorFix.findFixes(resultString);
+            // } 
             if (search.containsKey(id)) {
                 resultString = search.get(id);
             }
