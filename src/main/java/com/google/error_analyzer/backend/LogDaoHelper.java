@@ -22,7 +22,7 @@ import org.elasticsearch.search.SearchHits;
 
 public class LogDaoHelper {
 
-    // return ArrayList of hit ids corresponding to given searchhit list
+    // return ImmutableList of hit ids corresponding to given searchhit list
     public ImmutableList < String > hitId(SearchHit[] searchHits) {
         Builder<String> ids = ImmutableList.<String>builder();
         for (SearchHit hit: searchHits) {
@@ -32,7 +32,7 @@ public class LogDaoHelper {
         return ids.build();
     }
 
-    // return ArrayList of content of specified field  corresponding to 
+    // return ImmutableList of content of specified field  corresponding to 
     // given searchhit list
     public ImmutableList < String > hitFieldContent(
     SearchHit[] searchHits, String field) {

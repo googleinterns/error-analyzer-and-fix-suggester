@@ -41,6 +41,7 @@ import static org.mockito.Mockito.when;
 public final class LogDaoHelperTest {
     private final String field = "name";
     private LogDaoHelper logDaoHelper;
+    private SearchHit[] searchHits;
     @Mock 
     SearchHit hit1;
 
@@ -53,12 +54,12 @@ public final class LogDaoHelperTest {
     @Before
     public void setUp() {
         logDaoHelper = new LogDaoHelper();
+        searchHits=new SearchHit[]{hit1, hit2};
     }
 
     // hitId
     @Test
     public void getIdsOfGivenSearchHits() throws Exception {
-        SearchHit[] searchHits=new SearchHit[]{hit1, hit2};
         getHitId();
         ImmutableList <String> actual = logDaoHelper.hitId(searchHits);
         ImmutableList<String> expected = ImmutableList.<String>builder() 
@@ -70,7 +71,6 @@ public final class LogDaoHelperTest {
     // hitFieldContent
     @Test
     public void getFieldContentForEachHit() throws Exception {
-        SearchHit[] searchHits=new SearchHit[]{hit1, hit2};
         when(hit1.getSourceAsMap()).thenReturn(getSource("error1"));
         when(hit2.getSourceAsMap()).thenReturn(getSource("error2"));
         ImmutableList <String> actual = 
@@ -104,16 +104,16 @@ public final class LogDaoHelperTest {
         when(hit2.getId()).thenReturn("2");
     }
 
-    private HashMap<String,Object> getSource(String content){
-        HashMap<String,Object> fieldMap = new HashMap();
-        fieldMap.put(field,content);
+    private HashMap <String,Object> getSource(String content){
+        HashMap <String,Object> fieldMap = new HashMap();
+        fieldMap.put(field, content);
         return fieldMap;
     }
 
     private HashMap<String, HighlightField> highlight(String highlightText){
         Text [] text = new Text[]{new Text(highlightText)};
         HashMap <String,HighlightField> highlight = new HashMap();
-        highlight.put(field,new HighlightField(field,text));
+        highlight.put(field, new HighlightField(field, text));
         return highlight;     
     }
 
