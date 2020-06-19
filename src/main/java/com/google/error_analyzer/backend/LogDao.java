@@ -104,19 +104,15 @@ public class LogDao implements DaoInterface {
     //search db using regex and keywords and store back in db searchHits
     //Returns name of the new error File
     @Override 
-    public String errorQuery(String fileName) throws IOException {
+    public String findAndStoreErrors(String fileName) throws IOException {
         BooleanQuery booleanQuery = new BooleanQuery();
         SearchRequest searchRequest = booleanQuery.createSearchRequest(fileName);
         SearchResponse searchResponse = client
             .search(searchRequest, RequestOptions.DEFAULT);
         SearchHits hits = searchResponse.getHits();
-        String errorFile = fileName.concat("error");
-        for (SearchHit hit : hits) {
-            String jsonSource =  hit.getSourceAsString();
-            String id = hit.getId();
-            storeLogLine(errorFile, jsonSource, id);
-        }
-        return errorFile;
+        String errorFileName = fileName.concat("error");
+        storeFoundErrors(errorFileName, hits);
+        return errorFileName;
     }
     
     //checks whether index with name fileName already exists in the database; 
@@ -152,6 +148,15 @@ public class LogDao implements DaoInterface {
         highlightTitle.highlighterType("unified");
         highlightBuilder.field(highlightTitle);
         return highlightBuilder;
+    }
+
+    //store errors found in the log file
+    private void storeFoundErrors(String errorFileName, SearchHits hits){
+        for (SearchHit hit : hits) {
+            String jsonSource =  hit.getSourceAsString();
+            String id = hit.getId();
+            storeLogLine(errorFileName, jsonSource, id);
+        }
     }
 }
 

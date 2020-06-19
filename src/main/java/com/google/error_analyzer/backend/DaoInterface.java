@@ -29,7 +29,7 @@ public interface DaoInterface {
 
     //search db using regex and keywords and store back in db searchHits sorted by 
     // logLineNumber
-    public String errorQuery (String filename) throws IOException;
+    public String findAndStoreErrors (String filename) throws IOException;
 
     //checks whether index with name fileName already exists in the database;
     public boolean fileExists (String fileName) throws IOException;
