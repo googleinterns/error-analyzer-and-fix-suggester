@@ -30,6 +30,7 @@ public class MockLogDao implements DaoInterface {
     "Severe: Could not find index file", "warning: NullPointerException"};
     private ArrayList < Index > logDatabase = new ArrayList < Index >();
     private ArrayList<String> errorDatabase;
+    
     //search db using keywords and return searchHits having highlight field added 
     @Override 
     public ImmutableList < SearchHit > fullTextSearch(
@@ -84,8 +85,7 @@ public class MockLogDao implements DaoInterface {
         return searchHits;
     }
 
-    //search db using regex and keywords and store back in db searchHits 
-    // sorted by logLineNumber
+    //search db using regex and keywords and store back in db (errorDatabase here)
     @Override 
     public String errorQuery(String filename) {
         String errorFile = fileName.concat("error");
