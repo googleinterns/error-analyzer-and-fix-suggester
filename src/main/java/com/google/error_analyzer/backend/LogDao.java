@@ -102,15 +102,21 @@ public class LogDao implements DaoInterface {
     }
 
     //search db using regex and keywords and store back in db searchHits
-    //  sorted by logLineNumber
+    //Returns name of the new error File
     @Override 
-    public boolean errorQuery(String fileName) throws IOException {
-        return true;
-    }
-
-    //store sorted identified errors back in database
-    public void storeErrorLogs(String fileName, SearchHits hits) throws IOException {
-        return;
+    public String errorQuery(String fileName) throws IOException {
+        BooleanQuery booleanQuery = new BooleanQuery();
+        SearchRequest searchRequest = booleanQuery.createSearchRequest(fileName);
+        SearchResponse searchResponse = client
+            .search(searchRequest, RequestOptions.DEFAULT);
+        SearchHits hits = searchResponse.getHits();
+        String errorFile = fileName.concat("error");
+        for (SearchHit hit : hits) {
+            String jsonSource =  hit.getSourceAsString();
+            String id = hit.getId();
+            storeLogLine(errorFile, )
+        }
+        return errorFile;
     }
     
     //checks whether index with name fileName already exists in the database; 

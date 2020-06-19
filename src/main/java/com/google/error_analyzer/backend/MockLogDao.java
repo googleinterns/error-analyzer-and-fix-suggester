@@ -29,7 +29,7 @@ public class MockLogDao implements DaoInterface {
     "WARNING: An illegal reflective access operation has occurred", 
     "Severe: Could not find index file", "warning: NullPointerException"};
     private ArrayList < Index > logDatabase = new ArrayList < Index >();
-
+    private ArrayList<String> errorDatabase;
     //search db using keywords and return searchHits having highlight field added 
     @Override 
     public ImmutableList < SearchHit > fullTextSearch(
@@ -87,8 +87,18 @@ public class MockLogDao implements DaoInterface {
     //search db using regex and keywords and store back in db searchHits 
     // sorted by logLineNumber
     @Override 
-    public boolean errorQuery(String filename) {
-        return true;
+    public String errorQuery(String filename) {
+        String errorFile = fileName.concat("error");
+        MockErrorQuery  mockQuery = new MockErrorQuery();
+        ArrayList<String> searchResults = new ArrayList();
+        for (int i = 0; i < database.length; i++) {
+            String document = database[i];
+            if (mockQuery.matchesCondition(database[i])) {
+                searchResults.add(document);
+            }
+        }
+        errorDatabase = searchResults;
+        return errorFile;
     }
 
     //checks whether index with name fileName already exists in the database;
