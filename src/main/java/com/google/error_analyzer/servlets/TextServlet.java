@@ -31,10 +31,8 @@ plain text to the database*/
 public class TextServlet extends HttpServlet {
 
     @Override
-    public void doPost(HttpServletRequest request, 
-        HttpServletResponse response)
-    throws IOException, ServletException {
-
+    public void doPost(HttpServletRequest request,
+     HttpServletResponse response)throws IOException, ServletException {
         response.setContentType("text/html;");
         final String logText = "Log";
         String log = request.getParameter(logText);
