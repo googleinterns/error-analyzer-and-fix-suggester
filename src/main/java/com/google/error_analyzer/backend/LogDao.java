@@ -114,7 +114,7 @@ public class LogDao implements DaoInterface {
         for (SearchHit hit : hits) {
             String jsonSource =  hit.getSourceAsString();
             String id = hit.getId();
-            storeLogLine(errorFile, )
+            storeLogLine(errorFile, jsonSource, id);
         }
         return errorFile;
     }
