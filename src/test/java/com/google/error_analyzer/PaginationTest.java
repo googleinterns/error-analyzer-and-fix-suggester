@@ -1,12 +1,9 @@
 
 /**Copyright 2019 Google LLC
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
     https://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -73,36 +70,43 @@ public final class PaginationTest {
     public void setUp() {
         pagination = new Pagination();
         ReflectionTestUtils.setField(pagination, "database", database);
-        ReflectionTestUtils.setField(pagination, "databaseHelper", databaseHelper);
+        ReflectionTestUtils.setField(pagination, "databaseHelper", 
+        databaseHelper);
         MockitoAnnotations.initMocks(this);
     }
 
     // database related mocked functions
     private void databaseHelper() throws IOException {
-        
         ImmutableList<String> immutableListId = ImmutableList.of("2");
-        ImmutableList<String> immutableListContent = ImmutableList.of("error2");
+        ImmutableList<String> immutableListContent = 
+            ImmutableList.of("error2");
         when(databaseHelper.hitId(any())).thenReturn(immutableListId);
-        when(databaseHelper.hitFieldContent(any(),any())).thenReturn(immutableListContent);
+        when(databaseHelper.hitFieldContent(any(),any())).
+            thenReturn(immutableListContent);
     }
 
     // access private method addFetchResultToData
-    private Object getPrivateAddFetchResultToData(String fileType, ImmutableList < String > hitIds,
-    ImmutableList < String > hitFieldContent) throws Exception 
-    {
-        Method method = Pagination.class.getDeclaredMethod("addFetchResultToData", new Class[] {
-            String.class, ImmutableList.class, ImmutableList.class});
+    private Object getPrivateAddFetchResultToData(
+    String fileType, ImmutableList < String > hitIds,
+    ImmutableList < String > hitFieldContent) throws Exception {
+        Method method = Pagination.class.getDeclaredMethod(
+        "addFetchResultToData", new Class[] {
+        String.class, ImmutableList.class, ImmutableList.class});
         method.setAccessible(true);
-        return method.invoke(pagination, fileType, hitIds, hitFieldContent);
+        return method.invoke(pagination, fileType, hitIds, 
+            hitFieldContent);
     }
 
     // access private method fetchAndReturnResponse
-    private Object getPrivateMethodFetchAndReturnResponse(int page, String fileName, String fileType, int recordsPerPage)
-     throws Exception {
-        Method method = Pagination.class.getDeclaredMethod("fetchAndReturnResponse", new Class[] {
-            int.class, String.class, String.class, int.class});
+    private Object getPrivateMethodFetchAndReturnResponse(
+    int page, String fileName, String fileType, int recordsPerPage
+    )throws Exception {
+        Method method = Pagination.class.getDeclaredMethod
+        ("fetchAndReturnResponse", new Class[] {int.class, String.class,
+        String.class, int.class});
         method.setAccessible(true);
-        return method.invoke(pagination, page, fileName, fileType, recordsPerPage);
+        return method.invoke(pagination, page, fileName, 
+        fileType, recordsPerPage);
     }
 
     // addFetchResultToData
@@ -119,19 +123,19 @@ public final class PaginationTest {
         ImmutableList<String> hitContent = ImmutableList.<String>builder() 
                                                     .add("error1","error2")
                                                     .build();
-        String actual = (String)getPrivateAddFetchResultToData(fileType1,hitIds,hitContent);
+        String actual = (String)getPrivateAddFetchResultToData(
+        fileType1,hitIds,hitContent);
         String expected = new String("[\"searchError\",\"error2\"]");
         Assert.assertEquals(expected, actual);
-
     }
 
     // fetchAndReturnResponse
     @Test
     public void returnRequestedPageFromDb() throws Exception {
         databaseHelper();
-        String actual = (String) getPrivateMethodFetchAndReturnResponse(2, fileName, fileType1, 1);
+        String actual = (String) getPrivateMethodFetchAndReturnResponse(
+        2, fileName, fileType1, 1);
         String expected = new String ("[\"error2\"]");
         Assert.assertEquals(expected, actual);
     }
-    
 }

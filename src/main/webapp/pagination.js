@@ -13,7 +13,6 @@ function prevPage() {
     currentPage--;
     next = false;
     changePage(currentPage);
-
 }
 
 // increment by 1 on pressing next button
@@ -25,7 +24,6 @@ function nextPage() {
 
 // change content of page 
 async function changePage(page) {
-
     const logs = document.getElementById("logs");
     const fileType = logs.checked ? "logs" : "errors";
     if (page < 1 || page == undefined) {
@@ -42,7 +40,6 @@ async function changePage(page) {
         params.append('fileType', fileType);
         params.append('fileName', fileName.value);
         params.append('recordsPerPage', recordsPerPage);
-
         // ask for data to display from java servlet 
         const response = await fetch('/pagination', {
             method: 'POST',
@@ -72,7 +69,7 @@ function getOffset(page) {
     const start = recordsPerPage * ((page - 1) % noOfPages);
     offset[0] = start;
     if(page == lastPage) {
-        offset[1] = start + noOfRecordsOnLastPage - 1;
+        offset[1] = start + (noOfRecordsOnLastPage - 1);
     } else {
         offset[1] = start + (recordsPerPage - 1);
     }
@@ -89,7 +86,6 @@ function changeNoOfRecordsOnPage() {
 
 // return page no to be fetched from database
 function getPageToBeFetched() {
-    
     if (currentPage == 1) {
         lastPage = Number.MAX_VALUE;
         return 1;
@@ -100,7 +96,6 @@ function getPageToBeFetched() {
     } else {
         return -1;
     }
-    
 }
 
 // update value of lastPage for a file
@@ -122,7 +117,6 @@ function updateLastPage(fetchedPageLength, page) {
 
 // add logs or errors to result page
 function display() {
-    
     const offset = getOffset(currentPage);
     const listing_table = document.getElementById("listingTable");
     const page_span = document.getElementById("page");
@@ -139,7 +133,6 @@ function display() {
 function showAndHideBtn() {
     const btnPrev = document.getElementById("btnPrev");
     const btnNext = document.getElementById("btnNext");
-
     // hide previous button when on page 1
     if (currentPage == 1) {
         btnPrev.style.visibility = "hidden";

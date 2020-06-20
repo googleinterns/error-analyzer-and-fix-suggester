@@ -32,18 +32,21 @@ public class Pagination extends HttpServlet {
 
     private String field = "name";
     private static String ERROR = "errors";
-    private static final Logger LOG = LogManager.getLogger(Pagination.class);
-    // keep noOfPages a odd no so that there are equal pages in front and back 
+    private static final Logger LOG =
+        LogManager.getLogger(Pagination.class);
+    // keep noOfPages a odd no so that there are equal pages in front 
+    // and back 
     private int noOfPages = 5;
-    private  LogDao database = new LogDao();
-    private  LogDaoHelper databaseHelper = new LogDaoHelper();
+    private LogDao database = new LogDao();
+    private LogDaoHelper databaseHelper = new LogDaoHelper();
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int page = Integer.parseInt(request.getParameter("requestedPage"));
         String fileName = request.getParameter("fileName");
         String fileType = request.getParameter("fileType");
-        int recordsPerPage = Integer.parseInt(request.getParameter("recordsPerPage"));
+        int recordsPerPage =
+            Integer.parseInt(request.getParameter("recordsPerPage"));
 
         response.setContentType("application/json");
         if (fileName.length() == 0) {
@@ -51,69 +54,75 @@ public class Pagination extends HttpServlet {
             response.getWriter().println(json);
             return;
         }
-        String json = fetchAndReturnResponse(page, fileName, fileType, recordsPerPage);
+        String json =
+            fetchAndReturnResponse(page, fileName, fileType, recordsPerPage);
         response.getWriter().println(json);
     }
 
     // fetches logs from database and return json for the same
-    private String fetchAndReturnResponse(int page, String fileName, String fileType, int recordsPerPage) { 
-        
-        int start = (page-1)*recordsPerPage;
+    private String fetchAndReturnResponse(int page, String fileName,
+        String fileType, int recordsPerPage) {
+        int start = (page - 1) * recordsPerPage;
         int size = recordsPerPage;
-        if(page == 1) {
-            size = noOfPages*recordsPerPage;
+        if (page == 1) {
+            size = noOfPages * recordsPerPage;
         }
-        if(fileType.equals(ERROR)) {
-            fileName+= "error";
+        if (fileType.equals(ERROR)) {
+            fileName += "error";
         }
         return fetchData(start, size, fileName, fileType);
     }
-    
+
     // interact with database using dao functions
-    private String fetchData(int start, int size, String fileName, String fileType) {
-        try{ 
-            SearchHit[] searchHits = database.getAll( fileName, start, size);
-            ImmutableList < String > hitIds = databaseHelper.hitId(searchHits);
-            ImmutableList < String > hitFieldContent = databaseHelper.hitFieldContent(searchHits, field);
-            if(hitIds == null) {
+    private String fetchData(int start, int size, String fileName,
+        String fileType) {
+        try {
+            SearchHit[] searchHits =
+                database.getAll(fileName, start, size);
+            ImmutableList < String > hitIds =
+                databaseHelper.hitId(searchHits);
+            ImmutableList < String > hitFieldContent =
+                databaseHelper.hitFieldContent(searchHits, field);
+            if (hitIds == null) {
                 return convertToJson(new ArrayList());
             }
             return addFetchResultToData(fileType, hitIds, hitFieldContent);
-        } catch(IOException exception) {
+        } catch (IOException exception) {
             LOG.error(exception);
         }
         return convertToJson(new ArrayList());
     }
 
     // add errorfixes and text highlightes 
-    private String addFetchResultToData ( String fileType, ImmutableList < String > hitIds,
-    ImmutableList < String > hitFieldContent) {   
+    private String addFetchResultToData(String fileType,
+        ImmutableList < String > hitIds,
+        ImmutableList < String > hitFieldContent) {
         ArrayList < String > data = new ArrayList();
         SearchErrors searchErrors = new SearchErrors();
-        HashMap < String, String > search = searchErrors.getSearchedErrors();
-        ErrorFixes errorFix=new ErrorFixes();
-        
-        for (int idx=0; idx < hitIds.size(); idx++) {
+        HashMap < String, String > search =
+            searchErrors.getSearchedErrors();
+        ErrorFixes errorFix = new ErrorFixes();
+        for (int idx = 0; idx < hitIds.size(); idx++) {
             String id = hitIds.get(idx);
             String resultString = hitFieldContent.get(idx);
-            String fix=new String();
+            String fix = new String();
 
-            // if(fileType.equals(ERROR)) {
-            //     fix = errorFix.findFixes(resultString);
-            // } 
+            if (fileType.equals(ERROR)) {
+                fix = errorFix.findFixes(resultString);
+            }
             if (search.containsKey(id)) {
                 resultString = search.get(id);
             }
-            resultString+=fix;
+            resultString += fix;
             data.add(resultString);
         }
         return convertToJson(data);
     }
 
     // return json for java object
-    private String convertToJson(ArrayList<String> display) {
+    private String convertToJson(ArrayList < String > data) {
         Gson gson = new Gson();
-        String json = gson.toJson(display);
+        String json = gson.toJson(data);
         return json;
     }
 
