@@ -44,18 +44,22 @@ public class StoreLogs {
 
     //Calls the method StoreLog if an index with name fileName does not 
     //exist in db
-    public String checkAndStoreLog(String fileName, String log)
-    throws IOException {
-        if (logDao.fileExists(fileName) == true) {
-            logger.info("File already exists");
-            final String response =
-                "\t\t\t<h2> Sorry! the file already exists</h2>";
+    public String checkAndStoreLog(String fileName, String log) {
+        try {
+            if (logDao.fileExists(fileName) == true) {
+                logger.error("File already exists");
+                final String response =
+                    "\t\t\t<h2> Sorry! the file already exists</h2>";
+                return (response);
+            } else {
+                final String response = storeLog(fileName, log);
+                logger.info("File Stored");
+                return (response);
+            }
+        } catch (Exception e) {
+            final String response = String.format("Could not store file %1$s", e);
+            logger.error("Could not store file", e);
             return (response);
-        } else {
-            final String response = storeLog(fileName, log);
-            logger.info("File Stored");
-            return (response);
-
         }
     }
 
