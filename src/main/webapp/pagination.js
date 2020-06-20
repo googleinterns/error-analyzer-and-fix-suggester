@@ -102,7 +102,10 @@ function getPageToBeFetched() {
 function updateLastPage(fetchedPageLength, page) {
     if (page == 1 && fetchedPageLength < recordsPerPage * noOfPages) {
             lastPage =  Math.ceil(fetchedPageLength / recordsPerPage);
-            noOfRecordsOnLastPage = fetchedPageLength % recordsPerPage;
+            if(fetchedPageLength % recordsPerPage != 0)
+                noOfRecordsOnLastPage = fetchedPageLength % recordsPerPage;
+            else
+                noOfRecordsOnLastPage = recordsPerPage;
     } else if (page != 1 && fetchedPageLength == 0) {
             lastPage = page - 1;
             noOfRecordsOnLastPage = recordsPerPage;
