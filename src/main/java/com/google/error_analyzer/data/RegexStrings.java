@@ -18,14 +18,13 @@ import java.util.*;
 
 public class RegexStrings{
 
-    private ArrayList<String> createList(){
-        ArrayList<String> regexList = new ArrayList<String>();
-        regexList.add(".*exception");
-        // regexList.add("error");
-        return regexList;
-    }
-    public String getQueryString(){
-        ArrayList<String> regexList = createList();
+    private static final ArrayList<String> regexList = new ArrayList<String>() {
+        {
+            add(".*exception");
+        }
+    };
+
+    public static String getQueryString(){
         String queryString = "";
         for(String keyword : regexList){
             if(queryString.length() == 0){

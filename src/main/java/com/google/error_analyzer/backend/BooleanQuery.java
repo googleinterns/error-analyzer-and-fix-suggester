@@ -32,11 +32,12 @@ public class BooleanQuery {
     private final String logTextField = "logText";
     private final String logLineNumberField = "logLineNumber";
     private final Integer requestSize = 10000;
+
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
     public SearchRequest createSearchRequest(String fileName) {
         BoolQueryBuilder boolQuery = buildBoolQuery();
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-            .size(1000)
+            .size(requestSize)
             .query(boolQuery)
             .sort(logLineNumberField);
         SearchRequest searchRequest = new SearchRequest(fileName);
@@ -44,7 +45,7 @@ public class BooleanQuery {
         return searchRequest;
     }
     
-    //private combine matchquery and regex query and return a bool query
+    //Combine matchquery and regex query and return a bool query
     private BoolQueryBuilder buildBoolQuery() {
         MatchQueryBuilder matchQuery = buildMatchQuery();
         RegexpQueryBuilder regexQuery = buildRegexQuery();
@@ -56,16 +57,14 @@ public class BooleanQuery {
     }
 
     private MatchQueryBuilder buildMatchQuery() {
-        Keywords errorKeywords = new Keywords();
-        String keywordsQueryString = errorKeywords.getQueryString();
+        String keywordsQueryString = Keywords.getQueryString();
         MatchQueryBuilder matchQuery = new MatchQueryBuilder
             (logTextField, keywordsQueryString);
         return matchQuery;
     }
 
     private RegexpQueryBuilder buildRegexQuery() {
-        RegexStrings regexExpressions = new RegexStrings();
-        String regexQueryString = regexExpressions.getQueryString();
+        String regexQueryString = RegexStrings.getQueryString();
         RegexpQueryBuilder regexQuery = new RegexpQueryBuilder(logTextField,regexQueryString);
         return regexQuery;
     }

@@ -14,6 +14,7 @@ package com.google.error_analyzer.backend;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.backend.BooleanQuery;
+import com.google.error_analyzer.backend.LogDaoHelper;
 import java.io.IOException;
 import java.util.*;
 import org.apache.http.HttpHost;
@@ -110,7 +111,7 @@ public class LogDao implements DaoInterface {
         SearchResponse searchResponse = client
             .search(searchRequest, RequestOptions.DEFAULT);
         SearchHits hits = searchResponse.getHits();
-        String errorFileName = fileName.concat("error");
+        String errorFileName = LogDaoHelper.getErrorIndexName(fileName);
         storeFoundErrors(errorFileName, hits);
         return errorFileName;
     }
