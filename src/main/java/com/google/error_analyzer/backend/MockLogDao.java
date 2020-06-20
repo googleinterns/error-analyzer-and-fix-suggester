@@ -13,6 +13,7 @@ package com.google.error_analyzer.backend;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.error_analyzer.backend.LogDaoHelper;
 import com.google.error_analyzer.data.Document;
 import com.google.error_analyzer.data.Index;
 import java.io.IOException;
@@ -88,7 +89,7 @@ public class MockLogDao implements DaoInterface {
     //search db using regex and keywords and store back in db (errorDatabase here)
     @Override 
     public String findAndStoreErrors(String fileName) {
-        String errorFile = fileName.concat("error");
+        String errorFileName = LogDaoHelper.getErrorIndexName(fileName);
         MockErrorQuery  mockQuery = new MockErrorQuery();
         ArrayList<String> searchResults = new ArrayList();
         for (int i = 0; i < database.length; i++) {
@@ -98,7 +99,7 @@ public class MockLogDao implements DaoInterface {
             }
         }
         errorDatabase = searchResults;
-        return errorFile;
+        return errorFileName;
     }
 
     //checks whether index with name fileName already exists in the database;
