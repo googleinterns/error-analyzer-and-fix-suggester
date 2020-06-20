@@ -151,7 +151,8 @@ public class LogDao implements DaoInterface {
     }
 
     //store errors found in the log file
-    private void storeFoundErrors(String errorFileName, SearchHits hits){
+    private void storeFoundErrors(String errorFileName, SearchHits hits)
+    throws IOException {
         for (SearchHit hit : hits) {
             String jsonSource =  hit.getSourceAsString();
             String id = hit.getId();
