@@ -36,7 +36,7 @@ import org.elasticsearch.client.RequestOptions;
 
 @WebServlet("/errorResults")
 public class ErrorResults extends HttpServlet {
-    private String indexFile = "stack"; //later fetched from request
+    private String indexFile = "stacks"; //later fetched from request
     private static final Logger logger = LogManager.getLogger(ErrorResults.class);
     private String logTextField = "logText"; 
     RestHighLevelClient client = new RestHighLevelClient(
@@ -50,14 +50,18 @@ public class ErrorResults extends HttpServlet {
             SearchRequest searchRequest = searchQuery.createSearchRequest(indexFile);
             SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
             SearchHit[] hits = searchResponse.getHits().getHits();
-            ArrayList<String> errorData = searchQuery.sortErrorDocuments(hits);
-            response.getWriter().println(errorData);
+            response.getWriter().println("hhher");
             String infoMsg = "Completed Boolean query successfully on ";
             infoMsg = infoMsg.concat(indexFile);
             logger.info(infoMsg);
         } catch(IOException e) {
             String loggerError = "Could not connect to database.";
             loggerError = loggerError.concat(e.toString());
+            logger.error(loggerError);
+            response.getWriter().println(loggerError);
+        } catch (Exception e1) {
+            String loggerError = "Runtime exception";
+            loggerError = loggerError.concat(e1.toString());
             logger.error(loggerError);
             response.getWriter().println(loggerError);
         }

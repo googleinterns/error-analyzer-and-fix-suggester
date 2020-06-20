@@ -31,49 +31,42 @@ public class BooleanQuery {
     private static final Logger logger = LogManager.getLogger(BooleanQuery.class);
     private final String logTextField = "logText";
     private final String logLineNumberField = "logLineumber";
+    private final Integer requestSize = 10000;
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
     public SearchRequest createSearchRequest(String fileName) {
+        BoolQueryBuilder boolQuery = buildBoolQuery();
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+            .size(1000)
+            .sort(logLineNumberField)
+            .query(boolQuery);
         SearchRequest searchRequest = new SearchRequest(fileName);
-        Keywords errorKeywords = new Keywords();
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        RegexStrings regexExpressions = new RegexStrings();
-        String regexQueryString = regexExpressions.getQueryString();
-        RegexpQueryBuilder regexQuery = new RegexpQueryBuilder(logTextField,regexQueryString);
-        String keywordsQueryString = errorKeywords.getQueryString();
-        QueryBuilder fulltextQuery = QueryBuilders.matchQuery(logTextField, keywordsQueryString);
-        QueryBuilder errorQuery = new BoolQueryBuilder()
-            .minimumShouldMatch(1)
-            .should(regexQuery)
-            .should(fulltextQuery);
-        searchSourceBuilder.size(1000);
-        searchSourceBuilder.sort(logLineNumberField);
-        searchSourceBuilder.query(errorQuery); 
         searchRequest.source(searchSourceBuilder);
         return searchRequest;
     }
     
-    //Sort the searchHits acc to ids and return document json strings
-    public ArrayList<String> sortErrorDocuments(SearchHit[] hits) {
-        ArrayList<Integer> searchHitIds = new ArrayList<>();
-        HashMap<Integer, String> hitsHashMap = new HashMap();
-        for (SearchHit hit : hits) {
-            try {
-                Integer id = Integer.parseInt(hit.getId());
-                logger.info("-------------------------------"+id);
-                searchHitIds.add(id);
-                String jsonDocument = hit.getSourceAsString();
-                hitsHashMap.put(id, jsonDocument);
-            } catch(NumberFormatException e) {
-                String errorMsg = "Could not parse: ";
-                logger.error(errorMsg.concat(e.toString()));
-            }
-        }
-        Collections.sort(searchHitIds);
-        ArrayList<String> sortedSourceStrings = new ArrayList();
-        for (Integer id : searchHitIds) {
-            String errorJsonString = hitsHashMap.get(id);
-            sortedSourceStrings.add(errorJsonString);
-        }
-        return sortedSourceStrings;
+    //private combine matchquery and regex query and return a bool query
+    private BoolQueryBuilder buildBoolQuery() {
+        MatchQueryBuilder matchQuery = buildMatchQuery();
+        RegexpQueryBuilder regexQuery = buildRegexQuery();
+        BoolQueryBuilder boolQuery = new BoolQueryBuilder()
+            .minimumShouldMatch(1)
+            .should(regexQuery)
+            .should(matchQuery);
+        return boolQuery;
+    }
+
+    private MatchQueryBuilder buildMatchQuery() {
+        Keywords errorKeywords = new Keywords();
+        String keywordsQueryString = errorKeywords.getQueryString();
+        MatchQueryBuilder matchQuery = new MatchQueryBuilder
+            (logTextField, keywordsQueryString);
+        return matchQuery;
+    }
+
+    private RegexpQueryBuilder buildRegexQuery() {
+        RegexStrings regexExpressions = new RegexStrings();
+        String regexQueryString = regexExpressions.getQueryString();
+        RegexpQueryBuilder regexQuery = new RegexpQueryBuilder(logTextField,regexQueryString);
+        return regexQuery;
     }
 }

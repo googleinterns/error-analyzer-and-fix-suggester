@@ -11,9 +11,9 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.error_analyzer.backend.BooleanQuery;
 import java.io.IOException;
 import java.util.*;
 import org.apache.http.HttpHost;
