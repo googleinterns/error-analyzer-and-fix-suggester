@@ -44,7 +44,7 @@ import org.elasticsearch.search.SearchHits;
 public class LogDao implements DaoInterface {
 
     private static final RestHighLevelClient client = new RestHighLevelClient
-        (RestClient.builder(new HttpHost("localhost", 9200, "http")));
+        (RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
     private static final SearchSourceBuilder searchSourceBuilder 
         = new SearchSourceBuilder();
     private static final int windowSize = 10;

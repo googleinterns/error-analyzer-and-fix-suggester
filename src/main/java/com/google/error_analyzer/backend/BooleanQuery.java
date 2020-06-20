@@ -30,15 +30,15 @@ import org.elasticsearch.search.SearchHits;
 public class BooleanQuery {
     private static final Logger logger = LogManager.getLogger(BooleanQuery.class);
     private final String logTextField = "logText";
-    private final String logLineNumberField = "logLineumber";
+    private final String logLineNumberField = "logLineNumber";
     private final Integer requestSize = 10000;
     //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
     public SearchRequest createSearchRequest(String fileName) {
         BoolQueryBuilder boolQuery = buildBoolQuery();
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
             .size(1000)
-            .sort(logLineNumberField)
-            .query(boolQuery);
+            .query(boolQuery)
+            .sort(logLineNumberField);
         SearchRequest searchRequest = new SearchRequest(fileName);
         searchRequest.source(searchSourceBuilder);
         return searchRequest;

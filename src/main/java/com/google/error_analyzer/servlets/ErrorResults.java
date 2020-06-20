@@ -14,7 +14,7 @@
 
 package com.google.error_analyzer.servlets;
 
-import com.google.error_analyzer.backend.BooleanQuery;
+import com.google.error_analyzer.backend.LogDao;
 import com.google.gson.Gson;
 import java.lang.*;
 import java.util.*;
@@ -46,11 +46,8 @@ public class ErrorResults extends HttpServlet {
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json");
         try {
-            BooleanQuery searchQuery = new BooleanQuery();
-            SearchRequest searchRequest = searchQuery.createSearchRequest(indexFile);
-            SearchResponse searchResponse = client.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHit[] hits = searchResponse.getHits().getHits();
-            response.getWriter().println("hhher");
+            LogDao database = new LogDao();
+            database.findAndStoreErrors(indexFile);
             String infoMsg = "Completed Boolean query successfully on ";
             infoMsg = infoMsg.concat(indexFile);
             logger.info(infoMsg);
