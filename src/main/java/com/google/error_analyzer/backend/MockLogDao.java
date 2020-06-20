@@ -87,7 +87,7 @@ public class MockLogDao implements DaoInterface {
 
     //search db using regex and keywords and store back in db (errorDatabase here)
     @Override 
-    public String findAndStoreErrors(String filename) {
+    public String findAndStoreErrors(String fileName) {
         String errorFile = fileName.concat("error");
         MockErrorQuery  mockQuery = new MockErrorQuery();
         ArrayList<String> searchResults = new ArrayList();
