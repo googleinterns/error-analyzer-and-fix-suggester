@@ -12,7 +12,7 @@ package com.google.error_analyzer.backend;
 
 import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.data.ErrorFixes;
-import com.google.error_analyzer.data.SearchErrors;
+// import com.google.error_analyzer.data.SearchErrors;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.lang.*;
@@ -49,7 +49,7 @@ public class Pagination extends HttpServlet {
             Integer.parseInt(request.getParameter("recordsPerPage"));
 
         response.setContentType("application/json");
-        if (fileName.length() == 0) {
+        if (fileName.length() == 0 || !database.fileExists(fileName)) {
             String json = returnEmptyObject();
             response.getWriter().println(json);
             return;
@@ -98,9 +98,9 @@ public class Pagination extends HttpServlet {
         ImmutableList < String > hitIds,
         ImmutableList < String > hitFieldContent) {
         ArrayList < String > data = new ArrayList();
-        SearchErrors searchErrors = new SearchErrors();
-        HashMap < String, String > search =
-            searchErrors.getSearchedErrors();
+        // SearchErrors searchErrors = new SearchErrors();
+        // HashMap < String, String > search =
+            // searchErrors.getSearchedErrors();
         ErrorFixes errorFix = new ErrorFixes();
         for (int idx = 0; idx < hitIds.size(); idx++) {
             String id = hitIds.get(idx);
@@ -110,9 +110,9 @@ public class Pagination extends HttpServlet {
             if (fileType.equals(ERROR)) {
                 fix = errorFix.findFixes(resultString);
             }
-            if (search.containsKey(id)) {
-                resultString = search.get(id);
-            }
+            // if (search.containsKey(id)) {
+            //     resultString = search.get(id);
+            // }
             resultString += fix;
             data.add(resultString);
         }
