@@ -106,7 +106,7 @@ public class LogDao implements DaoInterface {
     //Returns name of the new index 
     @Override 
     public String findAndStoreErrors(String fileName) throws IOException {
-        SearchHits hits = findErrors(String fileName);
+        SearchHits hits = findErrors(fileName);
         String errorFileName = LogDaoHelper.getErrorIndexName(fileName);
         storeErrors(errorFileName, hits);
         return errorFileName;
