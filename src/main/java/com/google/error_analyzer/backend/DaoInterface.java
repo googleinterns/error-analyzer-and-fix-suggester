@@ -27,8 +27,8 @@ public interface DaoInterface {
     public SearchHit[] getAll (String fileName, int start, int size) 
     throws IOException;
 
-    //search db using regex and keywords and store back in db searchHits sorted by 
-    // logLineNumber
+    //search an index for errors using regex and keywords and store back in db
+    //Returns name of the new index 
     public String findAndStoreErrors (String filename) throws IOException;
 
     //checks whether index with name fileName already exists in the database;
