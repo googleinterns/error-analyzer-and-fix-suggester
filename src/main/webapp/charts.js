@@ -22,7 +22,8 @@ async function drawChart() {
           title: '% Error'
     };
 
-    const chart = new google.visualization.PieChart(document.getElementById('piechart'));
+    const chart = 
+        new google.visualization.PieChart(document.getElementById('piechart'));
     chart.draw(data, options);
 }
 

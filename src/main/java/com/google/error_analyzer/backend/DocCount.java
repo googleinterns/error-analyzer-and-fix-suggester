@@ -31,7 +31,8 @@ public class DocCount extends HttpServlet {
 
     // return no of document in given index
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPost(HttpServletRequest request, 
+        HttpServletResponse response) throws IOException {
         String index = request.getParameter("index");
         long count = 0l;
         try {
