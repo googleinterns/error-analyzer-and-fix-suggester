@@ -21,14 +21,14 @@ import java.util.ArrayList;
 public class Keywords {
 
     private static final ArrayList < String > keywordsList = new ArrayList < String > () {
-            {
-                add("error");
-                add("fatal");
-                add("severe");
-                add("exit");
-                add("exception");
-            }
-        };
+        {
+            add("error");
+            add("fatal");
+            add("severe");
+            add("exit");
+            add("exception");
+        }
+    };
 
     //returns kewords as a single string combined together in OR logic.
     public static String getQueryString() {
