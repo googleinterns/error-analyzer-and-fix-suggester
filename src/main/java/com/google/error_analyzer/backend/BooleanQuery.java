@@ -12,6 +12,7 @@ limitations under the License.*/
 package com.google.error_analyzer.backend;
 
 import com.google.error_analyzer.data.Keywords;
+import com.google.error_analyzer.data.LogFields;
 import com.google.error_analyzer.data.RegexStrings;
 import java.util.*;
 import org.elasticsearch.action.search.SearchRequest;
@@ -24,9 +25,14 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
+/** Build search request for boolean query.
+* Match query uses Keywords class for query string
+* Regex query uses RegexStrings class for query string
+*/
+
 public class BooleanQuery {
-    private final String logTextField = "logText";
-    private final String logLineNumberField = "logLineNumber";
+    private final String logTextField = LogFields.logTextField;
+    private final String logLineNumberField = LogFields.logLineNumberField;
     private final Integer requestSize = 10000; //limited by ElasticSearch settings
 
     //create searchRequest to seach index file for errors
