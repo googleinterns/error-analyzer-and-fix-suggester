@@ -86,7 +86,8 @@ public class MockLogDao implements DaoInterface {
         return searchHits;
     }
 
-    //search db using regex and keywords and store back in db (errorDatabase here)
+    //search an index for errors using regex and keywords and store back in db
+    //Returns name of the new index 
     @Override 
     public String findAndStoreErrors(String fileName) {
         String errorFileName = LogDaoHelper.getErrorIndexName(fileName);

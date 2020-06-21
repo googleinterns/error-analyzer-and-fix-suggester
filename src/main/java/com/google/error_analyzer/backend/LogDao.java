@@ -101,18 +101,14 @@ public class LogDao implements DaoInterface {
         SearchHit[] searchHits = hits.getHits();
         return searchHits;
     }
-
-    //search db using regex and keywords and store back in db searchHits
-    //Returns name of the new error File
+ 
+    //search an index for errors using regex and keywords and store back in db
+    //Returns name of the new index 
     @Override 
     public String findAndStoreErrors(String fileName) throws IOException {
-        BooleanQuery booleanQuery = new BooleanQuery();
-        SearchRequest searchRequest = booleanQuery.createSearchRequest(fileName);
-        SearchResponse searchResponse = client
-            .search(searchRequest, RequestOptions.DEFAULT);
-        SearchHits hits = searchResponse.getHits();
+        SearchHits hits = findErrors(String fileName);
         String errorFileName = LogDaoHelper.getErrorIndexName(fileName);
-        storeFoundErrors(errorFileName, hits);
+        storeErrors(errorFileName, hits);
         return errorFileName;
     }
     
@@ -151,8 +147,19 @@ public class LogDao implements DaoInterface {
         return highlightBuilder;
     }
 
+
+    //find errors in a given index
+    private SearchHits findErrors(String fileName) 
+    throws IOException {
+        BooleanQuery booleanQuery = new BooleanQuery();
+        SearchRequest searchRequest = booleanQuery.createSearchRequest(fileName);
+        SearchResponse searchResponse = client
+            .search(searchRequest, RequestOptions.DEFAULT);
+        return searchResponse.getHits();
+    }
+
     //store errors found in the log file
-    private void storeFoundErrors(String errorFileName, SearchHits hits)
+    private void storeErrors(String errorFileName, SearchHits hits)
     throws IOException {
         for (SearchHit hit : hits) {
             String jsonSource =  hit.getSourceAsString();
