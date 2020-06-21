@@ -22,12 +22,10 @@ import java.util.regex.Pattern;
 */
 
 public class MockErrorQuery {
-    private final Keywords keyWords = new Keywords();
-    private final String keyWordsQueryString = keyWords.getQueryString();
+    private final String keyWordsQueryString = Keywords.getQueryString();
     private final String[] keyWordsList = keyWordsQueryString.split(" OR ");
     private final HashSet<String> keyWordSet = new HashSet<>(Arrays.asList(keyWordsList));
-    private final RegexStrings regex = new RegexStrings();
-    private final String regexQueryString = regex.getQueryString();
+    private final String regexQueryString = RegexStrings.getQueryString();
     private final String[] regexList = regexQueryString.split(Pattern.quote("|"));
     
     //return true if document contains keyword or matches regex
