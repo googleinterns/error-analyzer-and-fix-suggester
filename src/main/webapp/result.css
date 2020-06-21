@@ -1,7 +1,7 @@
 /* Body Header */
 
 #body-header {
-    height: 18vh;
+    height: 20vh;
     padding-top: 1.2rem;
     color: white;
     margin-bottom: 2vh;
@@ -14,7 +14,7 @@
     padding-bottom: 20px;
 }
 
-button {
+.themeButton {
     height: 4vh;
     border-radius: 2rem;
     background-color: white;
@@ -75,3 +75,26 @@ footer a {
     font-weight: bold;
 }
 
+/* error-log nav */
+.nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+  box-shadow:0px 0px 8px  rgb(0, 153, 153);
+}
+
+/* slider */
+#slideContainer {
+    min-height: 40vh;
+}
+
+/* records input  */
+#records {
+    width: 25vw;
+    height: 4vh;
+    border-radius: 2rem;
+    padding: 5px;
+    font-family: cursive;
+}
+
+/* collapse button */
+#collapse {
+    width:30vw;
+}

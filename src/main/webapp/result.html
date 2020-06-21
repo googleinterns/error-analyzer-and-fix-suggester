@@ -1,4 +1,4 @@
- <!-- Copyright 2020 Google LLC
+<!-- Copyright 2020 Google LLC
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
@@ -13,60 +13,141 @@
 <html>
 
 <head>
-    <!--info for browser -->
-    <meta charset="UTF-8">
-    <meta name="keywords" content="error, logs, search, stacktrace">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="images/gSuite.png" />
-    <!-- title -->
-    <title>Error analyzer</title>
+	<!--info for browser -->
+	<meta charset="UTF-8">
+	<meta name="keywords" content="error, logs, search, stacktrace">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<!-- favicon -->
+	<link rel="shortcut icon" type="image/x-icon" href="images/gSuite.png" />
+	<!-- title -->
+	<title>Error analyzer</title>
 
-    <!-- add css -->
-    <link rel="stylesheet" href="result.css">
-    <!-- add fontawesome icons -->
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" 
-    integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+	<!-- add css -->
+	<link rel="stylesheet" href="result.css">
+	<!-- add fontawesome icons -->
+	<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css"
+		integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" 
+        crossorigin="anonymous">
+	<!-- CSS only -->
+	<link rel="stylesheet" 
+        href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css"
+		integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" 
+        crossorigin="anonymous">
+
 </head>
 
-<body onload="changePage()">
-    <header id="body-header" class="backgroundColor">
-        <!-- search bar -->
-        <div>
-            <span>
-                <input type="text" id="searchBar" class="shadow inputDimension font" name="searchBar">
-                <button onclick="search()" ><i class="fas fa-search"></i></button>
+<body onload="changePage(1)">
+	<header id="body-header" class="backgroundColor">
+		<!-- search bar -->
+		<div>
+			<span>
+                <input type="text" id="searchBar" class="shadow inputDimension font" 
+                    name="searchBar" placeholder="Search">
+                <button onclick="search()" class="themeButton"><i class="fas fa-search"></i></button>
             </span>
-        </div>
-        <!-- choose file  -->
-        <div>
-            <span>
-                <input type="text"  id="fileName" class="shadow inputDimension font" name="fileName">
+		</div>
+		<!-- choose file  -->
+		<div>
+			<span>
+                <input type="text"  id="fileName" class="shadow inputDimension font" 
+                    name="fileName" placeholder="File Name">
                 <!-- if user is changing file then show results starting from 1st page -->
-                <button onclick="changePage()" >submit</button>
+                <button onclick="drawChart(); changePage(1); addclass();" class="themeButton">submit</button>
             </span>
-            <!-- log or error container -->
-            <span>
-                <input type="radio" id="logs" name="display" value="logs" checked>logs
-                <input type="radio" id="errors" name="display" value="errors">errors
-            </span>
-        </div>
-    </header>
-    <!-- header -->
 
-    <!-- show result -->
-    <div>
-        <div id="listingTable"></div>
+		</div>
+
+        <!-- choose no of lines per page -->
+		<div>
+			<span>
+                <input type="number" min="1" max="14" class="shadow" id="records" name="records" 
+                    placeholder="Lines per page">
+                <button onclick="changeNoOfRecordsOnPage(); addclass();" class="themeButton"> apply </button>
+           </span>
+		</div>
+	</header>
+	<!-- header -->
+
+	<!-- log or error -->
+	<ul class="nav nav-tabs nav-fill" role="tablist">
+		<li class="nav-item " role="presentation">
+			<a class="nav-link active" id="logs" data-toggle="tab" href="#slide1" role="tab" 
+            aria-controls="home" aria-selected="true" onclick="changePage(1); addclass();">Logs</a>
+		</li>
+		<li class="nav-item" role="presentation">
+			<a class="nav-link" id="errors" data-toggle="tab" href="#slide1" role="tab" 
+            aria-controls="profile" aria-selected="false" onclick="changePage(1); addclass();">Errors</a>
+		</li>
+	</ul>
+
+	<!-- show result -->
+	<div>
+		<div id="piechart"></div>
+		<div class="tab-content" >
+			<div class="tab-pane fade show active" id="listingTable" role="tabpanel" 
+                aria-labelledby="home-tab"></div>
+                <div id="carouselExampleControls" class="carousel slide" data-interval="false">
+                    <div class="carousel-inner text-center" id="slideContainer">
+                        <div class="carousel-item active" id="slide1Container">
+                            <p class="d-block w-100 h-100" id="slide1"></p>
+                        </div>
+                        <div class="carousel-item" id="slide2Container">
+                            <p class="d-block w-100 h-100" id="slide2"></p>
+                        </div>
+                    </div>
+                    <!-- navigate between pages -->
+                    <a onclick="prevPage()" class="carousel-control-prev backgroundColor" id="btnPrev"
+                        href="#carouselExampleControls" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only" >Previous</span>
+                    </a>
+                    <a onclick="nextPage()" class="carousel-control-next backgroundColor" id="btnNext"
+                        href="#carouselExampleControls" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </div>
+		    </div>
+	    </div>
     </div>
-    <!-- navigate between pages -->
-    <footer class="backgroundColor text-center">
-        <div id="navigation">
-            <a href="javascript:prevPage()" id="btnPrev">Prev</a>
-            <span>page: <span id="page"></span></span>
-            <a href="javascript:nextPage()" id="btnNext">Next</a>
-        </div>
-    </footer>
-    <script src="pagination.js"></script>
+    <!-- delete pop-up -->
+	<div class="collapse" id="collapse">
+		<div class="card card-body">
+			Are you sure you want to delete all your files from the system
+			<button class="btn btn-info">yes</button>
+		</div>
+	</div>
+	<!-- pageno and delete button -->
+	<footer class="backgroundColor text-center">
+		<div id="navigation">
+			<span>page: <span id="page"></span></span>
+			<a class="btn btn-light" data-toggle="collapse" href="#collapse" role="button" 
+                aria-expanded="false" aria-controls="collapse">
+				<i class="fas fa-trash"></i>
+			</a>
+		</div>
+	</footer>
+
+    <!-- pagination JS  -->
+	<script src="pagination.js"></script>
+
+    <!-- chart JS -->
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script src="charts.js"></script>
+
+	<!-- bootstrap JS -->
+	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+		integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" 
+            crossorigin="anonymous">
+	</script>
+	<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+		integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" 
+            crossorigin="anonymous">
+	</script>
+	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"
+		integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" 
+            crossorigin="anonymous">
+	</script>
 </body>
 
 </html>

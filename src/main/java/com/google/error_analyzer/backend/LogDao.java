@@ -26,6 +26,8 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -39,6 +41,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+
 
 
 public class LogDao implements DaoInterface {
@@ -99,6 +102,17 @@ public class LogDao implements DaoInterface {
         SearchHits hits = searchResponse.getHits();
         SearchHit[] searchHits = hits.getHits();
         return searchHits;
+    }
+
+    // returns no of documents in an index
+    @Override 
+    public long getDocCount (String index) throws IOException {
+        CountRequest countRequest = new CountRequest(index);
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        countRequest.source(searchSourceBuilder);
+        CountResponse countResponse = 
+            client.count(countRequest, RequestOptions.DEFAULT);
+        return countResponse.getCount();
     }
 
     //search db using regex and keywords and store back in db searchHits

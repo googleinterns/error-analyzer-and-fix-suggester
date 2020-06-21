@@ -84,6 +84,10 @@ public class MockLogDao implements DaoInterface {
         return searchHits;
     }
 
+    // returns no of documents in an index
+    public long getDocCount (String index) throws IOException {
+        return 0l;
+    }
     //search db using regex and keywords and store back in db searchHits 
     // sorted by logLineNumber
     @Override 
