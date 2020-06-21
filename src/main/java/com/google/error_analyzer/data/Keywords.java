@@ -19,8 +19,8 @@ import java.util.ArrayList;
 */
 
 public class Keywords {
-    
-    private static final ArrayList<String> keywordsList = new ArrayList<String>(){
+
+    private static final ArrayList < String > keywordsList = new ArrayList < String > () {
             {
                 add("error");
                 add("fatal");
@@ -31,16 +31,15 @@ public class Keywords {
         };
 
     //returns kewords as a single string combined together in OR logic.
-    public static String getQueryString(){
+    public static String getQueryString() {
         String queryString = "";
-        for(String keyword : keywordsList){
-            if(queryString.length() == 0){
+        for (String keyword : keywordsList) {
+            if (queryString.length() == 0) {
                 queryString = queryString.concat(keyword);
-            }else{
+            } else {
                 queryString = queryString.concat(" OR " + keyword);
             }
         }
         return queryString;
-    }
-    
+    }    
 }

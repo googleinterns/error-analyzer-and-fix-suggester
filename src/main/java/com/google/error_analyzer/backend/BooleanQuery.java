@@ -14,8 +14,6 @@ package com.google.error_analyzer.backend;
 import com.google.error_analyzer.data.Keywords;
 import com.google.error_analyzer.data.RegexStrings;
 import java.util.*;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
@@ -26,14 +24,12 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
-
 public class BooleanQuery {
-    private static final Logger logger = LogManager.getLogger(BooleanQuery.class);
     private final String logTextField = "logText";
     private final String logLineNumberField = "logLineNumber";
-    private final Integer requestSize = 10000;
+    private final Integer requestSize = 10000; //limited by ElasticSearch settings
 
-    //search db using regex and keywords and store back in db searchHits sorted by logLineNumber
+    //create searchRequest to seach index file for errors
     public SearchRequest createSearchRequest(String fileName) {
         BoolQueryBuilder boolQuery = buildBoolQuery();
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
@@ -44,7 +40,7 @@ public class BooleanQuery {
         searchRequest.source(searchSourceBuilder);
         return searchRequest;
     }
-    
+
     //Combine matchquery and regex query and return a bool query
     private BoolQueryBuilder buildBoolQuery() {
         MatchQueryBuilder matchQuery = buildMatchQuery();

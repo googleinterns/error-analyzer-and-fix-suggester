@@ -18,22 +18,21 @@ import java.util.*;
 
 public class RegexStrings{
 
-    private static final ArrayList<String> regexList = new ArrayList<String>() {
+    private static final ArrayList < String > regexList = new ArrayList < String > () {
         {
             add(".*exception");
         }
     };
 
-    public static String getQueryString(){
+    public static String getQueryString() {
         String queryString = "";
-        for(String keyword : regexList){
-            if(queryString.length() == 0){
+        for (String keyword : regexList) {
+            if (queryString.length() == 0) {
                 queryString = queryString.concat(keyword);
-            }else{
+            } else {
                 queryString = queryString.concat("|" + keyword);
             }
         }
         return queryString;
     }
-    
 }

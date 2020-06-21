@@ -35,7 +35,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-
 @RunWith(MockitoJUnitRunner.class)
 public final class BooleanQueryTest {
 
@@ -80,10 +79,11 @@ public final class BooleanQueryTest {
     public void findErrorsTest() throws IOException {
         MockLogDao mockDatabase = new MockLogDao();
         String errorFileName = mockDatabase.findAndStoreErrors(fileName);
-        ArrayList<String> actual = mockDatabase.errorDatabase;
-        when(database.findAndStoreErrors(fileName)).thenReturn(errorFileName);
+        ArrayList < String > actual = mockDatabase.errorFile;
+        when(database.findAndStoreErrors(fileName))
+            .thenReturn(errorFileName);
         database.findAndStoreErrors(fileName);
-        ArrayList<String> expected = new ArrayList<String>(){
+        ArrayList < String > expected = new ArrayList < String > () {
             {
                 add("Error: nullPointerException");
                 add("Severe: Could not find index file");
