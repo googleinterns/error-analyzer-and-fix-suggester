@@ -57,7 +57,7 @@ public class LogDao implements DaoInterface {
     String fileName, String searchString, String field)throws IOException {
         int offset = 0;
         SearchHit[] searchHits = null;
-        Builder<SearchHit> searchResultBuilder = ImmutableList.<SearchHit>builder();
+        Builder < SearchHit > searchResultBuilder = ImmutableList.< SearchHit > builder();
 
         // we check for matching keywords in a specific windowsize in each 
         // iteration and do this until the the end of index .this way we 
@@ -101,7 +101,7 @@ public class LogDao implements DaoInterface {
         SearchHit[] searchHits = hits.getHits();
         return searchHits;
     }
- 
+
     //search an index for errors using regex and keywords and store back in db
     //Returns name of the new index 
     @Override 
@@ -111,7 +111,7 @@ public class LogDao implements DaoInterface {
         storeErrors(errorFileName, hits);
         return errorFileName;
     }
-    
+
     //checks whether index with name fileName already exists in the database; 
     @Override
     public boolean fileExists(String fileName) throws IOException {
@@ -147,7 +147,6 @@ public class LogDao implements DaoInterface {
         return highlightBuilder;
     }
 
-
     //find errors in a given index
     private SearchHits findErrors(String fileName) 
     throws IOException {
@@ -168,4 +167,3 @@ public class LogDao implements DaoInterface {
         }
     }
 }
-

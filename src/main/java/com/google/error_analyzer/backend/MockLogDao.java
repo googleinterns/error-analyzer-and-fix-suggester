@@ -25,18 +25,21 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 
 public class MockLogDao implements DaoInterface {
+    //database is an example of input index file
     private final String[] database = new String[] {"Error: nullPointerException", 
     "info: start appengine","scheduler shutting down",
     "WARNING: An illegal reflective access operation has occurred", 
     "Severe: Could not find index file", "warning: NullPointerException"};
+    //logDatabase is the list of all indices stored in the database
     private ArrayList < Index > logDatabase = new ArrayList < Index >();
-    private ArrayList<String> errorDatabase;
-    
+    //errorFile is for storing error logs after findAndStoreErrors is executed
+    public ArrayList < String > errorFile;
+
     //search db using keywords and return searchHits having highlight field added 
     @Override 
     public ImmutableList < SearchHit > fullTextSearch(
     String fileName, String searchString, String field) throws IOException {
-        Builder<SearchHit> searchResultBuilder = ImmutableList.<SearchHit>builder();
+        Builder < SearchHit > searchResultBuilder = ImmutableList.< SearchHit >builder();
         String[] keyWords = searchString.split(" ");
         for (int i = 0; i < database.length; i++) {
             String dbEntry = database[i];
@@ -49,7 +52,7 @@ public class MockLogDao implements DaoInterface {
                     SearchHit hit = new SearchHit
                         (i,String.valueOf(i),null,new HashMap());
                     Text [] text = new Text[]{new Text(database[i])};
-                    HashMap <String,HighlightField> highlight = new HashMap();
+                    HashMap < String,HighlightField > highlight = new HashMap();
                     highlight.put(field,new HighlightField(field,text));
                     hit.highlightFields(highlight);
                     searchResultBuilder.add(hit);
@@ -92,14 +95,14 @@ public class MockLogDao implements DaoInterface {
     public String findAndStoreErrors(String fileName) {
         String errorFileName = LogDaoHelper.getErrorIndexName(fileName);
         MockErrorQuery  mockQuery = new MockErrorQuery();
-        ArrayList<String> searchResults = new ArrayList();
+        ArrayList < String > searchResults = new ArrayList();
         for (int i = 0; i < database.length; i++) {
             String document = database[i];
             if (mockQuery.matchesCondition(database[i])) {
                 searchResults.add(document);
             }
         }
-        errorDatabase = searchResults;
+        errorFile = searchResults;
         return errorFileName;
     }
 
@@ -142,6 +145,4 @@ public class MockLogDao implements DaoInterface {
         }
         return result;
     }
-
-
 }
