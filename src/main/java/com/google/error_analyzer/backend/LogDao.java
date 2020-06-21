@@ -45,7 +45,7 @@ import org.elasticsearch.search.SearchHits;
 public class LogDao implements DaoInterface {
 
     private static final RestHighLevelClient client = new RestHighLevelClient
-        (RestClient.builder(new HttpHost("localhost", 9200, "http")));
+        (RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
     private static final SearchSourceBuilder searchSourceBuilder 
         = new SearchSourceBuilder();
     private static final int windowSize = 10;
@@ -148,7 +148,7 @@ public class LogDao implements DaoInterface {
     }
 
     //find errors in a given index
-    private SearchHits findErrors(String fileName) 
+    public SearchHits findErrors(String fileName) 
     throws IOException {
         BooleanQuery booleanQuery = new BooleanQuery();
         SearchRequest searchRequest = booleanQuery.createSearchRequest(fileName);
@@ -165,5 +165,12 @@ public class LogDao implements DaoInterface {
             String id = hit.getId();
             storeLogLine(errorFileName, jsonSource, id);
         }
+    }
+
+public SearchHits rangeQueryHits(SearchRequest searchRequest)
+throws IOException {
+        SearchResponse searchResponse = client
+            .search(searchRequest, RequestOptions.DEFAULT);
+        return searchResponse.getHits();
     }
 }
