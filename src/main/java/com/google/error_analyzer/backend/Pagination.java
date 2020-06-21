@@ -49,7 +49,7 @@ public class Pagination extends HttpServlet {
             Integer.parseInt(request.getParameter("recordsPerPage"));
 
         response.setContentType("application/json");
-        if (fileName.length() == 0) {
+        if (fileName.length() == 0 || !database.fileExists(fileName)) {
             String json = returnEmptyObject();
             response.getWriter().println(json);
             return;
