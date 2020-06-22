@@ -14,7 +14,7 @@ package com.google.error_analyzer;
 import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.LogDaoHelper;
-import com.google.error_analyzer.backend.Pagination;
+import com.google.error_analyzer.backend.PaginationServlet;
 import com.google.error_analyzer.data.SearchErrors;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -46,7 +46,7 @@ import static org.mockito.BDDMockito.any;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public final class PaginationTest {
+public final class PaginationServletTest {
 
     private String fileName = "file";
     private String fileType1 = "errors";
@@ -61,14 +61,14 @@ public final class PaginationTest {
     LogDaoHelper databaseHelper;
 
     @InjectMocks
-    Pagination pagination;
+    PaginationServlet pagination;
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
     @Before
     public void setUp() {
-        pagination = new Pagination();
+        pagination = new PaginationServlet();
         ReflectionTestUtils.setField(pagination, "database", database);
         ReflectionTestUtils.setField(pagination, "databaseHelper", 
         databaseHelper);
@@ -86,11 +86,11 @@ public final class PaginationTest {
     }
 
     // access private method addFetchResultToData
-    private Object getPrivateAddFetchResultToData(
+    private Object getPrivateAddErrorFixesAndHighlights(
     String fileType, ImmutableList < String > hitIds,
     ImmutableList < String > hitFieldContent) throws Exception {
-        Method method = Pagination.class.getDeclaredMethod(
-        "addFetchResultToData", new Class[] {
+        Method method = PaginationServlet.class.getDeclaredMethod(
+        "addErrorFixesAndHighlights", new Class[] {
         String.class, ImmutableList.class, ImmutableList.class});
         method.setAccessible(true);
         return method.invoke(pagination, fileType, hitIds, 
@@ -98,11 +98,11 @@ public final class PaginationTest {
     }
 
     // access private method fetchAndReturnResponse
-    private Object getPrivateMethodFetchAndReturnResponse(
+    private Object getPrivateMethodFetchResponse(
     int page, String fileName, String fileType, int recordsPerPage
     )throws Exception {
-        Method method = Pagination.class.getDeclaredMethod
-        ("fetchAndReturnResponse", new Class[] {int.class, String.class,
+        Method method = PaginationServlet.class.getDeclaredMethod
+        ("fetchResponse", new Class[] {int.class, String.class,
         String.class, int.class});
         method.setAccessible(true);
         return method.invoke(pagination, page, fileName, 
@@ -123,7 +123,7 @@ public final class PaginationTest {
         ImmutableList<String> hitContent = ImmutableList.<String>builder() 
                                                     .add("error1","error2")
                                                     .build();
-        String actual = (String)getPrivateAddFetchResultToData(
+        String actual = (String)getPrivateAddErrorFixesAndHighlights(
         fileType1,hitIds,hitContent);
         String expected = new String("[\"searchError\",\"error2\"]");
         Assert.assertEquals(expected, actual);
@@ -133,7 +133,7 @@ public final class PaginationTest {
     @Test
     public void returnRequestedPageFromDb() throws Exception {
         databaseHelper();
-        String actual = (String) getPrivateMethodFetchAndReturnResponse(
+        String actual = (String) getPrivateMethodFetchResponse(
         2, fileName, fileType1, 1);
         String expected = new String ("[\"error2\"]");
         Assert.assertEquals(expected, actual);

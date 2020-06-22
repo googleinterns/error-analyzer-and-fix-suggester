@@ -11,7 +11,7 @@ limitations under the License.*/
 package com.google.error_analyzer.backend;
 
 import com.google.common.collect.ImmutableList;
-import com.google.error_analyzer.data.ErrorFixes;
+// import com.google.error_analyzer.data.ErrorFixes;
 import com.google.error_analyzer.data.SearchErrors;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -28,15 +28,16 @@ import org.elasticsearch.search.SearchHits;
 
 
 @WebServlet("/pagination")
-public class Pagination extends HttpServlet {
+public class PaginationServlet extends HttpServlet {
 
-    private String field = "name";
-    private static String ERROR = "errors";
-    private static final Logger LOG =
-        LogManager.getLogger(Pagination.class);
+    // dataField contains the name of index field which cotains the data we want to display   
+    private static final String dataField = "name";
+    private static final String ERROR = "errors";
+    private static final Logger logger =
+        LogManager.getLogger(PaginationServlet.class);
     // keep noOfPages a odd no so that there are equal pages in front 
     // and back 
-    private int noOfPages = 5;
+    private static final int noOfPages = 5;
     private LogDao database = new LogDao();
     private LogDaoHelper databaseHelper = new LogDaoHelper();
 
@@ -50,17 +51,16 @@ public class Pagination extends HttpServlet {
 
         response.setContentType("application/json");
         if (fileName.length() == 0 || !database.fileExists(fileName)) {
-            String json = returnEmptyObject();
-            response.getWriter().println(json);
+            response.getWriter().println(emptyObject());
             return;
         }
         String json =
-            fetchAndReturnResponse(page, fileName, fileType, recordsPerPage);
+            fetchResponse(page, fileName, fileType, recordsPerPage);
         response.getWriter().println(json);
     }
 
     // fetches logs from database and return json for the same
-    private String fetchAndReturnResponse(int page, String fileName,
+    private String fetchResponse(int page, String fileName,
         String fileType, int recordsPerPage) {
         int start = (page - 1) * recordsPerPage;
         int size = recordsPerPage;
@@ -70,11 +70,12 @@ public class Pagination extends HttpServlet {
         if (fileType.equals(ERROR)) {
             fileName += "error";
         }
-        return fetchData(start, size, fileName, fileType);
+        return fetchPageFromDatabase(start, size, fileName, fileType);
     }
 
-    // interact with database using dao functions
-    private String fetchData(int start, int size, String fileName,
+    // interact with database using dao functions to fetch a section of documents 
+    // with given fileName starting from start and having length equals to size
+    private String fetchPageFromDatabase(int start, int size, String fileName,
         String fileType) {
         try {
             SearchHit[] searchHits =
@@ -82,38 +83,38 @@ public class Pagination extends HttpServlet {
             ImmutableList < String > hitIds =
                 databaseHelper.hitId(searchHits);
             ImmutableList < String > hitFieldContent =
-                databaseHelper.hitFieldContent(searchHits, field);
+                databaseHelper.hitFieldContent(searchHits, dataField);
             if (hitIds == null) {
                 return convertToJson(new ArrayList());
             }
-            return addFetchResultToData(fileType, hitIds, hitFieldContent);
+            return addErrorFixesAndHighlights(fileType, hitIds, hitFieldContent);
         } catch (IOException exception) {
-            LOG.error(exception);
+            logger.error(exception);
         }
         return convertToJson(new ArrayList());
     }
 
-    // add errorfixes and text highlightes 
-    private String addFetchResultToData(String fileType,
+    // add errorfixes and text highlights 
+    private String addErrorFixesAndHighlights(String fileType,
         ImmutableList < String > hitIds,
         ImmutableList < String > hitFieldContent) {
         ArrayList < String > data = new ArrayList();
         SearchErrors searchErrors = new SearchErrors();
         HashMap < String, String > search =
             searchErrors.getSearchedErrors();
-        ErrorFixes errorFix = new ErrorFixes();
+        // ErrorFixes errorFix = new ErrorFixes();
         for (int idx = 0; idx < hitIds.size(); idx++) {
             String id = hitIds.get(idx);
             String resultString = hitFieldContent.get(idx);
-            String fix = new String();
+            // String fix = new String();
 
-            if (fileType.equals(ERROR)) {
-                fix = errorFix.findFixes(resultString);
-            }
+            // if (fileType.equals(ERROR)) {
+            //     fix = errorFix.findFixes(resultString);
+            // }
             if (search.containsKey(id)) {
                 resultString = search.get(id);
             }
-            resultString += fix;
+            // resultString += fix;
             data.add(resultString);
         }
         return convertToJson(data);
@@ -127,7 +128,7 @@ public class Pagination extends HttpServlet {
     }
 
     // return empty json
-    private String returnEmptyObject() {
+    private String emptyObject() {
         String json = convertToJson(new ArrayList());
         return json;
     }
