@@ -11,9 +11,9 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
-import com.google.error_analyzer.data.Keywords;
-import com.google.error_analyzer.data.LogFields;
-import com.google.error_analyzer.data.RegexStrings;
+import com.google.error_analyzer.data.constant.Keywords;
+import com.google.error_analyzer.data.constant.LogFields;
+import com.google.error_analyzer.data.constant.RegexStrings;
 import java.util.*;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -34,10 +34,13 @@ public class BooleanQuery {
     private final String logTextField = LogFields.logTextField;
     private final String logLineNumberField = LogFields.logLineNumberField;
     private final Integer requestSize = 10000; //limited by ElasticSearch settings
+    private final Integer minimumMatch = 1;
 
     //create searchRequest to seach index file for errors
     public SearchRequest createSearchRequest(String fileName) {
-        BoolQueryBuilder boolQuery = buildBoolQuery();
+        String matchQueryString = Keywords.getQueryString();
+        String regexQueryString = RegexStrings.getQueryString();
+        BoolQueryBuilder boolQuery = buildBoolQuery(matchQueryString, regexQueryString);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
             .size(requestSize)
             .query(boolQuery)
@@ -48,26 +51,26 @@ public class BooleanQuery {
     }
 
     //Combine matchquery and regex query and return a bool query
-    private BoolQueryBuilder buildBoolQuery() {
-        MatchQueryBuilder matchQuery = buildMatchQuery();
-        RegexpQueryBuilder regexQuery = buildRegexQuery();
+    private BoolQueryBuilder buildBoolQuery(String matchQueryString, 
+    String regexQueryString) {
+        MatchQueryBuilder matchQuery = buildMatchQuery(matchQueryString);
+        RegexpQueryBuilder regexQuery = buildRegexQuery(regexQueryString);
         BoolQueryBuilder boolQuery = new BoolQueryBuilder()
-            .minimumShouldMatch(1)
+            .minimumShouldMatch(minimumMatch)
             .should(regexQuery)
             .should(matchQuery);
         return boolQuery;
     }
 
-    private MatchQueryBuilder buildMatchQuery() {
-        String keywordsQueryString = Keywords.getQueryString();
+    private MatchQueryBuilder buildMatchQuery(String matchQueryString) {
         MatchQueryBuilder matchQuery = new MatchQueryBuilder
-            (logTextField, keywordsQueryString);
+            (logTextField, matchQueryString);
         return matchQuery;
     }
 
-    private RegexpQueryBuilder buildRegexQuery() {
-        String regexQueryString = RegexStrings.getQueryString();
-        RegexpQueryBuilder regexQuery = new RegexpQueryBuilder(logTextField,regexQueryString);
+    private RegexpQueryBuilder buildRegexQuery(String regexQueryString) {
+        RegexpQueryBuilder regexQuery = new RegexpQueryBuilder
+            (logTextField,regexQueryString);
         return regexQuery;
     }
 }

@@ -11,8 +11,8 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
-import com.google.error_analyzer.data.Keywords; 
-import com.google.error_analyzer.data.RegexStrings;
+import com.google.error_analyzer.data.constant.Keywords; 
+import com.google.error_analyzer.data.constant.RegexStrings;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,14 +20,11 @@ import java.util.regex.Pattern;
 /** 
 * This class mocks the BooleanQuery of elasticsearch.
 */
-
 public class MockErrorQuery {
-    private final Keywords keyWords = new Keywords();
-    private final String keyWordsQueryString = keyWords.getQueryString();
+    private final String keyWordsQueryString = Keywords.getQueryString();
     private final String[] keyWordsList = keyWordsQueryString.split(" OR ");
     private final HashSet<String> keyWordSet = new HashSet<>(Arrays.asList(keyWordsList));
-    private final RegexStrings regex = new RegexStrings();
-    private final String regexQueryString = regex.getQueryString();
+    private final String regexQueryString = RegexStrings.getQueryString();
     private final String[] regexList = regexQueryString.split(Pattern.quote("|"));
     
     //return true if document contains keyword or matches regex

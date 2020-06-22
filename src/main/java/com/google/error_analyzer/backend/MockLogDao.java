@@ -34,7 +34,7 @@ public class MockLogDao implements DaoInterface {
     private ArrayList < Index > logDatabase = new ArrayList < Index >();
     //errorFile is for storing error logs after findAndStoreErrors is executed
     public ArrayList < String > errorFile;
-    
+
     //search db using keywords and return searchHits having highlight field added 
     @Override 
     public ImmutableList < SearchHit > fullTextSearch(

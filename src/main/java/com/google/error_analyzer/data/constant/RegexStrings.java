@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package com.google.error_analyzer.data;
+package com.google.error_analyzer.data.constant;
 
-import java.util.*;
+import java.util.ArrayList;
 
+/**
+* This class contains all the regular expressions used in regex query.
+* A log line will apear in search hits if a a term matches the regex.
+*/
 public class RegexStrings{
-
+    private final static String logicString = "|";
     private static final ArrayList < String > regexList = new ArrayList < String > () {
         {
             add(".*exception");
@@ -27,10 +31,10 @@ public class RegexStrings{
     public static String getQueryString() {
         String queryString = "";
         for (String keyword : regexList) {
-            if (queryString.length() == 0) {
+            if (queryString.isEmpty()) {
                 queryString = queryString.concat(keyword);
             } else {
-                queryString = queryString.concat("|" + keyword);
+                queryString = queryString.concat(logicString.concat(keyword));
             }
         }
         return queryString;
