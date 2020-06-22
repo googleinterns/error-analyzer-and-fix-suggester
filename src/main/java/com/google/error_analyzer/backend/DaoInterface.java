@@ -27,6 +27,9 @@ public interface DaoInterface {
     public SearchHit[] getAll (String fileName, int start, int size) 
     throws IOException;
 
+    // returns no of documents in an index
+    public long getDocCount (String index) throws IOException;
+
     //search db using regex and keywords and store back in db searchHits sorted by 
     // logLineNumber
     public boolean errorQuery (String filename) throws IOException;
