@@ -24,7 +24,7 @@ import org.apache.logging.log4j.LogManager;
 public class StoreLogs {
 
     private static final Logger logger = LogManager.getLogger(StoreLogs.class);
-    public LogDao logDao = new LogDao();
+    public DaoInterface logDao = new LogDao();
 
     //convert the logText and logLineNumber to a json string
     public String convertToJsonString(String logText, int logLineNumber) {

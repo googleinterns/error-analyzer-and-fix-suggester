@@ -39,10 +39,9 @@ import static org.mockito.Mockito.when;
 /*this class contains tests for the methods used for 
 storing logs to the database*/
 public final class StoreLogTest {
-    private MockLogDao mockLogDao = null;
 
     @Mock
-    LogDao logDao;
+    MockLogDao mockLogDao;
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -54,7 +53,7 @@ public final class StoreLogTest {
     public void setUp() {
         mockLogDao = new MockLogDao();
         storeLogs = new StoreLogs();
-        storeLogs.logDao = logDao;
+        storeLogs.logDao = mockLogDao;
     }
 
     //store the log into the database when index with name same as the
@@ -63,12 +62,6 @@ public final class StoreLogTest {
     public void checkAndStoreLogTest() throws IOException {
         String log = "error1";
         String fileName = "samplefile";
-        boolean fileExists = mockLogDao.fileExists(fileName);
-        String jsonString = storeLogs.convertToJsonString(log, 1);
-        String storedLog = mockLogDao.storeLogLine(fileName, jsonString, "1");
-        when(logDao.storeLogLine(fileName, jsonString, "1")).
-        thenReturn(storedLog);
-        when(logDao.fileExists(fileName)).thenReturn(fileExists);
         String expected = "\t\t\t<h2> File Stored</h2>";
         String actual = storeLogs.checkAndStoreLog(fileName, log);
         assertEquals(expected, actual);
@@ -82,15 +75,7 @@ public final class StoreLogTest {
     throws IOException {
         String log = "error2";
         String fileName = "samplefile1";
-        boolean fileExists = mockLogDao.fileExists(fileName);
-        String jsonString = storeLogs.convertToJsonString(log, 1);
-        String storedLog = mockLogDao.storeLogLine(fileName, jsonString, "1");
-        when(logDao.storeLogLine(fileName, jsonString, "1")).
-        thenReturn(storedLog);
-        when(logDao.fileExists(fileName)).thenReturn(fileExists);
         storeLogs.checkAndStoreLog(fileName, log);
-        fileExists = mockLogDao.fileExists(fileName);
-        when(logDao.fileExists(fileName)).thenReturn(fileExists);
         String expected = "\t\t\t<h2> Sorry! the file already exists</h2>";
         String actual = storeLogs.checkAndStoreLog(fileName, log);
         assertEquals(expected, actual);
@@ -102,8 +87,8 @@ public final class StoreLogTest {
     public void convertToJsonStringTest() {
         String actual = storeLogs.
         convertToJsonString("Error1:\"index not found\"", 5);
-        String expected = new String(
-            "{\"logLineNumber\":5,\"logText\":\"Error1:'index not found'\"}");
+        String expected = new String("{\"logLineNumber\":5," +
+            "\"logText\":\"Error1:\\\"index not found\\\"\"}");
         assertEquals(expected, actual);
     }
 
@@ -112,8 +97,8 @@ public final class StoreLogTest {
     public void RemoveSpecialCharactersTest() {
         String actual = storeLogs.
         convertToJsonString("Error1:\"^&index not found?/,*\"", 5);
-        String expected = new String(
-            "{\"logLineNumber\":5,\"logText\":\"Error1:' index not found '\"}");
+        String expected = new String("{\"logLineNumber\":5," +
+            "\"logText\":\"Error1:\\\" index not found \\\"\"}");
         assertEquals(expected, actual);
     }
 
