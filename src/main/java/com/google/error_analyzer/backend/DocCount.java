@@ -26,7 +26,7 @@ import org.apache.logging.log4j.LogManager;
 public class DocCount extends HttpServlet {
 
     private static LogDao database = new LogDao();
-    private static final Logger LOG =
+    private static final Logger logger = 
         LogManager.getLogger(DocCount.class);
 
     // return no of document in given index
@@ -39,11 +39,10 @@ public class DocCount extends HttpServlet {
             count = database.getDocCount(index);
         }  catch (Exception exception) {
             count = 0l;
-            LOG.error(exception);
+            logger.error(exception);
         } 
         response.setContentType("application/json");
-        String json =convertToJson(count);
-        response.getWriter().println(json);
+        response.getWriter().println(convertToJson(count));
     }
 
     // return json for java object
