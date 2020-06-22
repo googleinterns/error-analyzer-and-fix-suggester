@@ -45,11 +45,11 @@ async function changePage(page) {
             body: params
         });
         const fetchedData = await response.json();
-        if(fetchedData.length == 0) {
-           await fileNotFound();
-           return;
-        }
         updateLastPage(fetchedData.length, fetchedPage);
+        if(fetchedData.length == 0 && currentPage == 1) {
+            fileNotFound();
+            return;
+        }
         addToData(fetchedData, fetchedPage);    
     }
     if(currentPage == 1 ) {
