@@ -14,95 +14,59 @@ package com.google.error_analyzer;
 import com.google.error_analyzer.backend.BooleanQuery;
 import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.MockLogDao;
-import java.io.IOException;
-import java.util.*;
+import com.google.error_analyzer.data.constant.LogFields;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.RegexpQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.SearchHits;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public final class BooleanQueryTest {
-
-    private final String fileName = "file"; 
-    private final BooleanQuery boolQuery = new BooleanQuery();
-    SearchRequest searchRequest = null;
-    SearchSourceBuilder searchSourceBuilder = null;
-
-    @Mock
-    LogDao database;
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
-    @Before
-    public void setUp() {
-        searchRequest = boolQuery.createSearchRequest(fileName);
-        searchSourceBuilder = searchRequest.source();
-    }
 
     @Test
     public void createSearchRequestWithBoolQuery() {
-        String[] indices = searchRequest.indices();
-        Assert.assertEquals(indices.length, 1);
-        Assert.assertEquals(indices[0], fileName);
+        String fileName = "file"; 
+        String expectedMatchQueryString = "error OR fatal OR severe OR exit OR exception";
+        String expectedRegexQueryString = ".*exception";
+        Integer expectedRequestSize = 10000;
+        BoolQueryBuilder boolQuery = buildBoolQuery(expectedMatchQueryString, expectedRegexQueryString);
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
+            .size(expectedRequestSize)
+            .query(boolQuery)
+            .sort(LogFields.LOG_LINE_NUMBER);
+        SearchRequest expected = new SearchRequest(fileName);
+        expected.source(searchSourceBuilder);
+        BooleanQuery booleanQuery = new BooleanQuery();
+        SearchRequest actual = booleanQuery.createSearchRequest(fileName);
+        Assert.assertEquals(actual, expected);
+    }
+    
+    private BoolQueryBuilder buildBoolQuery(String matchQueryString, 
+    String regexQueryString) {
+        MatchQueryBuilder matchQuery = buildMatchQuery(matchQueryString);
+        RegexpQueryBuilder regexQuery = buildRegexQuery(regexQueryString);
+        BoolQueryBuilder boolQuery = new BoolQueryBuilder()
+            .minimumShouldMatch(1)
+            .should(regexQuery)
+            .should(matchQuery);
+        return boolQuery;
     }
 
-    @Test
-    public void keyWordQueryString() {
-        BoolQueryBuilder boolQuery = (BoolQueryBuilder) searchSourceBuilder
-            .query();
-        List < QueryBuilder > queryList = boolQuery.should();
-        MatchQueryBuilder matchQuery = (MatchQueryBuilder) queryList.get(1);
-        String actual = (String) matchQuery.value();
-        String expected = "error OR fatal OR severe OR exit OR exception";
-        Assert.assertEquals(expected, actual);
+    private MatchQueryBuilder buildMatchQuery(String matchQueryString) {
+        MatchQueryBuilder matchQuery = new MatchQueryBuilder
+            (LogFields.LOG_TEXT, matchQueryString);
+        return matchQuery;
     }
 
-    @Test
-    public void regexpQueryString() {
-        BoolQueryBuilder boolQuery = (BoolQueryBuilder) searchSourceBuilder
-            .query();
-        List < QueryBuilder > queryList = boolQuery.should();
-        RegexpQueryBuilder regexQuery = (RegexpQueryBuilder) queryList.get(0);
-        String actual = regexQuery.value();
-        String expected = ".*exception";
-        Assert.assertEquals(expected, actual);
-    }
-
-    @Test
-    public void findErrorsTest() throws IOException {
-        MockLogDao mockDatabase = new MockLogDao();
-        String errorFileName = mockDatabase.findAndStoreErrors(fileName);
-        ArrayList < String > actual = mockDatabase.errorFile;
-        when(database.findAndStoreErrors(fileName))
-            .thenReturn(errorFileName);
-        database.findAndStoreErrors(fileName);
-        ArrayList < String > expected = new ArrayList < String > () {
-            {
-                add("Error: nullPointerException");
-                add("Severe: Could not find index file");
-                add("warning: NullPointerException");
-            }
-        };
-        verify(database, times(1)).findAndStoreErrors(fileName);
-        Assert.assertEquals(expected, actual);
+    private RegexpQueryBuilder buildRegexQuery(String regexQueryString) {
+        RegexpQueryBuilder regexQuery = new RegexpQueryBuilder
+            (LogFields.LOG_TEXT,regexQueryString);
+        return regexQuery;
     }
 }

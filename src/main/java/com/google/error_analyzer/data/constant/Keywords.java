@@ -18,8 +18,8 @@ import java.util.ArrayList;
 * A log line will apear in search hits if one or more of these terms appear in it.
 */
 public class Keywords {
-    private final static String LogicString = " OR ";
-    private static final ArrayList < String > keywordsList = new ArrayList < String > () {
+    private final static String OR_OPERATOR = " OR ";
+    private static final ArrayList < String > KEYWORD_LIST = new ArrayList < String > () {
         {
             add("error");
             add("fatal");
@@ -32,11 +32,11 @@ public class Keywords {
     //returns keywords as a single string combined together in OR logic.
     public static String getQueryString() {
         String queryString = "";
-        for (String keyword : keywordsList) {
+        for (String keyword : KEYWORD_LIST) {
             if (queryString.isEmpty()) {
                 queryString = queryString.concat(keyword);
             } else {
-                queryString = queryString.concat(LogicString.concat(keyword));
+                queryString = queryString.concat(OR_OPERATOR.concat(keyword));
             }
         }
         return queryString;

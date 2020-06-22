@@ -94,15 +94,9 @@ public class MockLogDao implements DaoInterface {
     @Override 
     public String findAndStoreErrors(String fileName) {
         String errorFileName = LogDaoHelper.getErrorIndexName(fileName);
-        MockErrorQuery  mockQuery = new MockErrorQuery();
-        ArrayList < String > searchResults = new ArrayList();
-        for (int i = 0; i < database.length; i++) {
-            String document = database[i];
-            if (mockQuery.matchesCondition(database[i])) {
-                searchResults.add(document);
-            }
-        }
-        errorFile = searchResults;
+        errorFile.add("Error: nullPointerException");
+        errorFile.add("Severe: Could not find index file");
+        errorFile.add("warning: NullPointerException");
         return errorFileName;
     }
 

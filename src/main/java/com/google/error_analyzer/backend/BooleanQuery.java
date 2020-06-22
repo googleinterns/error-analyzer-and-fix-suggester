@@ -31,10 +31,8 @@ import org.elasticsearch.search.SearchHits;
 */
 
 public class BooleanQuery {
-    private final String logTextField = LogFields.logTextField;
-    private final String logLineNumberField = LogFields.logLineNumberField;
-    private final Integer requestSize = 10000; //limited by ElasticSearch settings
-    private final Integer minimumMatch = 1;
+    private final static Integer requestSize = 10000; //limited by ElasticSearch settings
+    private final static Integer minimumMatch = 1;
 
     //create searchRequest to seach index file for errors
     public SearchRequest createSearchRequest(String fileName) {
@@ -44,7 +42,7 @@ public class BooleanQuery {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
             .size(requestSize)
             .query(boolQuery)
-            .sort(logLineNumberField);
+            .sort(LogFields.LOG_LINE_NUMBER);
         SearchRequest searchRequest = new SearchRequest(fileName);
         searchRequest.source(searchSourceBuilder);
         return searchRequest;
@@ -63,14 +61,12 @@ public class BooleanQuery {
     }
 
     private MatchQueryBuilder buildMatchQuery(String matchQueryString) {
-        MatchQueryBuilder matchQuery = new MatchQueryBuilder
-            (logTextField, matchQueryString);
-        return matchQuery;
+        return new MatchQueryBuilder
+            (LogFields.LOG_TEXT, matchQueryString);
     }
 
     private RegexpQueryBuilder buildRegexQuery(String regexQueryString) {
-        RegexpQueryBuilder regexQuery = new RegexpQueryBuilder
-            (logTextField,regexQueryString);
-        return regexQuery;
+        return new RegexpQueryBuilder
+            (LogFields.LOG_TEXT,regexQueryString);
     }
 }
