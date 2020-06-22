@@ -38,7 +38,6 @@ public class StoreLogs {
         //remove extra white space
         String jsonString = String.format("{\"logLineNumber\":%1$s," +
             "\"logText\":\"%2$s\"}", logLineNumber, logText);
-       // jsonString = JSON.stringify(jsonString);
         return jsonString;
     }
 
