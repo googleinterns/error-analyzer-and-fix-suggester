@@ -54,9 +54,20 @@ public class PaginationServlet extends HttpServlet {
             response.getWriter().println(emptyObject());
             return;
         }
+        if (fileType.equals(ERROR)) {
+            fileName += "error";
+            String json = fetchErrorInBottomUpManner(page, fileName, fileType, recordsPerPage);
+            response.getWriter().println(json);
+            return;
+        }
         String json =
             fetchResponse(page, fileName, fileType, recordsPerPage);
         response.getWriter().println(json);
+    }
+
+    private String fetchErrorInBottomUpManner(int page, String fileName,
+        String fileType, int recordsPerPage) {
+            
     }
 
     // fetches logs from database and return json for the same
@@ -66,9 +77,6 @@ public class PaginationServlet extends HttpServlet {
         int size = recordsPerPage;
         if (page == 1) {
             size = noOfPages * recordsPerPage;
-        }
-        if (fileType.equals(ERROR)) {
-            fileName += "error";
         }
         return fetchPageFromDatabase(start, size, fileName, fileType);
     }
