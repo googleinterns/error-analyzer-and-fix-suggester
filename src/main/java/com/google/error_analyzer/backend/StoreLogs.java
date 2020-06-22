@@ -33,12 +33,12 @@ public class StoreLogs {
         logText = logText.replaceAll(removeSpecialCharactersString, space);
         //remove special characters
         final String doubleInvertedComma = "\"";
-        final String singleInvertedComma = "\'";
-        logText = logText.replaceAll(doubleInvertedComma, singleInvertedComma);
+        logText = logText.replaceAll(doubleInvertedComma, "\\\\\"");
         logText = logText.replaceAll("\\s+", " ");
         //remove extra white space
         String jsonString = String.format("{\"logLineNumber\":%1$s," +
             "\"logText\":\"%2$s\"}", logLineNumber, logText);
+       // jsonString = JSON.stringify(jsonString);
         return jsonString;
     }
 
@@ -57,7 +57,7 @@ public class StoreLogs {
                 return (response);
             }
         } catch (Exception e) {
-            final String response = String.format("Could not store file %1$s", e);
+            final String response = String.format("\t\t\t<h2> Could not store file %1$s</h2>", e);
             logger.error("Could not store file", e);
             return (response);
         }
