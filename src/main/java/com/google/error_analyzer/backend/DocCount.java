@@ -25,7 +25,7 @@ import org.apache.logging.log4j.LogManager;
 @WebServlet("/getCount")
 public class DocCount extends HttpServlet {
 
-    private static LogDao database = new LogDao();
+    private static LogDao logDao = new LogDao();
     private static final Logger logger = 
         LogManager.getLogger(DocCount.class);
 
@@ -36,7 +36,7 @@ public class DocCount extends HttpServlet {
         String index = request.getParameter("index");
         long count = 0l;
         try {
-            count = database.getDocCount(index);
+            count = logDao.getDocCount(index);
         }  catch (Exception exception) {
             count = 0l;
             logger.error(exception);
