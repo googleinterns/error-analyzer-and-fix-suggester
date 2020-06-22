@@ -154,7 +154,6 @@ public class LogDao implements DaoInterface {
         logger.info("Finding errors in".concat(fileName));
         BooleanQuery booleanQuery = new BooleanQuery();
         SearchRequest searchRequest = booleanQuery.createSearchRequest(fileName);
-        SearchRequest searchRequest = new SearchRequest();
         SearchResponse searchResponse = client
             .search(searchRequest, RequestOptions.DEFAULT);
         return searchResponse.getHits();
