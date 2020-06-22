@@ -64,5 +64,9 @@ public class LogDaoHelper {
     //returns index name which stores the error logs
     public static String getErrorIndexName (String fileName) {
         return fileName.concat("error");
+    }
+
+    public static String getStackIndexName(String fileName) {
+        return fileName.concat("stack");
     } 
 }

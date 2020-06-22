@@ -11,9 +11,9 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
-import com.google.error_analyzer.data.LogFields;
+import com.google.error_analyzer.backend.LogDaoHelper;
+import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.StackTraceFormat;
-import com.google.error_analyzer.backend.LogDao;
 import java.io.IOException;
 import java.util.*;
 import org.apache.logging.log4j.Logger;
@@ -32,35 +32,52 @@ public class StackTrace {
 
     public void findStackTraceOfErrors(String fileName) throws IOException {
         SearchHits hits = logDao.findErrors(fileName);
-        String stackFileName = fileName.concat("stack");
+        String stackFileName = LogDaoHelper.getStackIndexName(fileName);
+        Integer last = 0;
         for (SearchHit hit : hits) {
             Map <String, Object > sourceAsMap = hit.getSourceAsMap();
             Integer logLineNumber = (Integer) sourceAsMap.get(logLineNumberField);
-            System.out.println("------------------------" + logLineNumber);
-            String logText = (String) sourceAsMap.get(logTextField); 
-            logger.info(logText);
-            SearchRequest searchRequest = createSearchRequest(fileName, logLineNumber);
-            SearchHits rangeHits = logDao.rangeQueryHits(searchRequest);
-            for (SearchHit rangeHit : rangeHits) {
-                Integer lognumber = matchesCallStackFormat(rangeHit);
-                if ( lognumber != -1 ){
-                    String jsonString = rangeHit.getSourceAsString();
-                logDao.storeLogLine(stackFileName, jsonString, lognumber.toString());
-                }else{
-                    break;
-                }
+            if (last > logLineNumber) {
+                continue;
+            }
+            last = logLineNumber;
+            Integer endOfStack = findStack(logLineNumber, fileName);
+            logger.info("error at " + logLineNumber);
+            if (endOfStack != -1) {
+                String jsonString = hit.getSourceAsString();
+                logDao.storeLogLine(stackFileName, jsonString, logLineNumber.toString());
+                last = endOfStack;
             }
         }
     }
-    private findStack(SearchHit hits, String fileName) {
-
+    private Integer findStack(Integer logLineNumber, String fileName) throws IOException{
+        SearchRequest searchRequest = createSearchRequest(fileName, logLineNumber);
+        SearchHits rangeHits = logDao.rangeQueryHits(searchRequest);
+        Integer last = -1;
+        String stackFileName = LogDaoHelper.getStackIndexName(fileName);
+        for (SearchHit rangeHit : rangeHits) {
+            Integer lognumber = matchesCallStackFormat(rangeHit);
+            if ( lognumber != -1 ){
+                logger.info("errorstack for " + logLineNumber + " : line = " + lognumber);
+                String jsonString = rangeHit.getSourceAsString();
+                logDao.storeLogLine(stackFileName, jsonString, lognumber.toString());
+                last = lognumber;
+            }else{
+                return last;
+            }
+        }
+        return last;
     }
+
+    // private void checkLogLines(SearchHit hits) {
+
+    // }
 
     private Integer matchesCallStackFormat (SearchHit hit) {
         Map<String, Object> sourceAsMap = hit.getSourceAsMap();
         String logText = (String) sourceAsMap.get(logTextField);
         if(StackTraceFormat.matchesFormat(logText)){
-            logger.info(logText);
+            // logger.info(logText);
             return (Integer) sourceAsMap.get(logLineNumberField);
         } else {
             return -1;
@@ -80,7 +97,8 @@ public class StackTrace {
         RangeQueryBuilder rangeQuery = buildRangeQuery(logLineNumber);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
             .query(rangeQuery)
-            .sort(logLineNumberField);
+            .sort(logLineNumberField)
+            .size(100);
         SearchRequest searchRequest = new SearchRequest(fileName);
         searchRequest.source(searchSourceBuilder);
         return searchRequest;
