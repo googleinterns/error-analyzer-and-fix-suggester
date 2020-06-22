@@ -29,11 +29,9 @@ import org.junit.Test;
 
 public final class BooleanQueryTest {
 
-    private final String fileName = "file"; 
-    SearchRequest searchRequest = null;
-
-    @Before
-    public void setUp() {
+    @Test
+    public void createSearchRequestWithBoolQuery() {
+        String fileName = "file"; 
         String expectedMatchQueryString = "error OR fatal OR severe OR exit OR exception";
         String expectedRegexQueryString = ".*exception";
         Integer expectedRequestSize = 10000;
@@ -41,16 +39,12 @@ public final class BooleanQueryTest {
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
             .size(expectedRequestSize)
             .query(boolQuery)
-            .sort(LogFields.logLineNumberField);
-        searchRequest = new SearchRequest(fileName);
-        searchRequest.source(searchSourceBuilder);
-    }
-
-    @Test
-    public void createSearchRequestWithBoolQuery() {
+            .sort(LogFields.LOG_LINE_NUMBER);
+        SearchRequest expected = new SearchRequest(fileName);
+        expected.source(searchSourceBuilder);
         BooleanQuery booleanQuery = new BooleanQuery();
         SearchRequest actual = booleanQuery.createSearchRequest(fileName);
-        Assert.assertEquals(actual, searchRequest);
+        Assert.assertEquals(actual, expected);
     }
     
     private BoolQueryBuilder buildBoolQuery(String matchQueryString, 
@@ -66,13 +60,13 @@ public final class BooleanQueryTest {
 
     private MatchQueryBuilder buildMatchQuery(String matchQueryString) {
         MatchQueryBuilder matchQuery = new MatchQueryBuilder
-            (LogFields.logTextField, matchQueryString);
+            (LogFields.LOG_TEXT, matchQueryString);
         return matchQuery;
     }
 
     private RegexpQueryBuilder buildRegexQuery(String regexQueryString) {
         RegexpQueryBuilder regexQuery = new RegexpQueryBuilder
-            (LogFields.logTextField,regexQueryString);
+            (LogFields.LOG_TEXT,regexQueryString);
         return regexQuery;
     }
 }

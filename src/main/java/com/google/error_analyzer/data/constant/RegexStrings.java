@@ -21,8 +21,8 @@ import java.util.ArrayList;
 * A log line will apear in search hits if a a term matches the regex.
 */
 public class RegexStrings{
-    private final static String logicString = "|";
-    private static final ArrayList < String > regexList = new ArrayList < String > () {
+    private final static String PIPE_OPERATOR = "|";
+    private static final ArrayList < String > REGEX_LIST = new ArrayList < String > () {
         {
             add(".*exception");
         }
@@ -30,11 +30,11 @@ public class RegexStrings{
 
     public static String getQueryString() {
         String queryString = "";
-        for (String keyword : regexList) {
+        for (String keyword : REGEX_LIST) {
             if (queryString.isEmpty()) {
                 queryString = queryString.concat(keyword);
             } else {
-                queryString = queryString.concat(logicString.concat(keyword));
+                queryString = queryString.concat(PIPE_OPERATOR.concat(keyword));
             }
         }
         return queryString;
