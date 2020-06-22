@@ -109,6 +109,7 @@ public class LogDao implements DaoInterface {
         SearchHits hits = findErrors(fileName);
         String errorFileName = LogDaoHelper.getErrorIndexName(fileName);
         storeErrors(errorFileName, hits);
+        logger.info("Errors stored in index ".concat(errorFileName));
         return errorFileName;
     }
 
@@ -150,8 +151,10 @@ public class LogDao implements DaoInterface {
     //find errors in a given index
     private SearchHits findErrors(String fileName) 
     throws IOException {
+        logger.info("Finding errors in".concat(fileName));
         BooleanQuery booleanQuery = new BooleanQuery();
         SearchRequest searchRequest = booleanQuery.createSearchRequest(fileName);
+        SearchRequest searchRequest = new SearchRequest();
         SearchResponse searchResponse = client
             .search(searchRequest, RequestOptions.DEFAULT);
         return searchResponse.getHits();
