@@ -15,8 +15,8 @@ import com.google.error_analyzer.backend.BooleanQuery;
 import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.LogDaoHelper;
 import com.google.error_analyzer.backend.MockLogDao;
-import com.google.error_analyzer.data.Keywords;
-import com.google.error_analyzer.data.RegexStrings;
+import com.google.error_analyzer.data.constant.Keywords;
+import com.google.error_analyzer.data.constant.RegexStrings;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.elasticsearch.action.search.SearchRequest;
@@ -67,12 +67,6 @@ public final class BooleanQueryTest {
         String actual = RegexStrings.getQueryString();
         String expected = ".*exception";
         Assert.assertEquals(expected, actual);
-    }
-
-    @Test
-    public void errorFileNameAppend() {
-        String actual = LogDaoHelper.getErrorIndexName(fileName);
-        Assert.assertEquals("fileerror", actual);
     }
 
     @Test

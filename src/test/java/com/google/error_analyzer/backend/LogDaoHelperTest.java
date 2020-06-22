@@ -99,6 +99,13 @@ public final class LogDaoHelperTest {
         Assert.assertTrue(expected.equals(actual));
     }
 
+    @Test
+    public void errorFileNameAppend() {
+        String fileName = "file";
+        String actual = logDaoHelper.getErrorIndexName(fileName);
+        Assert.assertEquals("fileerror", actual);
+    }
+
     private void getHitId(){
         when(hit1.getId()).thenReturn("1");
         when(hit2.getId()).thenReturn("2");

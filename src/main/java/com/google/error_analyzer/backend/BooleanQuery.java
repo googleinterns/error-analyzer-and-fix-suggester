@@ -11,9 +11,9 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
-import com.google.error_analyzer.data.Keywords;
-import com.google.error_analyzer.data.LogFields;
-import com.google.error_analyzer.data.RegexStrings;
+import com.google.error_analyzer.data.constant.Keywords;
+import com.google.error_analyzer.data.constant.LogFields;
+import com.google.error_analyzer.data.constant.RegexStrings;
 import java.util.*;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -34,6 +34,7 @@ public class BooleanQuery {
     private final String logTextField = LogFields.logTextField;
     private final String logLineNumberField = LogFields.logLineNumberField;
     private final Integer requestSize = 10000; //limited by ElasticSearch settings
+    private final Integer minimumMatch = 1;
 
     //create searchRequest to seach index file for errors
     public SearchRequest createSearchRequest(String fileName) {
@@ -52,7 +53,7 @@ public class BooleanQuery {
         MatchQueryBuilder matchQuery = buildMatchQuery();
         RegexpQueryBuilder regexQuery = buildRegexQuery();
         BoolQueryBuilder boolQuery = new BoolQueryBuilder()
-            .minimumShouldMatch(1)
+            .minimumShouldMatch(minimumMatch)
             .should(regexQuery)
             .should(matchQuery);
         return boolQuery;
