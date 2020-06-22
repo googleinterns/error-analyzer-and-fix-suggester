@@ -38,7 +38,9 @@ public class BooleanQuery {
 
     //create searchRequest to seach index file for errors
     public SearchRequest createSearchRequest(String fileName) {
-        BoolQueryBuilder boolQuery = buildBoolQuery();
+        String matchQueryString = Keywords.getQueryString();
+        String regexQueryString = RegexStrings.getQueryString();
+        BoolQueryBuilder boolQuery = buildBoolQuery(matchQueryString, regexQueryString);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
             .size(requestSize)
             .query(boolQuery)
@@ -49,9 +51,10 @@ public class BooleanQuery {
     }
 
     //Combine matchquery and regex query and return a bool query
-    private BoolQueryBuilder buildBoolQuery() {
-        MatchQueryBuilder matchQuery = buildMatchQuery();
-        RegexpQueryBuilder regexQuery = buildRegexQuery();
+    private BoolQueryBuilder buildBoolQuery(String matchQueryString, 
+    String regexQueryString) {
+        MatchQueryBuilder matchQuery = buildMatchQuery(matchQueryString);
+        RegexpQueryBuilder regexQuery = buildRegexQuery(regexQueryString);
         BoolQueryBuilder boolQuery = new BoolQueryBuilder()
             .minimumShouldMatch(minimumMatch)
             .should(regexQuery)
@@ -59,16 +62,15 @@ public class BooleanQuery {
         return boolQuery;
     }
 
-    private MatchQueryBuilder buildMatchQuery() {
-        String keywordsQueryString = Keywords.getQueryString();
+    private MatchQueryBuilder buildMatchQuery(String matchQueryString) {
         MatchQueryBuilder matchQuery = new MatchQueryBuilder
-            (logTextField, keywordsQueryString);
+            (logTextField, matchQueryString);
         return matchQuery;
     }
 
-    private RegexpQueryBuilder buildRegexQuery() {
-        String regexQueryString = RegexStrings.getQueryString();
-        RegexpQueryBuilder regexQuery = new RegexpQueryBuilder(logTextField,regexQueryString);
+    private RegexpQueryBuilder buildRegexQuery(String regexQueryString) {
+        RegexpQueryBuilder regexQuery = new RegexpQueryBuilder
+            (logTextField,regexQueryString);
         return regexQuery;
     }
 }
