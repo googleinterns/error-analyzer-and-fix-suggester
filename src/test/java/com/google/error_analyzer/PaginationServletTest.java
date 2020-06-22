@@ -55,10 +55,10 @@ public final class PaginationServletTest {
     private int page2 = 2;
 
     @Mock
-    LogDao database;
+    LogDao logDao;
 
     @Mock
-    LogDaoHelper databaseHelper;
+    LogDaoHelper logDaoHelper;
 
     @InjectMocks
     PaginationServlet pagination;
@@ -69,9 +69,9 @@ public final class PaginationServletTest {
     @Before
     public void setUp() {
         pagination = new PaginationServlet();
-        ReflectionTestUtils.setField(pagination, "database", database);
-        ReflectionTestUtils.setField(pagination, "databaseHelper", 
-        databaseHelper);
+        ReflectionTestUtils.setField(pagination, "logDao", logDao);
+        ReflectionTestUtils.setField(pagination, "logDaoHelper", 
+        logDaoHelper);
         MockitoAnnotations.initMocks(this);
     }
 
@@ -80,8 +80,8 @@ public final class PaginationServletTest {
         ImmutableList<String> immutableListId = ImmutableList.of("2");
         ImmutableList<String> immutableListContent = 
             ImmutableList.of("error2");
-        when(databaseHelper.hitId(any())).thenReturn(immutableListId);
-        when(databaseHelper.hitFieldContent(any(),any())).
+        when(logDaoHelper.hitId(any())).thenReturn(immutableListId);
+        when(logDaoHelper.hitFieldContent(any(),any())).
             thenReturn(immutableListContent);
     }
 

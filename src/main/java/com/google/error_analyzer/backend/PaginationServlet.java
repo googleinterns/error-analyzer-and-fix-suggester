@@ -38,8 +38,8 @@ public class PaginationServlet extends HttpServlet {
     // keep noOfPages a odd no so that there are equal pages in front 
     // and back 
     private static final int noOfPages = 5;
-    private LogDao database = new LogDao();
-    private LogDaoHelper databaseHelper = new LogDaoHelper();
+    private LogDao logDao = new LogDao();
+    private LogDaoHelper logDaoHelper = new LogDaoHelper();
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -50,7 +50,7 @@ public class PaginationServlet extends HttpServlet {
             Integer.parseInt(request.getParameter("recordsPerPage"));
 
         response.setContentType("application/json");
-        if (fileName.length() == 0 || !database.fileExists(fileName)) {
+        if (fileName.length() == 0 || !logDao.fileExists(fileName)) {
             response.getWriter().println(emptyObject());
             return;
         }
@@ -79,11 +79,11 @@ public class PaginationServlet extends HttpServlet {
         String fileType) {
         try {
             SearchHit[] searchHits =
-                database.getAll(fileName, start, size);
+                logDao.getAll(fileName, start, size);
             ImmutableList < String > hitIds =
-                databaseHelper.hitId(searchHits);
+                logDaoHelper.hitId(searchHits);
             ImmutableList < String > hitFieldContent =
-                databaseHelper.hitFieldContent(searchHits, dataField);
+                logDaoHelper.hitFieldContent(searchHits, dataField);
             if (hitIds == null) {
                 return convertToJson(new ArrayList());
             }
