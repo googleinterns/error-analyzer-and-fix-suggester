@@ -171,8 +171,8 @@ public class LogDao implements DaoInterface {
         }
     }
 
-public SearchHits rangeQueryHits(SearchRequest searchRequest)
-throws IOException {
+    public SearchHits rangeQueryHits(SearchRequest searchRequest)
+    throws IOException {
         SearchResponse searchResponse = client
             .search(searchRequest, RequestOptions.DEFAULT);
         return searchResponse.getHits();

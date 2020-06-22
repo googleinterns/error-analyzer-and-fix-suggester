@@ -25,82 +25,90 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
 public class StackTrace {
+    private final static Integer batchSize = 3;
     private final LogDao logDao = new LogDao();
-    private final String logTextField = LogFields.logTextField;
-    private final String logLineNumberField = LogFields.logLineNumberField; 
     private static final Logger logger = LogManager.getLogger(StackTrace.class);
 
     public void findStackTraceOfErrors(String fileName) throws IOException {
-        SearchHits hits = logDao.findErrors(fileName);
+        SearchHits errorHits = logDao.findErrors(fileName);
         String stackFileName = LogDaoHelper.getStackIndexName(fileName);
-        Integer last = 0;
-        for (SearchHit hit : hits) {
-            Map <String, Object > sourceAsMap = hit.getSourceAsMap();
-            Integer logLineNumber = (Integer) sourceAsMap.get(logLineNumberField);
-            if (last > logLineNumber) {
+        Integer lastHitLogLineNumber = 0;
+        for (SearchHit errorHit : errorHits) {
+            Map < String, Object > sourceAsMap = errorHit.getSourceAsMap();
+            Integer errorLogLineNumber = (Integer) sourceAsMap.get(LogFields.LOG_LINE_NUMBER);
+            logger.info("Error found at: ".concat(errorLogLineNumber.toString()));
+            if (lastHitLogLineNumber >= errorLogLineNumber) {
+                logger.info("Skipping error hit: ".concat(errorLogLineNumber.toString()));
                 continue;
             }
-            last = logLineNumber;
-            Integer endOfStack = findStack(logLineNumber, fileName);
-            logger.info("error at " + logLineNumber);
+            lastHitLogLineNumber = errorLogLineNumber;
+            Integer endOfStack = findStack(errorLogLineNumber, fileName);
             if (endOfStack != -1) {
-                String jsonString = hit.getSourceAsString();
-                logDao.storeLogLine(stackFileName, jsonString, logLineNumber.toString());
-                last = endOfStack;
+                String jsonString = errorHit.getSourceAsString();
+                logDao.storeLogLine(stackFileName, jsonString, errorLogLineNumber.toString());
+                lastHitLogLineNumber = endOfStack;
+            } else {
+                logger.info("No stack found for error hit: ".concat(errorLogLineNumber.toString()));
             }
         }
     }
-    private Integer findStack(Integer logLineNumber, String fileName) throws IOException{
-        SearchRequest searchRequest = createSearchRequest(fileName, logLineNumber);
-        SearchHits rangeHits = logDao.rangeQueryHits(searchRequest);
-        Integer last = -1;
-        String stackFileName = LogDaoHelper.getStackIndexName(fileName);
-        for (SearchHit rangeHit : rangeHits) {
-            Integer lognumber = matchesCallStackFormat(rangeHit);
-            if ( lognumber != -1 ){
-                logger.info("errorstack for " + logLineNumber + " : line = " + lognumber);
-                String jsonString = rangeHit.getSourceAsString();
-                logDao.storeLogLine(stackFileName, jsonString, lognumber.toString());
-                last = lognumber;
-            }else{
-                return last;
+
+    //returns logLineNumber of the document where the stack ends
+    //returns -1 if no stack is found.
+    private Integer findStack(Integer errorLogLineNumber, String fileName) throws IOException {
+        Integer lastCheckedLine = errorLogLineNumber;
+        Integer endOfStack = -1;
+        while (true) {
+            logger.info("creating a new search request");
+            SearchRequest searchRequest = createSearchRequest(fileName, lastCheckedLine);
+            SearchHits rangeHits = logDao.rangeQueryHits(searchRequest);
+            String stackFileName = LogDaoHelper.getStackIndexName(fileName);
+            if(rangeHits.getHits().length == 0) {
+                return endOfStack;
             }
+            for (SearchHit rangeHit : rangeHits) {
+                Integer logLineNumber = matchesCallStackFormat(rangeHit);
+                if ( logLineNumber != -1 ) {
+                    logger.info("call stack for: ".concat(errorLogLineNumber.toString()).concat(" : line = ").concat(logLineNumber.toString()));
+                    String jsonString = rangeHit.getSourceAsString();
+                    logDao.storeLogLine(stackFileName, jsonString, logLineNumber.toString());
+                    endOfStack = logLineNumber;
+                } else {
+                    return endOfStack;
+                }
+            }
+            lastCheckedLine += batchSize;
         }
-        return last;
     }
 
-    // private void checkLogLines(SearchHit hits) {
-
-    // }
-
+    //return logLineNumber of the document if it matches call stack format
+    //return -1 otherwise
     private Integer matchesCallStackFormat (SearchHit hit) {
         Map<String, Object> sourceAsMap = hit.getSourceAsMap();
-        String logText = (String) sourceAsMap.get(logTextField);
+        String logText = (String) sourceAsMap.get(LogFields.LOG_TEXT);
         if(StackTraceFormat.matchesFormat(logText)){
-            // logger.info(logText);
-            return (Integer) sourceAsMap.get(logLineNumberField);
+            return (Integer) sourceAsMap.get(LogFields.LOG_LINE_NUMBER);
         } else {
             return -1;
         }
     }
 
-
-
-    private  RangeQueryBuilder buildRangeQuery(Integer logLineNumber) {
-        RangeQueryBuilder rangeQuery = new RangeQueryBuilder(logLineNumberField)
-            .gt(logLineNumber)
-            .lte(logLineNumber + 100);
-        return rangeQuery;
-    }
-
-    private SearchRequest createSearchRequest(String fileName, Integer logLineNumber) {
-        RangeQueryBuilder rangeQuery = buildRangeQuery(logLineNumber);
+    //create request for 100 documents after found error
+    private SearchRequest createSearchRequest(String fileName, Integer errorLogLineNumber) {
+        RangeQueryBuilder rangeQuery = buildRangeQuery(errorLogLineNumber);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
             .query(rangeQuery)
-            .sort(logLineNumberField)
-            .size(100);
+            .sort(LogFields.LOG_LINE_NUMBER)
+            .size(batchSize);
         SearchRequest searchRequest = new SearchRequest(fileName);
         searchRequest.source(searchSourceBuilder);
         return searchRequest;
+    }
+
+    private  RangeQueryBuilder buildRangeQuery(Integer logLineNumber) {
+        RangeQueryBuilder rangeQuery = new RangeQueryBuilder(LogFields.LOG_LINE_NUMBER)
+            .gt(logLineNumber)
+            .lte(logLineNumber + batchSize);
+        return rangeQuery;
     }
 }
