@@ -67,7 +67,26 @@ public class PaginationServlet extends HttpServlet {
 
     private String fetchErrorInBottomUpManner(int page, String fileName,
         String fileType, int recordsPerPage) {
-            
+        
+        try{
+        int indexLength = (int) database.getDocCount(fileName);
+        int totalPages = (int) Math.ceil((double)indexLength/(double)recordsPerPage);
+        if(page > totalPages) {
+            return emptyObject();
+        }
+        int start = ((totalPages - page + 1)*recordsPerPage) - 1;
+        if(indexLength % recordsPerPage != 0) {
+            start = ((totalPages - page)*recordsPerPage);
+        }
+        int size = recordsPerPage;
+        if(page == 1) {
+            size = Math.min(indexLength, (noOfPages * recordsPerPage));
+        } 
+        return fetchPageFromDatabase(start, size, fileName, fileType);
+        } catch (Exception exception) {
+            logger.error(exception);
+            return emptyObject();
+        }
     }
 
     // fetches logs from database and return json for the same
