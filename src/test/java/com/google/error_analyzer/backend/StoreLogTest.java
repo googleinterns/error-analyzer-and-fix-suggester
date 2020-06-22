@@ -40,13 +40,7 @@ import static org.mockito.Mockito.when;
 storing logs to the database*/
 public final class StoreLogTest {
 
-    @Mock
     MockLogDao mockLogDao;
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
-
-    @InjectMocks
     StoreLogs storeLogs;
 
     @Before
