@@ -11,9 +11,9 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.error_analyzer.backend.BooleanQuery;
 import com.google.error_analyzer.backend.LogDaoHelper;
 import java.io.IOException;
 import java.util.*;
@@ -151,7 +151,7 @@ public class LogDao implements DaoInterface {
     //find errors in a given index
     private SearchHits findErrors(String fileName) 
     throws IOException {
-        logger.info("Finding errors in".concat(fileName));
+        logger.info("Finding errors in ".concat(fileName));
         BooleanQuery booleanQuery = new BooleanQuery();
         SearchRequest searchRequest = booleanQuery.createSearchRequest(fileName);
         SearchResponse searchResponse = client
@@ -162,6 +162,8 @@ public class LogDao implements DaoInterface {
     //store errors found in the log file
     private void storeErrors(String errorFileName, SearchHits hits)
     throws IOException {
+        Integer numberOfErrorsFound = hits.getHits().length;
+        logger.info("Storing ".concat(numberOfErrorsFound.toString()).concat(" into database"));
         for (SearchHit hit : hits) {
             String jsonSource =  hit.getSourceAsString();
             String id = hit.getId();
