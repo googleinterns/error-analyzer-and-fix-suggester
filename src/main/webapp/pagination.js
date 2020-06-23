@@ -9,7 +9,6 @@ let fileLength = Number.MAX_VALUE;
 let noOfRecordsOnLastPage = recordsPerPage;
 let lastPage = Number.MAX_VALUE;
 let data = new Array();
-const DomElementForFileName = document.getElementById("fileName");
 
 // decrement by 1 on pressing previous button
 function prevPage() {
@@ -28,8 +27,10 @@ function nextPage() {
 // change content of page 
 async function changePage(page) {
     const logs = document.getElementById("logs").getAttribute("aria-selected");
+    const searchString = document.getElementById("searchBar").value;
+    let fileName = document.getElementById("fileName").value;
     const fileType = logs == "true" ? LOGS : ERRORS ;
-    let fileName = DomElementForFileName.value;
+    
     if(fileType == ERRORS) {
         fileName += "error"; 
     }
@@ -49,6 +50,7 @@ async function changePage(page) {
          console.log(startAndSize);
         params.append('start', startAndSize[0]);
         params.append('size',  startAndSize[1]);
+        params.append('searchString', searchString);
         params.append('fileType', fileType);
         params.append('fileName', fileName);
         const response = await fetch('/pagination', {
@@ -218,18 +220,10 @@ function showAndHideBtn() {
 }
 
 // search dataBase for the requested string
-async function search() {
+function search() {
     const searchString = document.getElementById("searchBar").value;
-    const fileName = DomElementForFileName.value;
-    if (fileName == "" || searchString == "") {
+    if (searchString == "") {
         return;
     }
-    const params = new URLSearchParams();
-    params.append('searchString', searchString);
-    params.append('fileName', fileName);
-    await fetch('/searchString', {
-        method: 'POST',
-        body: params
-    });
     changePage(1);
 }
