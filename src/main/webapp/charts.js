@@ -44,3 +44,7 @@ function addclass() {
     slide1.classList.add('active');
     slide2.classList.remove('active');
 }
+
+
+
+
