@@ -30,59 +30,40 @@ import org.elasticsearch.search.SearchHits;
 public class PaginationServlet extends HttpServlet {
 
     // dataField contains the name of index field which cotains the data we want to display   
-    private static final String dataField = "name";
+    private static final String LOG_FIELD = "name";
     private static final String ERROR = "errors";
     private static final Logger logger =
         LogManager.getLogger(PaginationServlet.class);
     // keep noOfPages a odd no so that there are equal pages in front 
     // and back 
-    private static final int noOfPages = 5;
-    private LogDao logDao = new LogDao();
-    private LogDaoHelper logDaoHelper = new LogDaoHelper();
+    private LogDao database = new LogDao();
+    private LogDaoHelper databaseHelper = new LogDaoHelper();
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int page = Integer.parseInt(request.getParameter("requestedPage"));
+        int start = Integer.parseInt(request.getParameter("start"));
+        int size = Integer.parseInt(request.getParameter("size"));
         String fileName = request.getParameter("fileName");
         String fileType = request.getParameter("fileType");
-        int recordsPerPage =
-            Integer.parseInt(request.getParameter("recordsPerPage"));
 
         response.setContentType("application/json");
-        if (fileName.length() == 0 || !logDao.fileExists(fileName)) {
+        if (fileName.isEmpty() || !database.fileExists(fileName)) {
             response.getWriter().println(emptyObject());
             return;
         }
-        String json =
-            fetchResponse(page, fileName, fileType, recordsPerPage);
+        String json = fetchPageFromDatabase(start, size, fileName, fileType);
         response.getWriter().println(json);
     }
 
-    // fetches logs from database and return json for the same
-    private String fetchResponse(int page, String fileName,
-        String fileType, int recordsPerPage) {
-        int start = (page - 1) * recordsPerPage;
-        int size = recordsPerPage;
-        if (page == 1) {
-            size = noOfPages * recordsPerPage;
-        }
-        if (fileType.equals(ERROR)) {
-            fileName += "error";
-        }
-        return fetchPageFromDatabase(start, size, fileName, fileType);
-    }
-
-    // interact with database using dao functions to fetch a section of documents 
-    // with given fileName starting from start and having length equals to size
     private String fetchPageFromDatabase(int start, int size, String fileName,
         String fileType) {
         try {
             SearchHit[] searchHits =
-                logDao.getAll(fileName, start, size);
+                database.getAll(fileName, start, size);
             ImmutableList < String > hitIds =
-                logDaoHelper.hitId(searchHits);
+                databaseHelper.hitId(searchHits);
             ImmutableList < String > hitFieldContent =
-                logDaoHelper.hitFieldContent(searchHits, dataField);
+                databaseHelper.hitFieldContent(searchHits, LOG_FIELD);
             if (hitIds == null) {
                 return convertToJson(new ArrayList());
             }
@@ -101,9 +82,17 @@ public class PaginationServlet extends HttpServlet {
         SearchErrors searchErrors = new SearchErrors();
         HashMap < String, String > search =
             searchErrors.getSearchedErrors();
-        for (int idx = 0; idx < hitIds.size(); idx++) {
+        int startIdx = 0;
+        if(fileType.equals(ERROR))
+            startIdx = hitIds.size() -1 ;
+        for (int idx = startIdx; idx < hitIds.size() && idx >= 0;) {
             String id = hitIds.get(idx);
             String resultString = hitFieldContent.get(idx);
+            if (fileType.equals(ERROR)) {
+                idx--;
+            } else {
+                idx++;
+            } 
             if (search.containsKey(id)) {
                 resultString = search.get(id);
             }

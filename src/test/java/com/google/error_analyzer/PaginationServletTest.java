@@ -29,20 +29,8 @@ import org.junit.Rule;
 import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.InjectMocks;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
-import org.mockito.Mock;
-import org.mockito.Mockito.*;
-import org.mockito.MockitoAnnotations;
-import org.mockito.quality.Strictness;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static org.mockito.BDDMockito.any;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -50,39 +38,15 @@ public final class PaginationServletTest {
 
     private String fileName = "file";
     private String fileType1 = "errors";
-    private String filetType2 = "logs";
+    private String fileType2 = "logs";
     private int page1 = 1;
     private int page2 = 2;
 
-    @Mock
-    LogDao logDao;
-
-    @Mock
-    LogDaoHelper logDaoHelper;
-
-    @InjectMocks
     PaginationServlet pagination;
-
-    @Rule
-    public MockitoRule rule = MockitoJUnit.rule();
 
     @Before
     public void setUp() {
         pagination = new PaginationServlet();
-        ReflectionTestUtils.setField(pagination, "logDao", logDao);
-        ReflectionTestUtils.setField(pagination, "logDaoHelper", 
-        logDaoHelper);
-        MockitoAnnotations.initMocks(this);
-    }
-
-    // database related mocked functions
-    private void databaseHelper() throws IOException {
-        ImmutableList<String> immutableListId = ImmutableList.of("2");
-        ImmutableList<String> immutableListContent = 
-            ImmutableList.of("error2");
-        when(logDaoHelper.hitId(any())).thenReturn(immutableListId);
-        when(logDaoHelper.hitFieldContent(any(),any())).
-            thenReturn(immutableListContent);
     }
 
     // access private method addFetchResultToData
@@ -97,21 +61,9 @@ public final class PaginationServletTest {
             hitFieldContent);
     }
 
-    // access private method fetchAndReturnResponse
-    private Object getPrivateMethodFetchResponse(
-    int page, String fileName, String fileType, int recordsPerPage
-    )throws Exception {
-        Method method = PaginationServlet.class.getDeclaredMethod
-        ("fetchResponse", new Class[] {int.class, String.class,
-        String.class, int.class});
-        method.setAccessible(true);
-        return method.invoke(pagination, page, fileName, 
-        fileType, recordsPerPage);
-    }
-
     // addFetchResultToData
     @Test
-    public void addresult() throws Exception {
+    public void addErrors() throws Exception {
         HashMap<String,String>searches=new HashMap();
         searches.put("1","searchError");
         SearchErrors searchErrors = new SearchErrors();
@@ -125,17 +77,25 @@ public final class PaginationServletTest {
                                                     .build();
         String actual = (String)getPrivateAddErrorFixesAndHighlights(
         fileType1,hitIds,hitContent);
-        String expected = new String("[\"searchError\",\"error2\"]");
+        String expected = new String("[\"error2\",\"searchError\"]");
         Assert.assertEquals(expected, actual);
     }
-
-    // fetchAndReturnResponse
     @Test
-    public void returnRequestedPageFromDb() throws Exception {
-        databaseHelper();
-        String actual = (String) getPrivateMethodFetchResponse(
-        2, fileName, fileType1, 1);
-        String expected = new String ("[\"error2\"]");
+    public void addLogs() throws Exception {
+        HashMap<String,String>searches=new HashMap();
+        searches.put("1","searchError");
+        SearchErrors searchErrors = new SearchErrors();
+        searchErrors.setSearchedErrors(searches);
+        ImmutableList<String> hitIds = ImmutableList.<String>builder() 
+                                                    .add("1","2")
+                                                    .build();
+            
+        ImmutableList<String> hitContent = ImmutableList.<String>builder() 
+                                                    .add("log1","log2")
+                                                    .build();
+        String actual = (String)getPrivateAddErrorFixesAndHighlights(
+        fileType2,hitIds,hitContent);
+        String expected = new String("[\"searchError\",\"log2\"]");
         Assert.assertEquals(expected, actual);
     }
 }
