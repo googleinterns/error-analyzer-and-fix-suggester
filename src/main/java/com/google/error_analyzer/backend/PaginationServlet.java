@@ -11,7 +11,6 @@ limitations under the License.*/
 package com.google.error_analyzer.backend;
 
 import com.google.common.collect.ImmutableList;
-// import com.google.error_analyzer.data.ErrorFixes;
 import com.google.error_analyzer.data.SearchErrors;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -102,19 +101,12 @@ public class PaginationServlet extends HttpServlet {
         SearchErrors searchErrors = new SearchErrors();
         HashMap < String, String > search =
             searchErrors.getSearchedErrors();
-        // ErrorFixes errorFix = new ErrorFixes();
         for (int idx = 0; idx < hitIds.size(); idx++) {
             String id = hitIds.get(idx);
             String resultString = hitFieldContent.get(idx);
-            // String fix = new String();
-
-            // if (fileType.equals(ERROR)) {
-            //     fix = errorFix.findFixes(resultString);
-            // }
             if (search.containsKey(id)) {
                 resultString = search.get(id);
             }
-            // resultString += fix;
             data.add(resultString);
         }
         return convertToJson(data);
