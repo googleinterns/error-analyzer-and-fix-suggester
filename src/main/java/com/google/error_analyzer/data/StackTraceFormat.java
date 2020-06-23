@@ -17,25 +17,24 @@ import java.util.regex.Pattern;
 
 public class StackTraceFormat {
 
-    private static final ArrayList < Pattern > regexStrings = new ArrayList < Pattern > () {
+    private static final ArrayList < String > regexStrings = new ArrayList < String > () {
         {
-            add(Pattern.compile(".{0,20} at .+"));
-            add(Pattern.compile(".{0,20} new .+"));
-            add(Pattern.compile(".{0,20} runnable .+"));
-            add(Pattern.compile(".{0,20} lock .+"));
-            add(Pattern.compile(".{0,20} locked .+"));
-            add(Pattern.compile(".{0,20} blocked .+"));
-            add(Pattern.compile(".{0,20} waiting .+"));
-            add(Pattern.compile(".{0,20} timed waiting .+"));
-            add(Pattern.compile(".{0,20} terminated .+"));
+            add(".{0,20} at .+");
+            add(".{0,20} new .+");
+            add(".{0,20} runnable .+");
+            add(".{0,20} lock .+");
+            add(".{0,20} locked .+");
+            add(".{0,20} blocked .+");
+            add(".{0,20} waiting .+");
+            add(".{0,20} timed waiting .+");
+            add(".{0,20} terminated .+");
         }
     };
 
     public static boolean matchesFormat (String logText) {
         String logTextInLowerCase = logText.toLowerCase();
-        for (Pattern regex : regexStrings ) {
-            Matcher match = regex.matcher(logTextInLowerCase);
-            if (match.matches()) {
+        for (String regex : regexStrings ) {
+            if (logTextInLowerCase.matches(regex)) {
                 return true;
             }
         }

@@ -25,61 +25,103 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
 public class StackTrace {
-    private final static Integer batchSize = 3;
+    private final static Integer batchSize = 1;
+    private final static Integer allowedMsgs = 5;
     private final LogDao logDao = new LogDao();
     private static final Logger logger = LogManager.getLogger(StackTrace.class);
 
     public void findStackTraceOfErrors(String fileName) throws IOException {
         SearchHits errorHits = logDao.findErrors(fileName);
         String stackFileName = LogDaoHelper.getStackIndexName(fileName);
-        Integer lastHitLogLineNumber = 0;
+        Integer lastCheckedLine = 0;
         for (SearchHit errorHit : errorHits) {
-            Map < String, Object > sourceAsMap = errorHit.getSourceAsMap();
-            Integer errorLogLineNumber = (Integer) sourceAsMap.get(LogFields.LOG_LINE_NUMBER);
+            Integer errorLogLineNumber = (Integer) errorHit.getSourceAsMap().get(LogFields.LOG_LINE_NUMBER);
             logger.info("Error found at: ".concat(errorLogLineNumber.toString()));
-            if (lastHitLogLineNumber >= errorLogLineNumber) {
+            if (lastCheckedLine >= errorLogLineNumber) {
                 logger.info("Skipping error hit: ".concat(errorLogLineNumber.toString()));
                 continue;
             }
-            lastHitLogLineNumber = errorLogLineNumber;
+            lastCheckedLine = errorLogLineNumber;
             Integer endOfStack = findStack(errorLogLineNumber, fileName);
             if (endOfStack != -1) {
                 String jsonString = errorHit.getSourceAsString();
-                logDao.storeLogLine(stackFileName, jsonString, errorLogLineNumber.toString());
-                lastHitLogLineNumber = endOfStack;
+                // logDao.storeLogLine(stackFileName, jsonString, errorLogLineNumber.toString());
+                lastCheckedLine = endOfStack;
             } else {
                 logger.info("No stack found for error hit: ".concat(errorLogLineNumber.toString()));
             }
         }
+        logger.info("end of call");
     }
 
     //returns logLineNumber of the document where the stack ends
     //returns -1 if no stack is found.
     private Integer findStack(Integer errorLogLineNumber, String fileName) throws IOException {
-        Integer lastCheckedLine = errorLogLineNumber;
+        Integer countOfPossibleMsgs = 0;
         Integer endOfStack = -1;
-        while (true) {
-            logger.info("creating a new search request");
-            SearchRequest searchRequest = createSearchRequest(fileName, lastCheckedLine);
-            SearchHits rangeHits = logDao.rangeQueryHits(searchRequest);
-            String stackFileName = LogDaoHelper.getStackIndexName(fileName);
-            if(rangeHits.getHits().length == 0) {
-                return endOfStack;
-            }
-            for (SearchHit rangeHit : rangeHits) {
-                Integer logLineNumber = matchesCallStackFormat(rangeHit);
-                if ( logLineNumber != -1 ) {
-                    logger.info("call stack for: ".concat(errorLogLineNumber.toString()).concat(" : line = ").concat(logLineNumber.toString()));
-                    String jsonString = rangeHit.getSourceAsString();
-                    logDao.storeLogLine(stackFileName, jsonString, logLineNumber.toString());
-                    endOfStack = logLineNumber;
+        ArrayList < SearchHit > possibleMsgs = new ArrayList< SearchHit >();
+        logger.info("Creating a new search request");
+        SearchRequest searchRequest = createSearchRequest(fileName, errorLogLineNumber);
+        SearchHits rangeHits = logDao.rangeQueryHits(searchRequest);
+        String stackFileName = LogDaoHelper.getStackIndexName(fileName);
+
+        for (SearchHit rangeHit : rangeHits) {
+            Integer logLineNumber = matchesCallStackFormat(rangeHit);
+            String jsonString = rangeHit.getSourceAsString();
+            if ( logLineNumber != -1 ) {
+                if (endOfStack == -1) {
+                    logger.info("Storing messages for ".concat(errorLogLineNumber.toString()));
+                    storeHitsInStackFile(stackFileName, possibleMsgs);
+                }
+                logger.info("Call stack for: ".concat(errorLogLineNumber.toString()).concat(" : line = ").concat(logLineNumber.toString()));
+                // logDao.storeLogLine(stackFileName, jsonString, logLineNumber.toString());
+                endOfStack = logLineNumber;
+            } else {
+                if (endOfStack == -1 && countOfPossibleMsgs < allowedMsgs) {
+                    possibleMsgs.add(rangeHit);
                 } else {
                     return endOfStack;
                 }
             }
-            lastCheckedLine += batchSize;
+        }
+        return findStackInWhileLoop(endOfStack, fileName);
+    }
+
+    private Integer findStackInWhileLoop(Integer errorLogLineNumber, String fileName) 
+    throws IOException {
+        Integer lastCheckedLine = errorLogLineNumber;
+        logger.info("Exceeding batch size request");
+        String stackFileName = LogDaoHelper.getStackIndexName(fileName);
+        while (true) {
+            logger.info("Creating a new search request");
+            SearchRequest searchRequest = createSearchRequest(fileName, lastCheckedLine);
+            SearchHits rangeHits = logDao.rangeQueryHits(searchRequest);
+            if (rangeHits.getHits().length == 0) {
+                return lastCheckedLine;
+            }
+            for (SearchHit rangeHit : rangeHits) {
+                Integer logLineNumber = matchesCallStackFormat(rangeHit);
+                String jsonString = rangeHit.getSourceAsString();
+                if ( logLineNumber != -1 ) {
+                    logger.info("Call stack for: ".concat(errorLogLineNumber.toString()).concat(" : line = ").concat(logLineNumber.toString()));
+                    // logDao.storeLogLine(stackFileName, jsonString, logLineNumber.toString());
+                    lastCheckedLine = logLineNumber;
+                } else {
+                    return lastCheckedLine;
+                }
+            }
         }
     }
+
+    private void storeHitsInStackFile(String stackFileName, ArrayList<SearchHit> hits)
+    throws IOException {
+        for(SearchHit hit : hits){
+            Integer logLineNumber = (Integer)hit.getSourceAsMap().get(LogFields.LOG_LINE_NUMBER);
+            logger.info("Storing msg line: ".concat(logLineNumber.toString()));
+            // logDao.storeLogLine(stackFileName, hit.getSourceAsString(), logLineNumber.toString());
+        }
+    }
+
 
     //return logLineNumber of the document if it matches call stack format
     //return -1 otherwise
@@ -95,7 +137,7 @@ public class StackTrace {
 
     //create request for 100 documents after found error
     private SearchRequest createSearchRequest(String fileName, Integer errorLogLineNumber) {
-        RangeQueryBuilder rangeQuery = buildRangeQuery(errorLogLineNumber);
+        RangeQueryBuilder rangeQuery = buildRangeQuery(errorLogLineNumber, batchSize);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
             .query(rangeQuery)
             .sort(LogFields.LOG_LINE_NUMBER)
@@ -105,10 +147,10 @@ public class StackTrace {
         return searchRequest;
     }
 
-    private  RangeQueryBuilder buildRangeQuery(Integer logLineNumber) {
+    private  RangeQueryBuilder buildRangeQuery(Integer logLineNumber, Integer requestSize) {
         RangeQueryBuilder rangeQuery = new RangeQueryBuilder(LogFields.LOG_LINE_NUMBER)
             .gt(logLineNumber)
-            .lte(logLineNumber + batchSize);
+            .lte(logLineNumber + requestSize);
         return rangeQuery;
     }
 }
