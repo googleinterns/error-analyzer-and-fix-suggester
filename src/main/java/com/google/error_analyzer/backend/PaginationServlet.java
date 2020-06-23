@@ -12,6 +12,7 @@ package com.google.error_analyzer.backend;
 
 import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.data.SearchErrors;
+import com.google.error_analyzer.data.constant.LogFields;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.lang.*;
@@ -30,7 +31,7 @@ import org.elasticsearch.search.SearchHits;
 public class PaginationServlet extends HttpServlet {
 
     // dataField contains the name of index field which cotains the data we want to display   
-    private static final String LOG_FIELD = "name";
+    private static final String LOG_FIELD = LogFields.LOG_TEXT;
     private static final String ERROR = "errors";
     private static final Logger logger =
         LogManager.getLogger(PaginationServlet.class);
@@ -51,12 +52,12 @@ public class PaginationServlet extends HttpServlet {
             response.getWriter().println(emptyObject());
             return;
         }
-        String json = fetchPageFromDatabase(start, size, fileName, fileType);
+        String json = fetchPageFromDatabase(fileName, fileType, start, size);
         response.getWriter().println(json);
     }
 
-    private String fetchPageFromDatabase(int start, int size, String fileName,
-        String fileType) {
+    private String fetchPageFromDatabase(String fileName,
+        String fileType, int start, int size) {
         try {
             SearchHit[] searchHits =
                 database.getAll(fileName, start, size);
@@ -82,7 +83,10 @@ public class PaginationServlet extends HttpServlet {
         SearchErrors searchErrors = new SearchErrors();
         HashMap < String, String > search =
             searchErrors.getSearchedErrors();
+ 
         int startIdx = 0;
+        // if file is of type error then we need to return the hits content 
+        // in reverse order
         if(fileType.equals(ERROR))
             startIdx = hitIds.size() -1 ;
         for (int idx = startIdx; idx < hitIds.size() && idx >= 0;) {
