@@ -37,8 +37,8 @@ public class MockLogDao implements DaoInterface {
 
     //search db using keywords and return searchHits having highlight field added 
     @Override 
-    public ImmutableList < SearchHit > fullTextSearch(
-    String fileName, String searchString, String field) throws IOException {
+    public ImmutableList < SearchHit > fullTextSearch(String fileName, 
+    String searchString, String field, int start, int size) throws IOException {
         Builder < SearchHit > searchResultBuilder = ImmutableList.< SearchHit >builder();
         String[] keyWords = searchString.split(" ");
         for (int i = 0; i < database.length; i++) {

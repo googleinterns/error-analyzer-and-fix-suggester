@@ -15,7 +15,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.LogDaoHelper;
 import com.google.error_analyzer.backend.PaginationServlet;
-import com.google.error_analyzer.data.SearchErrors;
 import com.google.error_analyzer.data.ErrorFixes;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -70,13 +69,15 @@ public final class PaginationServletTest {
     // access private method addFetchResultToData
     private Object getPrivateAddErrorFixesAndHighlights(
     String fileType, ImmutableList < String > hitIds,
-    ImmutableList < String > hitFieldContent) throws Exception {
+    ImmutableList < String > hitFieldContent, HashMap<String,String>searches) 
+    throws Exception {
         Method method = PaginationServlet.class.getDeclaredMethod(
         "addErrorFixesAndHighlights", new Class[] {
-        String.class, ImmutableList.class, ImmutableList.class});
+        String.class, ImmutableList.class, ImmutableList.class,
+        HashMap.class});
         method.setAccessible(true);
         return method.invoke(pagination, fileType, hitIds, 
-            hitFieldContent);
+            hitFieldContent, searches);
     }
 
     // addFetchResultToData
@@ -84,8 +85,6 @@ public final class PaginationServletTest {
     public void addresult() throws Exception {
         HashMap<String,String>searches=new HashMap();
         searches.put("1","searchError");
-        SearchErrors searchErrors = new SearchErrors();
-        searchErrors.setSearchedErrors(searches);
         when(errorFix.findFixes(any(String.class))).thenReturn(new String());
         ImmutableList<String> hitIds = ImmutableList.<String>builder() 
                                                     .add("1","2")
@@ -95,7 +94,7 @@ public final class PaginationServletTest {
                                                     .add("error1","error2")
                                                     .build();
         String actual = (String)getPrivateAddErrorFixesAndHighlights(
-        fileType1,hitIds,hitContent);
+        fileType1,hitIds,hitContent,searches);
         String expected = new String("[\"error2 \",\"searchError \"]");
         Assert.assertEquals(expected, actual);
     }

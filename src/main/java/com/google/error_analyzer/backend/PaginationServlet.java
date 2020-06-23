@@ -13,7 +13,6 @@ package com.google.error_analyzer.backend;
 import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.ErrorFixes;
-import com.google.error_analyzer.data.SearchErrors;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.lang.*;
@@ -32,7 +31,8 @@ import org.elasticsearch.search.SearchHits;
 public class PaginationServlet extends HttpServlet {
 
     // dataField contains the name of index field which cotains the data we want to display   
-    private static final String dataField = LogFields.LOG_TEXT;
+    private static final String dataField = "name";
+    // LogFields.LOG_TEXT;
     private static final String ERROR = "errors";
     private static final Logger logger =
         LogManager.getLogger(PaginationServlet.class);
@@ -48,18 +48,19 @@ public class PaginationServlet extends HttpServlet {
         int size = Integer.parseInt(request.getParameter("size"));
         String fileName = request.getParameter("fileName");
         String fileType = request.getParameter("fileType");
+        String searchString = request.getParameter("searchString");
 
         response.setContentType("application/json");
         if (fileName.length() == 0 || !database.fileExists(fileName)) {
             response.getWriter().println(emptyObject());
             return;
         }
-        String json = fetchPageFromDatabase(start, size, fileName, fileType);
+        String json = fetchPageFromDatabase(start, size, fileName, fileType, searchString);
         response.getWriter().println(json);
     }
 
     private String fetchPageFromDatabase(int start, int size, String fileName,
-        String fileType) {
+        String fileType, String searchString) {
         try {
             SearchHit[] searchHits =
                 database.getAll(fileName, start, size);
@@ -70,7 +71,13 @@ public class PaginationServlet extends HttpServlet {
             if (hitIds == null) {
                 return convertToJson(new ArrayList());
             }
-            return addErrorFixesAndHighlights(fileType, hitIds, hitFieldContent);
+            HashMap<String, String> search = new HashMap();
+            if(!searchString.isEmpty()) {
+                ImmutableList < SearchHit > searchHitsFromSearch = 
+                    database.fullTextSearch(fileName, searchString, dataField, start, size);
+                search = databaseHelper.getHighLightedText(searchHitsFromSearch, dataField);
+            }
+            return addErrorFixesAndHighlights(fileType, hitIds, hitFieldContent, search);
         } catch (IOException exception) {
             logger.error(exception);
         }
@@ -80,11 +87,9 @@ public class PaginationServlet extends HttpServlet {
     // add errorfixes and text highlights 
     private String addErrorFixesAndHighlights(String fileType,
         ImmutableList < String > hitIds,
-        ImmutableList < String > hitFieldContent) {
+        ImmutableList < String > hitFieldContent, 
+        HashMap<String, String> search) {
         ArrayList < String > data = new ArrayList();
-        SearchErrors searchErrors = new SearchErrors();
-        HashMap < String, String > search =
-            searchErrors.getSearchedErrors();
         int startIdx = 0;
         if(fileType.equals(ERROR))
             startIdx = hitIds.size() -1 ;

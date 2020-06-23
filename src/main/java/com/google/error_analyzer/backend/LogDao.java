@@ -51,42 +51,29 @@ public class LogDao implements DaoInterface {
         (RestClient.builder(new HttpHost("localhost", 9200, "http")));
     private static final SearchSourceBuilder searchSourceBuilder 
         = new SearchSourceBuilder();
-    private static final int windowSize = 10;
+    // private static final int windowSize = 10;
     private static final Logger logger = LogManager.getLogger(LogDao.class);
 
     //search db using keywords and return searchHits having highlight field added  
     @Override 
-    public ImmutableList < SearchHit > fullTextSearch(
-    String fileName, String searchString, String field)throws IOException {
-        int offset = 0;
-        SearchHit[] searchHits = null;
-        Builder < SearchHit > searchResultBuilder = ImmutableList.< SearchHit > builder();
-
+    public ImmutableList < SearchHit > fullTextSearch(String fileName, 
+    String searchString, String field, int start, int size)throws IOException {
         // we check for matching keywords in a specific windowsize in each 
         // iteration and do this until the the end of index .this way we 
         // have traverse whole index 
-        while (true) {
-            SearchRequest searchRequest = new SearchRequest(fileName);
-            SimpleQueryStringBuilder simpleQueryBuilder = 
-                QueryBuilders.simpleQueryStringQuery(searchString);
-            searchSourceBuilder.query(simpleQueryBuilder)
-                .size(windowSize).from(offset);
-            searchSourceBuilder.highlighter(addHighLighter(field));
-            searchRequest.source(searchSourceBuilder);
-            SearchResponse searchResponse = 
-                client.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHits hits = searchResponse.getHits();
-            searchHits = hits.getHits();
-
-            if( searchHits.length == 0) {
-                break;
-            }
-            for (SearchHit hit: searchHits) {
-                searchResultBuilder.add(hit);
-            }
-            offset += windowSize;
-        }
-        return searchResultBuilder.build();
+        SearchRequest searchRequest = new SearchRequest(fileName);
+        SimpleQueryStringBuilder simpleQueryBuilder = 
+            QueryBuilders.simpleQueryStringQuery(searchString);
+        searchSourceBuilder.query(simpleQueryBuilder)
+            .size(size).from(start);
+        searchSourceBuilder.highlighter(addHighLighter(field));
+        searchRequest.source(searchSourceBuilder);
+        SearchResponse searchResponse = 
+            client.search(searchRequest, RequestOptions.DEFAULT);
+        SearchHits hits= searchResponse.getHits();
+        SearchHit[] searchHits= hits.getHits();
+        ImmutableList<SearchHit> searchResult = ImmutableList.copyOf(Arrays.asList(searchHits)); 
+        return searchResult;
     }
 
     //return a section of given index starting from start and of 
