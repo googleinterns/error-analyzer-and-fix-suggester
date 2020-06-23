@@ -68,6 +68,8 @@ public class StoreLogs {
                 return fileNotStoredResponse;
             } else {
                 String response = storeLog(fileName, log);
+                String findErrorsResponse = findAndStoreErrors(fileName);
+                response = response.concat(findErrorsResponse);
                 logger.info("File Stored");
                 return response;
             }
@@ -95,6 +97,13 @@ public class StoreLogs {
         return fileStoredResponse;
     }
 
-
+    private String findAndStoreErrors(String fileName) {
+        try {
+            logDao.findAndStoreErrors(fileName);
+            return "<h2>Processed successfuly</h2>";
+        } catch (IOException e) {
+            return "<h2>Could not process file</h2>";
+        }
+    }
 
 }
