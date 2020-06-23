@@ -29,16 +29,16 @@ import org.elasticsearch.common.xcontent.XContentType;
 plain text to the database*/
 @WebServlet("/StorePlainTextLogServlet")
 public class TextServlet extends HttpServlet {
-    private final String logText = "Log";
-    private final String filename = "filename";
-    private final StoreLogs storeLog = new StoreLogs();
+    private static final String LOG_TEXT = "Log";
+    private static final String FILE_NAME = "filename";
+    public static final StoreLogs storeLog = new StoreLogs();
 
     @Override
     public void doPost(HttpServletRequest request,
      HttpServletResponse response)throws IOException, ServletException {
         response.setContentType("text/html");
-        String log = request.getParameter(logText);
-        String fileName = request.getParameter(filename);
+        String log = request.getParameter(LOG_TEXT);
+        String fileName = request.getParameter(FILE_NAME);
         String status = storeLog.checkAndStoreLog(fileName, log);
         response.getWriter().println(status);
         RequestDispatcher requestDispatcher = 
