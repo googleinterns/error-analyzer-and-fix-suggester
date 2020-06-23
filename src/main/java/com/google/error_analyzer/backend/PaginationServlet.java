@@ -37,71 +37,25 @@ public class PaginationServlet extends HttpServlet {
         LogManager.getLogger(PaginationServlet.class);
     // keep noOfPages a odd no so that there are equal pages in front 
     // and back 
-    private static final int noOfPages = 5;
     private LogDao database = new LogDao();
     private LogDaoHelper databaseHelper = new LogDaoHelper();
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int page = Integer.parseInt(request.getParameter("requestedPage"));
+        int start = Integer.parseInt(request.getParameter("start"));
+        int size = Integer.parseInt(request.getParameter("size"));
         String fileName = request.getParameter("fileName");
         String fileType = request.getParameter("fileType");
-        int recordsPerPage =
-            Integer.parseInt(request.getParameter("recordsPerPage"));
 
         response.setContentType("application/json");
         if (fileName.length() == 0 || !database.fileExists(fileName)) {
             response.getWriter().println(emptyObject());
             return;
         }
-        if (fileType.equals(ERROR)) {
-            fileName += "error";
-            String json = fetchErrorInBottomUpManner(page, fileName, fileType, recordsPerPage);
-            response.getWriter().println(json);
-            return;
-        }
-        String json =
-            fetchResponse(page, fileName, fileType, recordsPerPage);
+        String json = fetchPageFromDatabase(start, size, fileName, fileType);
         response.getWriter().println(json);
     }
 
-    private String fetchErrorInBottomUpManner(int page, String fileName,
-        String fileType, int recordsPerPage) {
-        
-        try{
-        int indexLength = (int) database.getDocCount(fileName);
-        int totalPages = (int) Math.ceil((double)indexLength/(double)recordsPerPage);
-        if(page > totalPages) {
-            return emptyObject();
-        }
-        int start = ((totalPages - page + 1)*recordsPerPage) - 1;
-        if(indexLength % recordsPerPage != 0) {
-            start = ((totalPages - page)*recordsPerPage);
-        }
-        int size = recordsPerPage;
-        if(page == 1) {
-            size = Math.min(indexLength, (noOfPages * recordsPerPage));
-        } 
-        return fetchPageFromDatabase(start, size, fileName, fileType);
-        } catch (Exception exception) {
-            logger.error(exception);
-            return emptyObject();
-        }
-    }
-
-    // fetches logs from database and return json for the same
-    private String fetchResponse(int page, String fileName,
-        String fileType, int recordsPerPage) {
-        int start = (page - 1) * recordsPerPage;
-        int size = recordsPerPage;
-        if (page == 1) {
-            size = noOfPages * recordsPerPage;
-        }
-        return fetchPageFromDatabase(start, size, fileName, fileType);
-    }
-
-    // interact with database using dao functions to fetch a section of documents 
-    // with given fileName starting from start and having length equals to size
     private String fetchPageFromDatabase(int start, int size, String fileName,
         String fileType) {
         try {
@@ -130,14 +84,20 @@ public class PaginationServlet extends HttpServlet {
         HashMap < String, String > search =
             searchErrors.getSearchedErrors();
         // ErrorFixes errorFix = new ErrorFixes();
-        for (int idx = 0; idx < hitIds.size(); idx++) {
+        int startIdx = 0;
+        if(fileType.equals(ERROR))
+            startIdx = hitIds.size() -1 ;
+        for (int idx = startIdx; idx < hitIds.size() && idx >= 0;) {
             String id = hitIds.get(idx);
             String resultString = hitFieldContent.get(idx);
             // String fix = new String();
 
-            // if (fileType.equals(ERROR)) {
+            if (fileType.equals(ERROR)) {
             //     fix = errorFix.findFixes(resultString);
-            // }
+                idx--;
+            } else {
+                idx++;
+            } 
             if (search.containsKey(id)) {
                 resultString = search.get(id);
             }

@@ -54,13 +54,6 @@ public final class PaginationServletTest {
     private int page1 = 1;
     private int page2 = 2;
 
-    @Mock
-    LogDao database;
-
-    @Mock
-    LogDaoHelper databaseHelper;
-
-    @InjectMocks
     PaginationServlet pagination;
 
     @Rule
@@ -69,20 +62,7 @@ public final class PaginationServletTest {
     @Before
     public void setUp() {
         pagination = new PaginationServlet();
-        ReflectionTestUtils.setField(pagination, "database", database);
-        ReflectionTestUtils.setField(pagination, "databaseHelper", 
-        databaseHelper);
         MockitoAnnotations.initMocks(this);
-    }
-
-    // database related mocked functions
-    private void databaseHelper() throws IOException {
-        ImmutableList<String> immutableListId = ImmutableList.of("2");
-        ImmutableList<String> immutableListContent = 
-            ImmutableList.of("error2");
-        when(databaseHelper.hitId(any())).thenReturn(immutableListId);
-        when(databaseHelper.hitFieldContent(any(),any())).
-            thenReturn(immutableListContent);
     }
 
     // access private method addFetchResultToData
@@ -95,18 +75,6 @@ public final class PaginationServletTest {
         method.setAccessible(true);
         return method.invoke(pagination, fileType, hitIds, 
             hitFieldContent);
-    }
-
-    // access private method fetchAndReturnResponse
-    private Object getPrivateMethodFetchResponse(
-    int page, String fileName, String fileType, int recordsPerPage
-    )throws Exception {
-        Method method = PaginationServlet.class.getDeclaredMethod
-        ("fetchResponse", new Class[] {int.class, String.class,
-        String.class, int.class});
-        method.setAccessible(true);
-        return method.invoke(pagination, page, fileName, 
-        fileType, recordsPerPage);
     }
 
     // addFetchResultToData
@@ -125,17 +93,7 @@ public final class PaginationServletTest {
                                                     .build();
         String actual = (String)getPrivateAddErrorFixesAndHighlights(
         fileType1,hitIds,hitContent);
-        String expected = new String("[\"searchError\",\"error2\"]");
-        Assert.assertEquals(expected, actual);
-    }
-
-    // fetchAndReturnResponse
-    @Test
-    public void returnRequestedPageFromDb() throws Exception {
-        databaseHelper();
-        String actual = (String) getPrivateMethodFetchResponse(
-        2, fileName, fileType1, 1);
-        String expected = new String ("[\"error2\"]");
+        String expected = new String("[\"error2\",\"searchError\"]");
         Assert.assertEquals(expected, actual);
     }
 }
