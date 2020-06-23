@@ -11,9 +11,10 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.error_analyzer.backend.BooleanQuery;
+import com.google.error_analyzer.backend.LogDaoHelper;
 import java.io.IOException;
 import java.util.*;
 import org.apache.http.HttpHost;
@@ -59,7 +60,7 @@ public class LogDao implements DaoInterface {
     String fileName, String searchString, String field)throws IOException {
         int offset = 0;
         SearchHit[] searchHits = null;
-        Builder<SearchHit> searchResultBuilder = ImmutableList.<SearchHit>builder();
+        Builder < SearchHit > searchResultBuilder = ImmutableList.< SearchHit > builder();
 
         // we check for matching keywords in a specific windowsize in each 
         // iteration and do this until the the end of index .this way we 
@@ -115,18 +116,17 @@ public class LogDao implements DaoInterface {
         return countResponse.getCount();
     }
 
-    //search db using regex and keywords and store back in db searchHits
-    //  sorted by logLineNumber
+    //search an index for errors using regex and keywords and store back in db
+    //Returns name of the new index 
     @Override 
-    public boolean errorQuery(String fileName) throws IOException {
-        return true;
+    public String findAndStoreErrors(String fileName) throws IOException {
+        SearchHits hits = findErrors(fileName);
+        String errorFileName = LogDaoHelper.getErrorIndexName(fileName);
+        storeErrors(errorFileName, hits);
+        logger.info("Errors stored in index ".concat(errorFileName));
+        return errorFileName;
     }
 
-    //store sorted identified errors back in database
-    public void storeErrorLogs(String fileName, SearchHits hits) throws IOException {
-        return;
-    }
-    
     //checks whether index with name fileName already exists in the database; 
     @Override
     public boolean fileExists(String fileName) throws IOException {
@@ -161,5 +161,27 @@ public class LogDao implements DaoInterface {
         highlightBuilder.field(highlightTitle);
         return highlightBuilder;
     }
-}
 
+    //find errors in a given index
+    private SearchHits findErrors(String fileName) 
+    throws IOException {
+        logger.info("Finding errors in ".concat(fileName));
+        BooleanQuery booleanQuery = new BooleanQuery();
+        SearchRequest searchRequest = booleanQuery.createSearchRequest(fileName);
+        SearchResponse searchResponse = client
+            .search(searchRequest, RequestOptions.DEFAULT);
+        return searchResponse.getHits();
+    }
+
+    //store errors found in the log file
+    private void storeErrors(String errorFileName, SearchHits hits)
+    throws IOException {
+        Integer numberOfErrorsFound = hits.getHits().length;
+        logger.info("Storing ".concat(numberOfErrorsFound.toString()).concat(" into database"));
+        for (SearchHit hit : hits) {
+            String jsonSource =  hit.getSourceAsString();
+            String id = hit.getId();
+            storeLogLine(errorFileName, jsonSource, id);
+        }
+    }
+}
