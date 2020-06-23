@@ -31,8 +31,7 @@ import org.elasticsearch.search.SearchHits;
 public class PaginationServlet extends HttpServlet {
 
     // dataField contains the name of index field which cotains the data we want to display   
-    private static final String dataField = "name";
-    // LogFields.LOG_TEXT;
+    private static final String dataField = LogFields.LOG_TEXT;
     private static final String ERROR = "errors";
     private static final Logger logger =
         LogManager.getLogger(PaginationServlet.class);
