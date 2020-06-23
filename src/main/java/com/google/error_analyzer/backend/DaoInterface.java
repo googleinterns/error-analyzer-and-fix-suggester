@@ -27,9 +27,13 @@ public interface DaoInterface {
     public SearchHit[] getAll (String fileName, int start, int size) 
     throws IOException;
 
+    // returns no of documents in an index
+    public long getDocCount (String index) throws IOException;
+
     //search an index for errors using regex and keywords and store back in db
     //Returns name of the new index 
     public String findAndStoreErrors (String filename) throws IOException;
+
 
     //checks whether index with name fileName already exists in the database;
     public boolean fileExists (String fileName) throws IOException;

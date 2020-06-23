@@ -88,6 +88,11 @@ public class MockLogDao implements DaoInterface {
         }
         return searchHits;
     }
+  
+    // returns no of documents in an index
+    public long getDocCount (String index) throws IOException {
+        return 0l;
+    }
 
     //search an index for errors using regex and keywords and store back in db
     //Returns name of the new index 
