@@ -37,8 +37,8 @@ import org.mockito.Mockito.*;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
-import static org.mockito.Mockito.when;	
 import static org.mockito.BDDMockito.any;
+import static org.mockito.Mockito.when;	
 
 
 @RunWith(MockitoJUnitRunner.class)
