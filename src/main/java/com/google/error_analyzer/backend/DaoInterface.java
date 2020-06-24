@@ -40,8 +40,9 @@ public interface DaoInterface {
     public String storeLogLine (String filename, String jsonString, String id) 
     throws IOException;
     
-    //Stores the documents into the database by performing multiple indexing operations
-    public void bulkStoreLog(String fileName, ImmutableList < Document > documentList)
-    throws IOException;
+    //Stores the documents into the database by performing multiple 
+    //indexing operations
+    public void bulkStoreLog(String fileName, 
+        ImmutableList < Document > documentList) throws IOException;
 
 }

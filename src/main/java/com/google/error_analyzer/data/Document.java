@@ -30,11 +30,13 @@ import java.util.ArrayList;
         this.jsonString = jsonString;
     }
 
-    public Document(String id, int logLineNumber, String logText) throws IOException{
+    public Document(String id, int logLineNumber, String logText)
+     throws IOException {
         this.id = id;
         this.logLineNumber = logLineNumber;
         this.logText = logText;
-        this.jsonString = storeLogHelper.convertToJsonString(logText, logLineNumber);
+        this.jsonString = storeLogHelper
+            .convertToJsonString(logText, logLineNumber);
     }
 
     public String getJsonString() {

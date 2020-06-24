@@ -61,14 +61,16 @@ public class StoreLogs {
 
     //Stores the log in an index with name fileName
     private String storeLog(String fileName, String log) throws IOException {
-        Builder < Document > documentList = ImmutableList. < Document > builder();
+        Builder < Document > documentList = ImmutableList
+            . < Document > builder();
         int logLineNumber = 1;
         String logLines[] = log.split(LINE_BREAK);
         for (String logLine: logLines) {
             String logLineNumberString = Integer.toString(logLineNumber);
             String cleanedLogLine = storeLogHelper.cleanLogText(logLine);
             if (!(logLine.isEmpty())) {
-                Document document = new Document(logLineNumberString, logLineNumber, cleanedLogLine);
+                Document document = new Document(
+                    logLineNumberString, logLineNumber, cleanedLogLine);
                 documentList.add(document);
                 logLineNumber++;
             }

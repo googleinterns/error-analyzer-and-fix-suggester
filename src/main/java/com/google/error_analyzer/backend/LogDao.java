@@ -142,8 +142,8 @@ public class LogDao implements DaoInterface {
     //Stores the documents into the database by performing multiple indexing operations
     //in a single API call
     @Override
-    public void bulkStoreLog(String fileName, ImmutableList < Document > documentList)
-    throws IOException {
+    public void bulkStoreLog(String fileName, 
+    ImmutableList < Document > documentList) throws IOException {
         BulkRequest request = new BulkRequest();
         for (Document document: documentList) {
             String jsonString = document.getJsonString();

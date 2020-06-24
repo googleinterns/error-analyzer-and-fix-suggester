@@ -142,7 +142,8 @@ public class MockLogDao implements DaoInterface {
 
     //Stores the documents into the database by performing multiple indexing operations
     @Override
-    public void bulkStoreLog(String fileName, ImmutableList < Document > documentList) {
+    public void bulkStoreLog(String fileName,
+     ImmutableList < Document > documentList) {
         Index index = new Index();
         index.setIndexName(fileName);
         for (Document document: documentList) {
