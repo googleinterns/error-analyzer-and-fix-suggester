@@ -1,6 +1,8 @@
 package com.google.error_analyzer;
 
 import com.google.error_analyzer.backend.MockLogDao;
+import com.google.error_analyzer.data.constant.LogFields;
+import com.google.error_analyzer.data.constant.PageConstants;
 import com.google.error_analyzer.servlets.TextServlet;
 import java.io.*;
 import java.util.*;
@@ -10,16 +12,13 @@ import org.apache.http.HttpHost;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.junit.Test;
 import org.mockito.*;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito.*;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.mockito.Mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -53,44 +52,53 @@ public class TextServletTest {
     }
 
     //store the log into the database when index with name same as the
-    //file name does not exist in the db
+    //file name does not exist in the db and then trying to store another 
+    //file with different file name
     @Test
     public void servletTest() throws ServletException, IOException {
-        when(request.getParameter("filename")).thenReturn("file1");
-        when(request.getParameter("Log")).thenReturn("error");
+        when(request.getParameter(LogFields.FILE_NAME)).thenReturn("file1");
+        when(request.getParameter(LogFields.LOG)).thenReturn("error");
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);
         when(response.getWriter()).thenReturn(writer);
         RequestDispatcher requestDispatcher =
             Mockito.mock(RequestDispatcher.class);
-        when(request.getRequestDispatcher("/index.html"))
+        when(request.getRequestDispatcher(PageConstants.LANDING_PAGE))
             .thenReturn(requestDispatcher);
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
         String expected = servlet.storeLog.FILE_STORED_RESPONSE;
         assertTrue(actual.contains(expected));
+        when(request.getParameter(LogFields.FILE_NAME)).thenReturn("file2");
+        servlet.doPost(request, response);
+        actual = stringWriter.toString();
+        expected = servlet.storeLog.FILE_STORED_RESPONSE;
+        assertTrue(actual.contains(expected));
 
     }
 
     //store the log into the database when index with name same as the
-    //file name already exist in the database
+    //file name does not exist in the database and then trying to
+    //store another file with same fileName
     @Test
     public void servletTestWhenFileAlreadyExists()
     throws ServletException, IOException {
-        when(request.getParameter("filename")).thenReturn("file1");
-        when(request.getParameter("Log")).thenReturn("error");
+        when(request.getParameter(LogFields.FILE_NAME)).thenReturn("file1");
+        when(request.getParameter(LogFields.LOG)).thenReturn("error");
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);
         when(response.getWriter()).thenReturn(writer);
         RequestDispatcher requestDispatcher =
             Mockito.mock(RequestDispatcher.class);
-        when(request.getRequestDispatcher("/index.html"))
+        when(request.getRequestDispatcher(PageConstants.LANDING_PAGE))
             .thenReturn(requestDispatcher);
         servlet.doPost(request, response);
-        servlet.doPost(request, response);
         String actual = stringWriter.toString();
-        System.out.println(actual);
-        String expected = servlet.storeLog.FILE_NOT_STORED_RESPONSE;
+        String expected = servlet.storeLog.FILE_STORED_RESPONSE;
+        assertTrue(actual.contains(expected));
+        servlet.doPost(request, response);
+        actual = stringWriter.toString();
+        expected = servlet.storeLog.FILE_ALREADY_EXISTS_RESPONSE;
         assertTrue(actual.contains(expected));
 
     }

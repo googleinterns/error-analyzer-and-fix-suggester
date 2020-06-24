@@ -22,14 +22,14 @@ import java.util.ArrayList;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.junit.Test;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
@@ -39,40 +39,28 @@ import static org.mockito.Mockito.when;
 /*this class contains tests for the methods used for 
 storing logs to the database*/
 public final class StoreLogTest {
-    private MockLogDao mockLogDao;
     private StoreLogs storeLogs;
 
     @Before
     public void setUp() {
-        mockLogDao = new MockLogDao();
         storeLogs = new StoreLogs();
-        storeLogs.logDao = mockLogDao;
+        storeLogs.logDao = new MockLogDao();
     }
 
     //store the log into the database when index with name same as the
-    //file name does not exist in the db
-    @Test
-    public void checkAndStoreLogTest() throws IOException {
-        String log = "error1";
-        String fileName = "samplefile";
-        String expected = storeLogs.FILE_STORED_RESPONSE;
-        String actual = storeLogs.checkAndStoreLog(fileName, log);
-        assertEquals(expected, actual);
-
-    }
-
-    //store the log into the database when index with name same as the
-    //file name already exist in the database
+    //file name does not exist in the database and then trying to
+    //store another file with same fileName
     @Test
     public void checkAndStoreLogInAlreadyExistingFileTest()
     throws IOException {
         String log = "error2";
         String fileName = "samplefile1";
-        storeLogs.checkAndStoreLog(fileName, log);
-        String expected = storeLogs.FILE_NOT_STORED_RESPONSE;
+        String expected = storeLogs.FILE_STORED_RESPONSE;
         String actual = storeLogs.checkAndStoreLog(fileName, log);
         assertEquals(expected, actual);
-
+        expected = storeLogs.FILE_ALREADY_EXISTS_RESPONSE;
+        actual = storeLogs.checkAndStoreLog(fileName, log);
+        assertEquals(expected, actual);
     }
 
 }

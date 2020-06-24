@@ -12,14 +12,16 @@
 package com.google.error_analyzer.servlets;
 
 import com.google.error_analyzer.backend.StoreLogs;
+import com.google.error_analyzer.data.constant.FileConstants;
+import com.google.error_analyzer.data.constant.LogFields;
+import com.google.error_analyzer.data.constant.PageConstants;
 import java.io.IOException;
-import javax.servlet.*;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.client.RequestOptions;
@@ -29,20 +31,18 @@ import org.elasticsearch.common.xcontent.XContentType;
 plain text to the database*/
 @WebServlet("/StorePlainTextLogServlet")
 public class TextServlet extends HttpServlet {
-    private static final String LOG_TEXT = "Log";
-    private static final String FILE_NAME = "filename";
     public static final StoreLogs storeLog = new StoreLogs();
 
     @Override
     public void doPost(HttpServletRequest request,
-     HttpServletResponse response)throws IOException, ServletException {
-        response.setContentType("text/html");
-        String log = request.getParameter(LOG_TEXT);
-        String fileName = request.getParameter(FILE_NAME);
+        HttpServletResponse response) throws IOException, ServletException {
+        response.setContentType(FileConstants.CONTENT_TYPE);
+        String log = request.getParameter(LogFields.LOG);
+        String fileName = request.getParameter(LogFields.FILE_NAME);
         String status = storeLog.checkAndStoreLog(fileName, log);
         response.getWriter().println(status);
-        RequestDispatcher requestDispatcher = 
-            request.getRequestDispatcher("/index.html");
+        RequestDispatcher requestDispatcher =
+            request.getRequestDispatcher(PageConstants.LANDING_PAGE);
         requestDispatcher.include(request, response);
     }
 }
