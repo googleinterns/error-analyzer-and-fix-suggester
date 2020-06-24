@@ -19,8 +19,8 @@ import org.elasticsearch.search.SearchHit;
 public interface DaoInterface {
 
     //search db using keywords and return SearchHit object containing highlight field
-    public ImmutableList < SearchHit > fullTextSearch (String fileName, 
-        String searchString, String field)throws IOException;
+    public ImmutableList < SearchHit > fullTextSearch (String fileName, String searchString,
+    String field, int start, int size)throws IOException;
 
     //return a section of given index starting from start and length equal to 
     // given size
