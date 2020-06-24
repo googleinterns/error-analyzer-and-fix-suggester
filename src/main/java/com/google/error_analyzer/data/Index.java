@@ -22,7 +22,7 @@ public class Index {
     private ArrayList < Document > documentList = new ArrayList < Document > ();
 
     public void setIndexName(String indexName) {
-        indexName = indexName;
+        this.indexName = indexName;
     }
 
     public void addDocument(Document doc) {
