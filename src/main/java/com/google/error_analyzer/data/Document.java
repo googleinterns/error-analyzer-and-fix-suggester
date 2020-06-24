@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 /*The document class has attributes id, logLineNumber, logText,
- and jsonString.Id represents the document id in the database.
+ and jsonString. Id represents the document id in the database.
  Data will be stored as json strings in the documents*/
  public class Document {
     private String id;
