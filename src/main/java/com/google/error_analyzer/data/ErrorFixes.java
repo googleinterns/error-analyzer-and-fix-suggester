@@ -32,13 +32,13 @@ public class ErrorFixes{
     public String findFixes(String searchQuery) {
     
         try{
-            String searchEngine = "009757721300365020426:cdhdu388bru"; //Your search engine
+            String searchEngine = "cx"; //Your search engine
 
             //Instance Customsearch
             Customsearch customeSearch = 
                 new Customsearch.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), null) 
                         .setApplicationName("errorFixes") 
-                        .setGoogleClientRequestInitializer(new CustomsearchRequestInitializer("AIzaSyAokgAC2C1lLyfRk-d7jLLwnJfy8N9cW_c")) 
+                        .setGoogleClientRequestInitializer(new CustomsearchRequestInitializer("your_api_keys")) 
                         .build();
 
             //Set search parameter
