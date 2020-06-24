@@ -108,3 +108,16 @@ input[name="resultbutton"] {
   margin: 6px 3px;
   cursor: pointer;
 }
+a {
+  text-decoration: none;
+  display: inline-block;
+  padding: 8px 16px;
+}
+.result {
+  background-color: #4CAF50;
+  color: white;
+}
+
+textarea {
+    white-space: nowrap;
+}

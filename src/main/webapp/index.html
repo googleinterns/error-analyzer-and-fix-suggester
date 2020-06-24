@@ -32,7 +32,7 @@
 		<h1>Error Analyzer</h1>
 		<form action="/StorePlainTextLogServlet" method="POST">
 			<textarea name="Log" wrap="hard" placeholder="Paste your text here"
-                        style="width:600px; height:400px;"></textarea>
+                        style="width:600px; height:400px;" white-space= "nowrap" ></textarea>
 			<br/>
 			<div class="tooltip">
 				<input type="text" name="filename" pattern="[0-9a-z]{1,}" 
@@ -72,10 +72,8 @@
         <br/>
         <br/>
         <br/>
-        <form>
-            <input type="submit" name="resultbutton" value="Go to Result Page &raquo;" /> 
-        </form>
 
+<a href="result.html" class="result">Go to Result Page &raquo;</a>
 	</div>
 </body>
 </html>
