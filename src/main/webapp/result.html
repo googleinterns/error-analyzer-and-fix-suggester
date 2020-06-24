@@ -106,8 +106,8 @@
             role="tabpanel" aria-labelledby="home-tab"></div>
                 <div id="carouselExampleControls" class="carousel slide" 
                 data-interval="false">
-                    <div class="carousel-inner text-center" 
-                    id="slideContainer">
+                <div id="slideContainer">
+                    <div class="carousel-inner text-center">
                         <div class="carousel-item active" 
                         id="slide1Container">
                             <p class="d-block w-100 h-100" id="slide1">
@@ -118,6 +118,7 @@
                             </p>
                         </div>
                     </div>
+                </div>
                     <!-- navigate between pages -->
                     <a onclick="prevPage()" class="carousel-control-prev 
                     backgroundColor" id="btnPrev"
@@ -141,26 +142,27 @@
                         </span>
                     </a>
                 </div>
+                
 		    </div>
 	    </div>
     </div>
-    <!-- delete pop-up -->
-	<div class="collapse" id="collapse">
-		<div class="card card-body mb-2">
-			Are you sure you want to delete all your files 
-            from the system
-			<button class="btn btn-info">yes</button>
-		</div>
-	</div>
+    
 	<!-- pageno and delete button -->
 	<footer class="backgroundColor text-center">
 		<div id="navigation">
-			<span>page: <span id="page"></span></span>
-			<a class="btn btn-light" data-toggle="collapse" 
-            href="#collapse" role="button" aria-expanded="false"
-            aria-controls="collapse">
-				<i class="fas fa-trash"></i>
-			</a>
+            <div class="btn-group dropup">
+                <button type="button" class="btn btn-light dropdown-toggle" 
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <i class="fas fa-trash"></i>
+                </button>
+                <div class="dropdown-menu">
+                    Are you sure you want to delete all your files 
+                    from the system
+                    <button class="btn btn-info">yes</button>
+                </div>
+            </div>
+
+            <span>page: <span id="page"></span> &nbsp</span>
 		</div>
 	</footer>
 
