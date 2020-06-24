@@ -138,6 +138,15 @@ public class LogDao implements DaoInterface {
         return getResponse.getSourceAsString();
     }
 
+    //fetch documents from index according to searchRequest
+    @Override
+    public SearchHit[] getHitsFromIndex(SearchRequest searchRequest)
+    throws IOException {
+        SearchResponse searchResponse = client
+            .search(searchRequest, RequestOptions.DEFAULT);
+        return searchResponse.getHits().getHits();
+    }
+
     // highlight searched text
     private HighlightBuilder addHighLighter(String field) {
         HighlightBuilder highlightBuilder = new HighlightBuilder()
@@ -149,7 +158,7 @@ public class LogDao implements DaoInterface {
     }
 
     //find errors in a given index
-    public SearchHits findErrors(String fileName) 
+    private SearchHits findErrors(String fileName) 
     throws IOException {
         logger.info("Finding errors in ".concat(fileName));
         BooleanQuery booleanQuery = new BooleanQuery();
@@ -169,12 +178,5 @@ public class LogDao implements DaoInterface {
             String id = hit.getId();
             storeLogLine(errorFileName, jsonSource, id);
         }
-    }
-
-    public SearchHits rangeQueryHits(SearchRequest searchRequest)
-    throws IOException {
-        SearchResponse searchResponse = client
-            .search(searchRequest, RequestOptions.DEFAULT);
-        return searchResponse.getHits();
     }
 }

@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableList;
 import java.io.IOException;
 import java.lang.*;
 import java.util.*;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.search.SearchHit;
 
 public interface DaoInterface {
@@ -39,4 +40,7 @@ public interface DaoInterface {
     public String storeLogLine (String filename, String jsonString, String id) 
     throws IOException;
 
+    //fetch documents from index according to searchRequest
+    public SearchHit[] getHitsFromIndex(SearchRequest searchRequest)
+    throws IOException;
 }

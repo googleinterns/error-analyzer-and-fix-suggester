@@ -19,6 +19,8 @@ import com.google.error_analyzer.data.Index;
 import java.io.IOException;
 import java.lang.*;
 import java.util.*;
+import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -138,5 +140,11 @@ public class MockLogDao implements DaoInterface {
             }
         }
         return result;
+    }
+
+    @Override
+    public SearchHit[] getHitsFromIndex(SearchRequest searchRequest)
+    throws IOException {
+        return new SearchHit[0];
     }
 }
