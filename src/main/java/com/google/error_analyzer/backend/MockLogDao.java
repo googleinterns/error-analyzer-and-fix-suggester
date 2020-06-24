@@ -13,6 +13,7 @@ package com.google.error_analyzer.backend;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.error_analyzer.backend.LogDaoHelper;
 import com.google.error_analyzer.data.Document;
 import com.google.error_analyzer.data.Index;
 import java.io.IOException;
@@ -24,17 +25,21 @@ import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 
 public class MockLogDao implements DaoInterface {
+    //database is an example of input index file
     private final String[] database = new String[] {"Error: nullPointerException", 
     "info: start appengine","scheduler shutting down",
     "WARNING: An illegal reflective access operation has occurred", 
     "Severe: Could not find index file", "warning: NullPointerException"};
+    //logDatabase is the list of all indices stored in the database
     private ArrayList < Index > logDatabase = new ArrayList < Index >();
+    //errorFile is for storing error logs after findAndStoreErrors is executed
+    public ArrayList < String > errorFile;
 
     //search db using keywords and return searchHits having highlight field added 
     @Override 
     public ImmutableList < SearchHit > fullTextSearch(
     String fileName, String searchString, String field) throws IOException {
-        Builder<SearchHit> searchResultBuilder = ImmutableList.<SearchHit>builder();
+        Builder < SearchHit > searchResultBuilder = ImmutableList.< SearchHit >builder();
         String[] keyWords = searchString.split(" ");
         for (int i = 0; i < database.length; i++) {
             String dbEntry = database[i];
@@ -47,7 +52,7 @@ public class MockLogDao implements DaoInterface {
                     SearchHit hit = new SearchHit
                         (i,String.valueOf(i),null,new HashMap());
                     Text [] text = new Text[]{new Text(database[i])};
-                    HashMap <String,HighlightField> highlight = new HashMap();
+                    HashMap < String,HighlightField > highlight = new HashMap();
                     highlight.put(field,new HighlightField(field,text));
                     hit.highlightFields(highlight);
                     searchResultBuilder.add(hit);
@@ -83,16 +88,21 @@ public class MockLogDao implements DaoInterface {
         }
         return searchHits;
     }
-
+  
     // returns no of documents in an index
     public long getDocCount (String index) throws IOException {
         return 0l;
     }
-    //search db using regex and keywords and store back in db searchHits 
-    // sorted by logLineNumber
+
+    //search an index for errors using regex and keywords and store back in db
+    //Returns name of the new index 
     @Override 
-    public boolean errorQuery(String filename) {
-        return true;
+    public String findAndStoreErrors(String fileName) {
+        String errorFileName = LogDaoHelper.getErrorIndexName(fileName);
+        errorFile.add("Error: nullPointerException");
+        errorFile.add("Severe: Could not find index file");
+        errorFile.add("warning: NullPointerException");
+        return errorFileName;
     }
 
     //checks whether index with name fileName already exists in the database;
@@ -134,6 +144,4 @@ public class MockLogDao implements DaoInterface {
         }
         return result;
     }
-
-
 }
