@@ -25,7 +25,7 @@ import org.apache.logging.log4j.LogManager;
 @WebServlet("/getCount")
 public class DocCountServlet extends HttpServlet {
 
-    private static LogDao logDao = new LogDao();
+    private LogDao logDao = new LogDao();
     private static final Logger logger = 
         LogManager.getLogger(DocCountServlet.class);
 
