@@ -12,16 +12,33 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
-
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Error analyzer</title>
-  </head>
-  <body>
-    <div>
-      <h1>Setting things up<h1>
-    </div>
-  </body>
+
+<head>
+	<meta charset="UTF-8">
+	<title>Log Analyzer</title>
+	<link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+	<div id="content">
+		<h1>Error Analyzer</h1>
+		<form action="/StorePlainTextLogServlet" method="POST">
+			<textarea name="Log" wrap="hard" placeholder="Paste your text here"
+                        style="width:600px; height:400px;" white-space= "nowrap"></textarea>
+			<br/>
+			<div class="tooltip">
+				<input type="text" name="filename" pattern="[0-9a-z]{1,}" 
+                                required="required" placeholder="File Name"> 
+                                <span class="tooltiptext">lower case alphanumeric
+                                    characters only</span> 
+			</div>
+			<br/>
+			<br/>
+			<input type="submit" name="textbutton" />
+		</form>
+	</div>
+</body>
+
 </html>
