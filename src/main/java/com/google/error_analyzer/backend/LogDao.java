@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.backend.BooleanQuery;
 import com.google.error_analyzer.backend.LogDaoHelper;
+import com.google.error_analyzer.data.Document;
 import java.io.IOException;
 import java.util.*;
 import org.apache.http.HttpHost;
@@ -40,7 +41,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-
+import org.elasticsearch.action.bulk.BulkRequest;
 
 public class LogDao implements DaoInterface {
 
@@ -136,6 +137,23 @@ public class LogDao implements DaoInterface {
         GetResponse getResponse =
             client.get(getRequest, RequestOptions.DEFAULT);
         return getResponse.getSourceAsString();
+    }
+
+    //Stores the documents into the database by performing multiple indexing operations
+    //using bulk API
+    @Override
+    public void bulkStoreLog(String fileName, ImmutableList < Document > documentList)
+    throws IOException {
+        BulkRequest request = new BulkRequest();
+        for (Document document: documentList) {
+            String jsonString = document.getJsonString();
+            IndexRequest indexRequest = new IndexRequest(fileName);
+            String id = document.getID();
+            indexRequest.id(id);
+            indexRequest.source(jsonString, XContentType.JSON);
+            request.add(indexRequest);
+        }
+        client.bulk(request, RequestOptions.DEFAULT);;
     }
 
     // highlight searched text
