@@ -65,7 +65,7 @@ public final class DocCountServletTest {
 
     // test dopost
     @Test
-    public void emptyFileName() throws Exception {
+    public void returnCount() throws Exception {
         when(request.getParameter("index")).thenReturn(fileName);
         when(logDao.getDocCount(any(String.class))).thenReturn((long)5);
         StringWriter stringWriter = new StringWriter();
