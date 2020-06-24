@@ -13,25 +13,24 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package com.google.error_analyzer.data;
 
-import java.util.*;
-import java.lang.*;
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.*;
-import com.google.api.services.customsearch.Customsearch;
-import com.google.api.services.customsearch.Customsearch.Cse;
-import com.google.api.services.customsearch.CustomsearchRequestInitializer;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import com.google.api.services.customsearch.Customsearch;
+import com.google.api.services.customsearch.CustomsearchRequestInitializer;
+import com.google.api.services.customsearch.Customsearch.Cse;
 import com.google.api.services.customsearch.Customsearch.Cse.List;
 import com.google.api.services.customsearch.model.Result;
 import com.google.api.services.customsearch.model.Search;
-import org.apache.logging.log4j.LogManager;
+import java.io.IOException;
+import java.lang.*;
+import java.security.GeneralSecurityException;
+import java.util.*;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 public class ErrorFixes{
     
-    private static final Logger LOG = LogManager.getLogger(ErrorFixes.class);
+    private static final Logger logger = LogManager.getLogger(ErrorFixes.class);
     public static String findFixes(String searchQuery) {
     
         try{
@@ -54,20 +53,16 @@ public class ErrorFixes{
             if (result.getItems()!=null){
                 Result stackoverflowResult= result.getItems().get(0);
                 String fix= stackoverflowResult.getLink();
-                fix=" <a href="+fix+"> click </a>";
+                fix=" <a href="+fix+"> FIX </a>";
                 return fix;
             } else {
                 return new String();
             }
-        } catch(GeneralSecurityException excep ) {
-            String exception = new String("error in interacting with google API");
-            exception+=excep;
-            LOG.error(exception);
+        } catch(GeneralSecurityException exception) {
+            logger.error(exception);
         }
-        catch(IOException excep ) {
-            String exception = new String("error in interacting with google API");
-            exception+=excep;
-            LOG.error(exception);
+        catch(IOException exception) {
+            logger.error(exception);
         }
         return new String();
     }
