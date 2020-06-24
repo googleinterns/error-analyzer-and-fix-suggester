@@ -46,7 +46,8 @@ public class PaginationServlet extends HttpServlet {
         String fileName = request.getParameter("fileName");
         String fileType = request.getParameter("fileType");
         String searchString = request.getParameter("searchString");
-
+        if(fileType.equals(ERROR))
+            fileName = logDaoHelper.getErrorIndexName(fileName);
         response.setContentType("application/json");
         if (fileName.isEmpty() || !logDao.fileExists(fileName)) {
             response.getWriter().println(emptyObject());
@@ -57,55 +58,58 @@ public class PaginationServlet extends HttpServlet {
         response.getWriter().println(json);
     }
 
-    private String fetchPageFromDatabase(String fileName,
-        String fileType, String searchString, int start, int size) {
+    private String fetchPageFromDatabase(int start, int size, String fileName,
+        String fileType, String searchString) {
+        ImmutableList < String > hitFieldContent = ImmutableList.
+            <String>builder().build();
+        ImmutableList < String > hitIds = ImmutableList.
+            <String>builder().build();
         try {
-            SearchHit[] searchHits =
-                logDao.getAll(fileName, start, size);
-            ImmutableList < String > hitIds =
-                logDaoHelper.hitId(searchHits);
-            ImmutableList < String > hitFieldContent =
-                logDaoHelper.hitFieldContent(searchHits, LOG_FIELD);
-            if (hitIds == null) {
-                return convertToJson(new ArrayList());
-            }
-            HashMap<String, String> search = new HashMap();
             if(!searchString.isEmpty()) {
-                ImmutableList < SearchHit > searchHitsFromSearch = 
-                    logDao.fullTextSearch(
-                        fileName, searchString,LOG_FIELD, start, size);
-                search = logDaoHelper
-                    .getHighLightedText(searchHitsFromSearch, LOG_FIELD);
+                ImmutableList < SearchHit > searchHits = 
+                    logDao.fullTextSearch(fileName, searchString, dataField, start, size);
+                hitFieldContent= 
+                    logDaoHelper.getHighLightedText(searchHits, dataField);
+                hitIds=
+                    logDaoHelper.hitId(searchHits);
+            } else {
+                ImmutableList < SearchHit > searchHits =
+                    logDao.getAll(fileName, start, size);
+                hitIds =
+                    logDaoHelper.hitId(searchHits);
+                hitFieldContent =
+                    logDaoHelper.hitFieldContent(searchHits, dataField);
+                if (hitIds == null) {
+                    return convertToJson(new ArrayList());
+                }
             }
-            return addErrorFixesAndHighlights(
-                fileType, hitIds, hitFieldContent, search);
+            return addErrorFixesAndHighlights(fileType, hitIds, hitFieldContent, searchString);
         } catch (IOException exception) {
             logger.error(exception);
         }
         return convertToJson(new ArrayList());
     }
 
-    // add errorfixes and text highlights 
+    // add errorfixes to error file and text highlights 
     private String addErrorFixesAndHighlights(String fileType,
         ImmutableList < String > hitIds,
-        ImmutableList < String > hitFieldContent, 
-        HashMap<String, String> search) {
+        ImmutableList < String > hitFieldContent, String searchString) {
         ArrayList < String > data = new ArrayList();
         int startIdx = 0;
-        if(fileType.equals(ERROR)) {
+        if(fileType.equals(ERROR) && searchString.isEmpty())
             startIdx = hitIds.size() -1 ;
-        }
         for (int idx = startIdx; idx < hitIds.size() && idx >= 0;) {
             String id = hitIds.get(idx);
             String resultString = hitFieldContent.get(idx);
+            String fix = new String();
+
             if (fileType.equals(ERROR)) {
+                fix = errorFix.findFixes(resultString);
                 idx--;
             } else {
                 idx++;
-            }
-            if (search.containsKey(id)) {
-                resultString = search.get(id);
-            }
+            } 
+            resultString += " " + fix;
             data.add(resultString);
         }
         return convertToJson(data);
