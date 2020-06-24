@@ -127,8 +127,9 @@ public final class PaginationServletTest {
         Assert.assertEquals(expected, actual);
     }
 
+    // test dopost
     @Test
-    public void mockFunctions() throws Exception {
+    public void validFileName() throws Exception {
         ImmutableList<String> immutableListId = ImmutableList.of("2");	
         ImmutableList<String> immutableListContent = 	
             ImmutableList.of("log2");	
@@ -147,6 +148,39 @@ public final class PaginationServletTest {
         pagination.doPost(request, response);
         String actual = stringWriter.toString();
         String expected =  new String("[\"log2\"]\n");
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void emptyFileName() throws Exception {
+        when(request.getParameter("start")).thenReturn("1");
+        when(request.getParameter("size")).thenReturn("1");
+        when(request.getParameter("fileName")).thenReturn("");
+        when(request.getParameter("fileType")).thenReturn(fileType2);
+        when(request.getParameter("searchString")).thenReturn("");
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter writer = new PrintWriter(stringWriter);
+        when(response.getWriter()).thenReturn(writer);
+        pagination.doPost(request, response);
+        String actual = stringWriter.toString();
+        String expected =  new String("[]\n");
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void noMatchingIndexForFileName() throws Exception {
+        when(logDao.fileExists(any(String.class))).thenReturn(false);
+        when(request.getParameter("start")).thenReturn("1");
+        when(request.getParameter("size")).thenReturn("1");
+        when(request.getParameter("fileName")).thenReturn(fileName);
+        when(request.getParameter("fileType")).thenReturn(fileType2);
+        when(request.getParameter("searchString")).thenReturn("");
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter writer = new PrintWriter(stringWriter);
+        when(response.getWriter()).thenReturn(writer);
+        pagination.doPost(request, response);
+        String actual = stringWriter.toString();
+        String expected =  new String("[]\n");
         Assert.assertEquals(expected, actual);
     }
 
