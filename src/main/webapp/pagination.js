@@ -30,14 +30,10 @@ async function changePage(page) {
     const searchString = document.getElementById("searchBar").value;
     let fileName = document.getElementById("fileName").value;
     const fileType = logs == "true" ? LOGS : ERRORS ;
-    
-    if(fileType == ERRORS) {
-        fileName += "error"; 
-    }
+
     currentPage = page;
-    if(page == 1){
-        fileLength = await getCount(fileName);
-        updateLastPage();
+    if(page == 1 && fileType == ERRORS){
+        fileLength = await getCount(fileName+"error");
     }
     const fetchedPage = getPageToBeFetched(); 
     if(currentPage != 1 ) {
@@ -58,6 +54,7 @@ async function changePage(page) {
             body: params
         });
         const fetchedData = await response.json();
+        updateLastPage(fetchedData.length, fetchedPage);
         console.log(fetchedData +" " +fileName+" "+lastPage);
         
         if(fetchedData.length == 0 && currentPage == 1) {
@@ -173,11 +170,21 @@ function getPageToBeFetched() {
 }
 
 // calculate last page and no of records on last page
-function updateLastPage() {
-    lastPage =  Math.ceil(fileLength/recordsPerPage);
-    if(fileLength % recordsPerPage != 0) {
-        noOfRecordsOnLastPage = fileLength % recordsPerPage;
-    }else {
+function updateLastPage(fetchedPageLength, page) {
+    if (page == 1 && fetchedPageLength < recordsPerPage * noOfPages) {
+        lastPage =  Math.ceil(fetchedPageLength / recordsPerPage);
+        if(fetchedPageLength % recordsPerPage != 0)
+             noOfRecordsOnLastPage = fetchedPageLength % recordsPerPage;
+        else
+            noOfRecordsOnLastPage = recordsPerPage;
+    } else if (page != 1 && fetchedPageLength == 0) {
+        lastPage = page - 1;
+        noOfRecordsOnLastPage = recordsPerPage;
+    } else if (page != 1 && fetchedPageLength < recordsPerPage) {
+        lastPage = page;
+        noOfRecordsOnLastPage = fetchedPageLength;
+    } else {
+        lastPage = Number.MAX_VALUE;
         noOfRecordsOnLastPage = recordsPerPage;
     }
 }
