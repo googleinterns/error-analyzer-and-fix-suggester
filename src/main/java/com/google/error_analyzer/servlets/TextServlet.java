@@ -36,7 +36,7 @@ public class TextServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request,
         HttpServletResponse response) throws IOException, ServletException {
-        response.setContentType(FileConstants.CONTENT_TYPE);
+        response.setContentType(FileConstants.TEXT_HTML_CONTENT_TYPE);
         String log = request.getParameter(LogFields.LOG);
         String fileName = request.getParameter(LogFields.FILE_NAME);
         String status = storeLog.checkAndStoreLog(fileName, log);

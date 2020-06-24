@@ -22,13 +22,13 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.json.simple.JSONObject;
 
-//This class contains the methods used for processing logs and storing them 
+//This class contains the methods used for storing logs
 //to the database.
-//This includes removal of special characters, conversion into json string.
 public class StoreLogs {
     private static final Logger logger = LogManager.getLogger(StoreLogs.class);
     private static final String LINE_BREAK = "\\r?\\n";
     private StoreLogHelper storeLogHelper = new StoreLogHelper();
+    private String ERROR_TEMPLATE_RESPONSE = "\t\t\t<h2> Could not store file %1$s</h2>";
     public static final String FILE_ALREADY_EXISTS_RESPONSE =
         "\t\t\t<h2> Sorry! the file already exists. " +
         "Please try with a different file name</h2>";
@@ -50,12 +50,11 @@ public class StoreLogs {
             }
         } catch (Exception e) {
             final String ERROR_RESPONSE =
-                String.format("\t\t\t<h2> Could not store file %1$s</h2>", e);
+                String.format(ERROR_TEMPLATE_RESPONSE, e);
             logger.error(String.format("Could not store file %1$s %2$s", fileName, e));
             return ERROR_RESPONSE;
         }
     }
-
 
     //Stores the log in an index with name fileName
     private String storeLog(String fileName, String log) throws IOException {
