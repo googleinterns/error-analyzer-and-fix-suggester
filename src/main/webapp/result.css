@@ -1,7 +1,7 @@
 /* Body Header */
 
 #body-header {
-    height: 20vh;
+    height: 25vh;
     padding-top: 1.2rem;
     color: white;
     margin-bottom: 2vh;
@@ -52,11 +52,11 @@
 }
 /* footer */
 footer {
-   position: fixed;
+   position: relative;
    left: 0;
    bottom: 0;
    width: 100%;
-   height: 5vh;
+   height: 7vh;
    color: white;
    padding: 5px;
    font-size: 1.5rem;
@@ -82,7 +82,13 @@ footer a {
 
 /* slider */
 #slideContainer {
-    min-height: 40vh;
+    min-height: 64vh;
+    max-width : 60vw;
+    word-wrap: normal;
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    margin-left:20vw;
 }
 
 /* records input  */
