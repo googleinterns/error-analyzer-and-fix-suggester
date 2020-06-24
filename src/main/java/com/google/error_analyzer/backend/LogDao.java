@@ -22,6 +22,7 @@ import org.apache.http.HttpHost;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
+import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -41,7 +42,6 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.action.bulk.BulkRequest;
 
 public class LogDao implements DaoInterface {
 
