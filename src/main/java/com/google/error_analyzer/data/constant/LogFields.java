@@ -12,7 +12,7 @@ limitations under the License.*/
 package com.google.error_analyzer.data.constant;
 
 /** Field names in an index file.
- */
+*/
 public class LogFields {
     public static final String LOG_TEXT = "logText";
     public static final String LOG_LINE_NUMBER = "logLineNumber";
