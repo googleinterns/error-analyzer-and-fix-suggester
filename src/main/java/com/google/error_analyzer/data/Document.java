@@ -11,6 +11,8 @@ limitations under the License.*/
 
 package com.google.error_analyzer.data;
 
+import com.google.error_analyzer.backend.StoreLogs;
+import java.io.IOException;
 import java.util.ArrayList;
 
 /*The document class has attributes id and jsonString.
@@ -18,11 +20,21 @@ import java.util.ArrayList;
  Data will be stored as json strings in the documents*/
  public class Document {
     private String id;
+    private int logLineNumber;
+    private String logText;
     private String jsonString;
 
     public Document(String id, String jsonString) {
         this.id = id;
         this.jsonString = jsonString;
+    }
+
+    public Document(String id, int logLineNumber, String logText) throws IOException{
+        this.id = id;
+        this.logLineNumber = logLineNumber;
+        this.logText = logText;
+        StoreLogs storeLogs = new StoreLogs();
+        this.jsonString = storeLogs.convertToJsonString(logText, logLineNumber);
     }
 
     public String getJsonString() {
@@ -32,4 +44,5 @@ import java.util.ArrayList;
     public String getID() {
         return id;
     }
+
 }
