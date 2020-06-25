@@ -46,7 +46,7 @@ public class StoreLogs {
         String log) {
         try {
             String indexName = LogDaoHelper.getIndexName(request, fileName);
-            indexName = findFileName(indexName);
+            indexName = findIndexName(indexName);
             final String response = storeLog(indexName, log);
             fileName = LogDaoHelper.getFileName(request, indexName);
             logger.info(String.format("File %s stored", fileName));
@@ -85,19 +85,19 @@ public class StoreLogs {
     }
 
     //find the name of the index in which the logs can be stored
-    public String findFileName(String fileName) throws IOException {
-        if (logDao.fileExists(fileName)) {
-            int fileSuffix = 1;
-            String nextFileName = String.format(
-                "%1$s(%2$s)", fileName, fileSuffix);
-            while (logDao.fileExists(nextFileName)) {
-                fileSuffix++;
-                nextFileName = String.format(
-                    "%1$s(%2$s)", fileName, fileSuffix);
+    private String findIndexName(String indexName) throws IOException {
+        if (logDao.fileExists(indexName)) {
+            int indexSuffix = 1;
+            String nextIndexName = String.format(
+                "%1$s(%2$s)", indexName, indexSuffix);
+            while (logDao.fileExists(nextIndexName)) {
+                indexSuffix++;
+                nextIndexName = String.format(
+                    "%1$s(%2$s)", indexName, indexSuffix);
             }
-            fileName = nextFileName;
+            indexName = nextIndexName;
         }
-        return fileName;
+        return indexName;
     }
 
 }
