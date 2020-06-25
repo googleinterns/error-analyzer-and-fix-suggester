@@ -14,6 +14,7 @@
 
 package com.google.error_analyzer.servlets;
 
+import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.backend.StackTrace;
 import com.google.gson.Gson;
@@ -38,7 +39,7 @@ public class StackTraceServlet extends HttpServlet {
         try {
             Integer errorLineNumber = Integer.parseInt(request.getParameter(LogFields.LOG_LINE_NUMBER));
             String indexName = request.getParameter(LogFields.FILE_NAME);
-            ArrayList<String> stackList = stackTrace.findStack(errorLineNumber,indexName);
+            ImmutableList<String> stackList = stackTrace.findStack(errorLineNumber,indexName);
             response.getWriter().println("<span>");
             // response.getWriter().println("");
             for (String logLine : stackList) {
