@@ -11,18 +11,32 @@ limitations under the License.*/
 
 package com.google.error_analyzer.data;
 
+import com.google.error_analyzer.backend.StoreLogHelper;
+import java.io.IOException;
 import java.util.ArrayList;
 
-/*The document class has attributes id and jsonString.
- id represents the document id in the mock database.
+/*The Document class has attributes id, logLineNumber, logText,
+ and jsonString. Id represents the document id in the database.
  Data will be stored as json strings in the documents*/
  public class Document {
     private String id;
+    private int logLineNumber;
+    private String logText;
     private String jsonString;
+    private static StoreLogHelper storeLogHelper = new StoreLogHelper();
 
     public Document(String id, String jsonString) {
         this.id = id;
         this.jsonString = jsonString;
+    }
+
+    public Document(String id, int logLineNumber, String logText)
+     throws IOException {
+        this.id = id;
+        this.logLineNumber = logLineNumber;
+        this.logText = logText;
+        this.jsonString = storeLogHelper
+            .convertToJsonString(logText, logLineNumber);
     }
 
     public String getJsonString() {
@@ -32,4 +46,5 @@ import java.util.ArrayList;
     public String getID() {
         return id;
     }
+
 }
