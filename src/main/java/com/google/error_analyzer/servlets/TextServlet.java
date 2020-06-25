@@ -22,7 +22,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.HttpHost;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.client.RequestOptions;

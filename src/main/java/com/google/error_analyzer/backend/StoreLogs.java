@@ -88,10 +88,12 @@ public class StoreLogs {
     public String findFileName(String fileName) throws IOException {
         if (logDao.fileExists(fileName)) {
             int fileSuffix = 1;
-            String nextFileName = String.format("%1$s(%2$s)", fileName, fileSuffix);
+            String nextFileName = String.format(
+                "%1$s(%2$s)", fileName, fileSuffix);
             while (logDao.fileExists(nextFileName)) {
                 fileSuffix++;
-                nextFileName = String.format("%1$s(%2$s)", fileName, fileSuffix);
+                nextFileName = String.format(
+                    "%1$s(%2$s)", fileName, fileSuffix);
             }
             fileName = nextFileName;
         }
