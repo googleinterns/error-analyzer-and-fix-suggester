@@ -34,7 +34,6 @@ public interface DaoInterface {
     //Returns name of the new index 
     public String findAndStoreErrors (String filename) throws IOException;
 
-
     //checks whether index with name fileName already exists in the database;
     public boolean fileExists (String fileName) throws IOException;
 

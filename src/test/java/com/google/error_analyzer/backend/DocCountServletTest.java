@@ -10,8 +10,8 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package com.google.error_analyzer;
 
-import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.DocCountServlet;
+import com.google.error_analyzer.backend.LogDao;
 import java.io.*;
 import java.util.*;
 import javax.servlet.http.HttpServletRequest;
@@ -21,8 +21,8 @@ import org.elasticsearch.search.SearchHits;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.junit.Test;	
 import org.mockito.InjectMocks;	
 import org.mockito.junit.MockitoJUnit;	
@@ -34,7 +34,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.Mockito.when;	
-
 
 @RunWith(MockitoJUnitRunner.class)
 public final class DocCountServletTest {
