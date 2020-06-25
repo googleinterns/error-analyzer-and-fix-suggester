@@ -15,7 +15,7 @@ import com.google.error_analyzer.backend.StoreLogHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/*The document class has attributes id, logLineNumber, logText,
+/*The Document class has attributes id, logLineNumber, logText,
  and jsonString. Id represents the document id in the database.
  Data will be stored as json strings in the documents*/
  public class Document {
