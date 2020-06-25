@@ -35,15 +35,18 @@ public class PaginationServlet extends HttpServlet {
     private static final String ERROR = "errors";
     private static final Logger logger =
         LogManager.getLogger(PaginationServlet.class);
+    private static int start;
+    private static int size;
+    private static String fileName;
     private LogDao logDao = new LogDao();
     private LogDaoHelper logDaoHelper = new LogDaoHelper();
 
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) 
     throws IOException {
-        int start = Integer.parseInt(request.getParameter("start"));
-        int size = Integer.parseInt(request.getParameter("size"));
-        String fileName = request.getParameter("fileName");
+        start = Integer.parseInt(request.getParameter("start"));
+        size = Integer.parseInt(request.getParameter("size"));
+        fileName = request.getParameter("fileName");
         String fileType = request.getParameter("fileType");
         String searchString = request.getParameter("searchString");
         if(fileType.equals(ERROR))
@@ -54,12 +57,12 @@ public class PaginationServlet extends HttpServlet {
             return;
         }
         String json = 
-            fetchPageFromDatabase(fileName, fileType, searchString, start, size);
+            fetchPageFromDatabase(fileType, searchString);
         response.getWriter().println(json);
     }
 
-    private String fetchPageFromDatabase(String fileName,String fileType,
-    String searchString, int start, int size) {
+    private String fetchPageFromDatabase(String fileType,
+    String searchString) {
         ImmutableList < String > hitFieldContent = ImmutableList.
             <String>builder().build();
         try {

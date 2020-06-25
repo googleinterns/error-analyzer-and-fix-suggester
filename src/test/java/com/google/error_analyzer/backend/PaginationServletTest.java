@@ -78,50 +78,14 @@ public final class PaginationServletTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    // access private method addErrorFixesAndBuildFinalResult
-    private Object getPrivateAddErrorFixesAndBuildFinalResult(
-    String fileType, String searchString,
-    ImmutableList < String > hitFieldContent) 
-    throws Exception {
-        Method method = PaginationServlet.class.getDeclaredMethod(
-        "addErrorFixesAndBuildFinalResult", new Class[] {
-        String.class, String.class, ImmutableList.class});
-        method.setAccessible(true);
-        return method.invoke(pagination, fileType, searchString, 
-            hitFieldContent);
-    }
-
-    // addErrorFixesAndBuildFinalResult
-    @Test
-    public void addErrors() throws Exception {
-        ImmutableList<String> hitContent = ImmutableList.<String>builder() 
-                                                    .add("error1","error2")
-                                                    .build();
-        String actual = (String)getPrivateAddErrorFixesAndBuildFinalResult(
-        fileType1,new String(),hitContent); 
-        String expected = new String("[\"error2 \",\"error1 \"]");
-        Assert.assertEquals(expected, actual);
-    }
-
-    @Test
-    public void addLogs() throws Exception {  
-        ImmutableList<String> hitContent = ImmutableList.<String>builder() 
-                                                    .add("log1","log2")
-                                                    .build();
-        String actual = (String)getPrivateAddErrorFixesAndBuildFinalResult(
-        fileType2,new String(),hitContent);
-        String expected = new String("[\"log1\",\"log2\"]");
-        Assert.assertEquals(expected, actual);
-    }
-
     // test dopost
     @Test
-    public void validFileName() throws Exception {	
-        ImmutableList<String> immutableListContent = 	
+    public void doPost_validLogFileName() throws Exception {	
+        ImmutableList<String> hitContent = 	
             ImmutableList.of("log2");	
         when(logDao.fileExists(any(String.class))).thenReturn(true);	
         when(logDaoHelper.hitFieldContent(any(),any())).	
-            thenReturn(immutableListContent);
+            thenReturn(hitContent);
         when(request.getParameter("start")).thenReturn("1");
         when(request.getParameter("size")).thenReturn("1");
         when(request.getParameter("fileName")).thenReturn(fileName);
@@ -137,7 +101,29 @@ public final class PaginationServletTest {
     }
 
     @Test
-    public void emptyFileName() throws Exception {
+    public void doPost_validErrorFileName() throws Exception {	
+        ImmutableList<String> hitContent = ImmutableList.<String>builder() 
+                                                    .add("error1","error2")
+                                                    .build();	
+        when(logDao.fileExists(any(String.class))).thenReturn(true);	
+        when(logDaoHelper.hitFieldContent(any(),any())).	
+            thenReturn(hitContent);
+        when(request.getParameter("start")).thenReturn("1");
+        when(request.getParameter("size")).thenReturn("1");
+        when(request.getParameter("fileName")).thenReturn(fileName);
+        when(request.getParameter("fileType")).thenReturn(fileType1);
+        when(request.getParameter("searchString")).thenReturn("");
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter writer = new PrintWriter(stringWriter);
+        when(response.getWriter()).thenReturn(writer);
+        pagination.doPost(request, response);
+        String actual = stringWriter.toString();
+        String expected = new String("[\"error2 \",\"error1 \"]\n");
+        Assert.assertEquals(expected, actual);
+    }
+
+    @Test
+    public void doPost_emptyFileName() throws Exception {
         when(request.getParameter("start")).thenReturn("1");
         when(request.getParameter("size")).thenReturn("1");
         when(request.getParameter("fileName")).thenReturn("");
@@ -153,7 +139,7 @@ public final class PaginationServletTest {
     }
 
     @Test
-    public void noMatchingIndexForFileName() throws Exception {
+    public void doPost_noMatchingIndexForFileName() throws Exception {
         when(logDao.fileExists(any(String.class))).thenReturn(false);
         when(request.getParameter("start")).thenReturn("1");
         when(request.getParameter("size")).thenReturn("1");
@@ -170,7 +156,7 @@ public final class PaginationServletTest {
     }
 
     @Test
-    public void searchStringNotEmpty() throws Exception {
+    public void doPost_searchStringNotEmpty() throws Exception {
         ImmutableList<String> immutableListContent = 	
             ImmutableList.of("Google Intern");
         when(logDao.fileExists(any(String.class))).thenReturn(true);	
