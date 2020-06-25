@@ -14,9 +14,12 @@
 
 package com.google.error_analyzer.backend;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.StoreLogHelper;
 import com.google.error_analyzer.data.constant.LogFields;
+import com.google.error_analyzer.data.Document;
 import java.io.*;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -29,11 +32,11 @@ public class StoreLogs {
     private static final String LINE_BREAK = "\\r?\\n";
     private StoreLogHelper storeLogHelper = new StoreLogHelper();
     private String ERROR_TEMPLATE_RESPONSE = "\t\t\t<h2> Could not store file %1$s</h2>";
+    public static final String FILE_STORED_RESPONSE =
+        "\t\t\t<h2> File Stored</h2>";
     public static final String FILE_ALREADY_EXISTS_RESPONSE =
         "\t\t\t<h2> Sorry! the file already exists. " +
         "Please try with a different file name</h2>";
-    public static final String FILE_STORED_RESPONSE =
-        "\t\t\t<h2> File Stored</h2>";
     public DaoInterface logDao = new LogDao();
 
     //Calls the method StoreLog if an index with name fileName does not 
@@ -58,18 +61,21 @@ public class StoreLogs {
 
     //Stores the log in an index with name fileName
     private String storeLog(String fileName, String log) throws IOException {
+        Builder < Document > documentList = ImmutableList
+            . < Document > builder();
         int logLineNumber = 1;
         String logLines[] = log.split(LINE_BREAK);
         for (String logLine: logLines) {
+            String cleanedLogLine = storeLogHelper.cleanLogText(logLine);
             if (!(logLine.isEmpty())) {
                 String logLineNumberString = Integer.toString(logLineNumber);
-                String cleanedLogLine = storeLogHelper.cleanLogText(logLine);
-                String jsonString = storeLogHelper
-                    .convertToJsonString(cleanedLogLine, logLineNumber);
-                logDao.storeLogLine(fileName, jsonString, logLineNumberString);
+                Document document = new Document(
+                    logLineNumberString, logLineNumber, cleanedLogLine);
+                documentList.add(document);
                 logLineNumber++;
             }
         }
+        logDao.bulkStoreLog(fileName, documentList.build());
         return FILE_STORED_RESPONSE;
     }
 
