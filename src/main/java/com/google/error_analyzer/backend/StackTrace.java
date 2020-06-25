@@ -25,64 +25,74 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
 public class StackTrace {
-    private final static Integer batchSize = 100;
-    private final static Integer allowedMsgs = 5;
-    private final static String noStackFoundMsg = "No stack found for this error";
+    private final static Integer batchSize = 10;
+    private final static Integer countOfAllowedMsgs = 5;
     private static final Logger logger = LogManager.getLogger(StackTrace.class);
     public DaoInterface logDao = new LogDao();
 
-    //returns logLineNumber of the document where the stack ends
-    //returns -1 if no stack is found.
+    //returns logText of the document where the 
     public ArrayList < String > findStack(Integer errorLogLineNumber, String fileName)
     throws IOException {
         ArrayList < String > stackLogLines = new ArrayList < String >();
         Integer countOfMsgsBeforeStack = 0;
-        Integer endOfStack = -1;
+        Integer lastCheckedLine = errorLogLineNumber;
         ArrayList < String > msgsBeforeStack = new ArrayList < String >();
         logger.info("Creating a new search request for error at ".concat(errorLogLineNumber.toString()));
         SearchRequest searchRequest = createSearchRequest(fileName, errorLogLineNumber);
         SearchHit[] rangeHits = logDao.getHitsFromIndex(searchRequest);
-        if (rangeHits.length == 0) {
-            stackLogLines.add(noStackFoundMsg);
-            return stackLogLines;
-        }
+
         for (SearchHit rangeHit : rangeHits) {
             Map < String ,Object > sourceMap = rangeHit.getSourceAsMap();
             String logText = (String) sourceMap.get(LogFields.LOG_TEXT);
             Integer logLineNumber = (Integer) sourceMap.get(LogFields.LOG_LINE_NUMBER);
+            if(logLineNumber != lastCheckedLine + 1){
+                return (stackLogLines.size() == 0 ? noStackFound() : stackLogLines);
+            }
+            lastCheckedLine = logLineNumber;
             if ( StackTraceFormat.matchesFormat(logText) ) {
-                if (endOfStack == -1) {
-                    logger.info("Storing messages before error for ".concat(errorLogLineNumber.toString()));
+                if (stackLogLines.size() == 0) {
+                    logger.info("Adding messages before error to stack for "
+                    .concat(errorLogLineNumber.toString()));
                     stackLogLines.addAll(msgsBeforeStack);
                 }
-                logger.info("Adding to stack list log line number ".concat(logLineNumber.toString()));
+                logger.info("Adding to stack list log line number "
+                .concat(logLineNumber.toString()));
                 stackLogLines.add(logText);
-                endOfStack = logLineNumber;
             } else {
-                if (endOfStack == -1 && countOfMsgsBeforeStack < allowedMsgs) {
+                if (stackLogLines.size() == 0 && countOfMsgsBeforeStack < countOfAllowedMsgs) {
                     logger.info("Adding ".concat(logLineNumber.toString())
                     .concat(" to error msgs"));
                     msgsBeforeStack.add(logText);
                     countOfMsgsBeforeStack++;
                 } else {
-                    if(stackLogLines.size() == 0) {
-                        stackLogLines.add("No stack found for this error");
-                    }
-                    return stackLogLines;
+                    return (stackLogLines.size() == 0 ? noStackFound() : stackLogLines);
                 }
             }
         }
-        stackLogLines.addAll(findStackExceedingBatchSize(endOfStack, fileName));
+        
+        if(stackLogLines.size() == 0) {
+            return noStackFound();
+        }
+        if(stackLogLines.size() == batchSize){
+            stackLogLines.addAll(findStackExceedingBatchSize(lastCheckedLine, fileName));
+        }
         return stackLogLines;
+    }
+
+    public ArrayList < String > noStackFound() {
+        return new ArrayList < String > () {
+            {
+                add("No stack found for this error");
+            }
+        };
     }
 
     private ArrayList < String > findStackExceedingBatchSize(Integer errorLogLineNumber,
     String fileName) throws IOException {
         ArrayList < String > stackLogLines = new ArrayList < String >();
         Integer lastCheckedLine = errorLogLineNumber;
-        logger.info("Exceeding batch size request");
         while (true) {
-            logger.info("Creating a new search request");
+            logger.info("Exceeding batch size request. Creating a new search request");
             SearchRequest searchRequest = createSearchRequest(fileName, lastCheckedLine);
             SearchHit[] rangeHits = logDao.getHitsFromIndex(searchRequest);
             if (rangeHits.length == 0) {
@@ -92,11 +102,14 @@ public class StackTrace {
                 Map < String ,Object > sourceMap = rangeHit.getSourceAsMap();
                 String logText = (String) sourceMap.get(LogFields.LOG_TEXT);
                 Integer logLineNumber = (Integer) sourceMap.get(LogFields.LOG_LINE_NUMBER);
+                if(logLineNumber != lastCheckedLine + 1){
+                    return stackLogLines;
+                }
+                lastCheckedLine = logLineNumber;
                 if ( StackTraceFormat.matchesFormat(logText) ) {
-                    logger.info("Call stack for: ".concat(errorLogLineNumber.toString())
-                    .concat(" : line = ").concat(logLineNumber.toString()));
+                    logger.info("Adding to stack list log line number "
+                    .concat(logLineNumber.toString()));
                     stackLogLines.add(logText);
-                    lastCheckedLine = logLineNumber;
                 } else {
                     return stackLogLines;
                 }

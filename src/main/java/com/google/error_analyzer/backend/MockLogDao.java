@@ -143,8 +143,7 @@ public class MockLogDao implements DaoInterface {
     }
 
     @Override
-    public SearchHit[] getHitsFromIndex(SearchRequest searchRequest)
-    throws IOException {
+    public SearchHit[] getHitsFromIndex(SearchRequest searchRequest) {
         return new SearchHit[0];
     }
 }
