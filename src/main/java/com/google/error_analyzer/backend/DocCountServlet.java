@@ -10,6 +10,7 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package com.google.error_analyzer.backend;
 
+import  com.google.error_analyzer.data.constant.FileConstants;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.lang.*;
@@ -41,7 +42,8 @@ public class DocCountServlet extends HttpServlet {
             count = 0l;
             logger.error(exception);
         } 
-        response.setContentType("application/json");
+        response.setContentType
+            (FileConstants.APPLICATION_JSON_CONTENT_TYPE);
         response.getWriter().println(convertToJson(count));
     }
 
