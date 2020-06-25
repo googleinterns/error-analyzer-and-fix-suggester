@@ -1,0 +1,29 @@
+{
+  "policy_template" : {
+    "order" : 0,
+    "index_patterns" : [
+      "*"
+    ],
+    "settings" : {
+      "index" : {
+        "lifecycle" : {
+          "name" : "ilm-log-management",
+          "rollover_alias" : ""
+        },
+        "number_of_shards" : "1",
+        "number_of_replicas" : "0"
+      }
+    },
+    "mappings" : {
+      "properties" : {
+        "logLineNumber" : {
+          "type" : "integer"
+        },
+        "logText" : {
+          "type" : "text"
+        }
+      }
+    },
+    "aliases" : { }
+  }
+}
