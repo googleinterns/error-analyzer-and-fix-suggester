@@ -66,9 +66,9 @@ public class StoreLogs {
         int logLineNumber = 1;
         String logLines[] = log.split(LINE_BREAK);
         for (String logLine: logLines) {
-            String logLineNumberString = Integer.toString(logLineNumber);
             String cleanedLogLine = storeLogHelper.cleanLogText(logLine);
             if (!(logLine.isEmpty())) {
+                String logLineNumberString = Integer.toString(logLineNumber);
                 Document document = new Document(
                     logLineNumberString, logLineNumber, cleanedLogLine);
                 documentList.add(document);
