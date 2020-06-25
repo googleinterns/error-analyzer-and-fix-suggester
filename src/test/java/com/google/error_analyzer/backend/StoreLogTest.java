@@ -19,16 +19,19 @@ import com.google.error_analyzer.backend.MockLogDao;
 import com.google.error_analyzer.backend.StoreLogs;
 import java.io.IOException;
 import java.util.ArrayList;
+import javax.servlet.http.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.junit.Test;
+import org.mockito.*;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.Mock;
+import org.mockito.Mockito.*;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import static org.junit.Assert.assertEquals;
@@ -41,10 +44,18 @@ storing logs to the database*/
 public final class StoreLogTest {
     private StoreLogs storeLogs;
 
+    @Mock
+    HttpServletRequest request;
+
+    @Mock
+    Cookie mockCookie;
+
     @Before
     public void setUp() {
         storeLogs = new StoreLogs();
         storeLogs.logDao = new MockLogDao();
+        request = Mockito.mock(HttpServletRequest.class);
+        mockCookie = Mockito.mock(Cookie.class);
     }
 
     //store the log into the database when index with name same as the
@@ -55,11 +66,16 @@ public final class StoreLogTest {
     throws IOException {
         String log = "error2";
         String fileName = "samplefile1";
-        String expected = storeLogs.FILE_STORED_RESPONSE;
-        String actual = storeLogs.checkAndStoreLog(fileName, log);
+        when(mockCookie.getValue()).thenReturn("abcd");
+        when(mockCookie.getName()).thenReturn("JSESSIONID");
+        when(request.getCookies()).thenReturn(new Cookie[] {mockCookie});
+        String expected = String.format(
+            storeLogs.FILE_STORED_TEMPLATE_RESPONSE, "samplefile1");
+        String actual = storeLogs.checkAndStoreLog(request, fileName, log);
         assertEquals(expected, actual);
-        expected = storeLogs.FILE_ALREADY_EXISTS_RESPONSE;
-        actual = storeLogs.checkAndStoreLog(fileName, log);
+        expected = String.format(
+            storeLogs.FILE_STORED_TEMPLATE_RESPONSE, "samplefile1(1)");
+        actual = storeLogs.checkAndStoreLog(request, fileName, log);
         assertEquals(expected, actual);
     }
 

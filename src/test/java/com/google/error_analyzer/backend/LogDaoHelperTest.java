@@ -15,6 +15,7 @@ import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.LogDaoHelper;
 import java.io.IOException;
 import java.util.*;
+import javax.servlet.http.*;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
 import org.elasticsearch.search.SearchHit;
@@ -22,9 +23,10 @@ import org.elasticsearch.search.SearchHits;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
-import org.junit.runners.JUnit4;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.junit.Test;
+import org.mockito.*;
 import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -35,7 +37,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 
 @RunWith(MockitoJUnitRunner.class)
 public final class LogDaoHelperTest {
@@ -48,6 +49,12 @@ public final class LogDaoHelperTest {
     @Mock 
     SearchHit hit2;
 
+    @Mock
+    HttpServletRequest request;
+
+    @Mock
+    Cookie mockCookie;
+
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
@@ -55,6 +62,8 @@ public final class LogDaoHelperTest {
     public void setUp() {
         logDaoHelper = new LogDaoHelper();
         searchHits=new SearchHit[]{hit1, hit2};
+        request = Mockito.mock(HttpServletRequest.class);
+        mockCookie = Mockito.mock(Cookie.class);
     }
 
     // hitId
@@ -104,6 +113,30 @@ public final class LogDaoHelperTest {
         String fileName = "file";
         String actual = logDaoHelper.getErrorIndexName(fileName);
         Assert.assertEquals("fileerror", actual);
+    }
+
+    //append sessionID to fileName to get indexName
+    @Test
+    public void getIndexNameTest() {
+        when(mockCookie.getValue()).thenReturn("abcd"); 
+        when(mockCookie.getName()).thenReturn("JSESSIONID");    
+        when(request.getCookies()).thenReturn(new Cookie[]{mockCookie});
+        String fileName = "file1";
+        String expected = "abcdfile1";
+        String actual = logDaoHelper.getIndexName(request,fileName);
+        Assert.assertEquals(expected, actual);
+    }
+
+    //remove sessionID from indexName to get fileName
+    @Test
+    public void getFileNameTest() {
+        when(mockCookie.getValue()).thenReturn("abcd"); 
+        when(mockCookie.getName()).thenReturn("JSESSIONID");    
+        when(request.getCookies()).thenReturn(new Cookie[]{mockCookie});
+        String indexName = "abcdfile1";
+        String expected = "file1";
+        String actual = logDaoHelper.getFileName(request,indexName);
+        Assert.assertEquals(expected, actual);
     }
 
     private void getHitId(){

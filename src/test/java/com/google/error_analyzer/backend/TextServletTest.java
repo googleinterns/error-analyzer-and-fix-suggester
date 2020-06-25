@@ -35,6 +35,9 @@ public class TextServletTest {
     @Mock
     HttpServletResponse response;
 
+    @Mock
+    Cookie mockCookie;
+
     @InjectMocks
     TextServlet servlet;
 
@@ -46,6 +49,7 @@ public class TextServletTest {
         servlet = new TextServlet();
         request = Mockito.mock(HttpServletRequest.class);
         response = Mockito.mock(HttpServletResponse.class);
+        mockCookie = Mockito.mock(Cookie.class);
         MockitoAnnotations.initMocks(this);
         servlet.storeLog.logDao = new MockLogDao();
 
@@ -65,14 +69,19 @@ public class TextServletTest {
             Mockito.mock(RequestDispatcher.class);
         when(request.getRequestDispatcher(PageConstants.LANDING_PAGE))
             .thenReturn(requestDispatcher);
+        when(mockCookie.getValue()).thenReturn("abcd");
+        when(mockCookie.getName()).thenReturn("JSESSIONID");
+        when(request.getCookies()).thenReturn(new Cookie[] {mockCookie});
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
-        String expected = servlet.storeLog.FILE_STORED_RESPONSE;
+        String expected = String.format(
+            servlet.storeLog.FILE_STORED_TEMPLATE_RESPONSE, "file1");
         assertTrue(actual.contains(expected));
         when(request.getParameter(LogFields.FILE_NAME)).thenReturn("file2");
         servlet.doPost(request, response);
         actual = stringWriter.toString();
-        expected = servlet.storeLog.FILE_STORED_RESPONSE;
+        expected = String.format(
+            servlet.storeLog.FILE_STORED_TEMPLATE_RESPONSE, "file2");;
         assertTrue(actual.contains(expected));
 
     }
@@ -92,13 +101,18 @@ public class TextServletTest {
             Mockito.mock(RequestDispatcher.class);
         when(request.getRequestDispatcher(PageConstants.LANDING_PAGE))
             .thenReturn(requestDispatcher);
+        when(mockCookie.getValue()).thenReturn("abcd");
+        when(mockCookie.getName()).thenReturn("JSESSIONID");
+        when(request.getCookies()).thenReturn(new Cookie[] {mockCookie});
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
-        String expected = servlet.storeLog.FILE_STORED_RESPONSE;
+        String expected = String.format(
+            servlet.storeLog.FILE_STORED_TEMPLATE_RESPONSE, "file1");
         assertTrue(actual.contains(expected));
         servlet.doPost(request, response);
         actual = stringWriter.toString();
-        expected = servlet.storeLog.FILE_ALREADY_EXISTS_RESPONSE;
+        expected = String.format(
+            servlet.storeLog.FILE_STORED_TEMPLATE_RESPONSE, "file1(1)");
         assertTrue(actual.contains(expected));
 
     }
