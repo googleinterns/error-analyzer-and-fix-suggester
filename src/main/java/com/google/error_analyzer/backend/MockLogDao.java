@@ -66,12 +66,13 @@ public class MockLogDao implements DaoInterface {
     //return a section of given index starting from start and of length equal
     //  to given size
     @Override 
-    public ImmutableList < SearchHit > getAll(String fileName, int start, int size) 
-    throws IOException {
+    public ImmutableList < SearchHit > getAll( String fileName,
+    int start, int size) throws IOException {
         if (start >= database.length) {
             return ImmutableList.< SearchHit >builder().build();
         }
-        Builder < SearchHit > resultBuilder = ImmutableList.< SearchHit >builder();
+        Builder < SearchHit > resultBuilder = 
+            ImmutableList.< SearchHit >builder();
         for (int idx = start; idx < start+size ; idx++) {
             resultBuilder.add(new SearchHit(idx));
         }

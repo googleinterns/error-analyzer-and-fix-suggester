@@ -82,7 +82,8 @@ public class LogDao implements DaoInterface {
             client.search(searchRequest, RequestOptions.DEFAULT);
         SearchHits hits = searchResponse.getHits();
         SearchHit[] searchHits = hits.getHits();
-        ImmutableList<SearchHit> searchResult = ImmutableList.copyOf(Arrays.asList(searchHits));
+        ImmutableList<SearchHit> searchResult = 
+            ImmutableList.copyOf(Arrays.asList(searchHits));
         return searchResult;
     }
 

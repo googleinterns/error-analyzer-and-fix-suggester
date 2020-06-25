@@ -68,7 +68,8 @@ public class PaginationServlet extends HttpServlet {
                     logDao.fullTextSearch(fileName, searchString, 
                     LogFields.LOG_TEXT, start, size);
                 hitFieldContent= 
-                    logDaoHelper.getHighLightedText(searchHits, LogFields.LOG_TEXT);
+                    logDaoHelper.getHighLightedText(searchHits,
+                         LogFields.LOG_TEXT);
             } else {
                 ImmutableList < SearchHit > searchHits =
                     logDao.getAll(fileName, start, size);
@@ -87,8 +88,8 @@ public class PaginationServlet extends HttpServlet {
     }
 
     // add errorfixes 
-    private String addErrorFixesAndBuildFinalResult(String fileType,String searchString,
-    ImmutableList < String > hitFieldContent) {
+    private String addErrorFixesAndBuildFinalResult(String fileType,
+    String searchString,ImmutableList < String > hitFieldContent) {
         ArrayList < String > data = new ArrayList();
         int startIdx = 0;
         if(fileType.equals(ERROR) && searchString.isEmpty()) { 
