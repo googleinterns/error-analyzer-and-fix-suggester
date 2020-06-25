@@ -24,7 +24,7 @@ public interface DaoInterface {
 
     //return a section of given index starting from start and length equal to 
     // given size
-    public SearchHit[] getAll (String fileName, int start, int size) 
+    public ImmutableList < SearchHit > getAll (String fileName, int start, int size) 
     throws IOException;
 
     //search an index for errors using regex and keywords and store back in db

@@ -8,9 +8,12 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package com.google.error_analyzer.backend;
+package com.google.error_analyzer.servlets;
 
 import com.google.common.collect.ImmutableList;
+import com.google.error_analyzer.backend.LogDao;
+import com.google.error_analyzer.backend.LogDaoHelper;
+import com.google.error_analyzer.data.constant.FileConstants;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.gson.Gson;
 import java.io.IOException;
@@ -29,9 +32,6 @@ import org.elasticsearch.search.SearchHits;
 @WebServlet("/pagination")
 public class PaginationServlet extends HttpServlet {
 
-    //  LogField contains the name of index field which cotains the data 
-    // we want to display   
-    private static final String LOG_FIELD = LogFields.LOG_TEXT;
     private static final String ERROR = "errors";
     private static final Logger logger =
         LogManager.getLogger(PaginationServlet.class);
@@ -48,7 +48,7 @@ public class PaginationServlet extends HttpServlet {
         String searchString = request.getParameter("searchString");
         if(fileType.equals(ERROR))
             fileName = logDaoHelper.getErrorIndexName(fileName);
-        response.setContentType("application/json");
+        response.setContentType(FileConstants.APPLICATION_JSON_CONTENT_TYPE);
         if (fileName.isEmpty() || !logDao.fileExists(fileName)) {
             response.getWriter().println(emptyObject());
             return;
@@ -58,58 +58,54 @@ public class PaginationServlet extends HttpServlet {
         response.getWriter().println(json);
     }
 
-    private String fetchPageFromDatabase(int start, int size, String fileName,
-        String fileType, String searchString) {
+    private String fetchPageFromDatabase(String fileName,String fileType,
+    String searchString, int start, int size) {
         ImmutableList < String > hitFieldContent = ImmutableList.
-            <String>builder().build();
-        ImmutableList < String > hitIds = ImmutableList.
             <String>builder().build();
         try {
             if(!searchString.isEmpty()) {
                 ImmutableList < SearchHit > searchHits = 
-                    logDao.fullTextSearch(fileName, searchString, dataField, start, size);
+                    logDao.fullTextSearch(fileName, searchString, 
+                    LogFields.LOG_TEXT, start, size);
                 hitFieldContent= 
-                    logDaoHelper.getHighLightedText(searchHits, dataField);
-                hitIds=
-                    logDaoHelper.hitId(searchHits);
+                    logDaoHelper.getHighLightedText(searchHits, LogFields.LOG_TEXT);
             } else {
                 ImmutableList < SearchHit > searchHits =
                     logDao.getAll(fileName, start, size);
-                hitIds =
-                    logDaoHelper.hitId(searchHits);
                 hitFieldContent =
-                    logDaoHelper.hitFieldContent(searchHits, dataField);
-                if (hitIds == null) {
-                    return convertToJson(new ArrayList());
-                }
+                    logDaoHelper.hitFieldContent(searchHits, LogFields.LOG_TEXT);
             }
-            return addErrorFixesAndHighlights(fileType, hitIds, hitFieldContent, searchString);
+            if (hitFieldContent == null) {
+                    return emptyObject();
+            }
+            return addErrorFixesAndBuildFinalResult(fileType, searchString,
+            hitFieldContent);
         } catch (IOException exception) {
             logger.error(exception);
         }
-        return convertToJson(new ArrayList());
+        return emptyObject();
     }
 
-    // add errorfixes to error file and text highlights 
-    private String addErrorFixesAndHighlights(String fileType,
-        ImmutableList < String > hitIds,
-        ImmutableList < String > hitFieldContent, String searchString) {
+    // add errorfixes 
+    private String addErrorFixesAndBuildFinalResult(String fileType,String searchString,
+    ImmutableList < String > hitFieldContent) {
         ArrayList < String > data = new ArrayList();
         int startIdx = 0;
-        if(fileType.equals(ERROR) && searchString.isEmpty())
-            startIdx = hitIds.size() -1 ;
-        for (int idx = startIdx; idx < hitIds.size() && idx >= 0;) {
-            String id = hitIds.get(idx);
+        if(fileType.equals(ERROR) && searchString.isEmpty()) { 
+            startIdx = hitFieldContent.size() -1 ;
+        }
+        for (int idx = startIdx; idx < hitFieldContent.size() && idx >= 0;) {
             String resultString = hitFieldContent.get(idx);
-            String fix = new String();
-
             if (fileType.equals(ERROR)) {
-                fix = errorFix.findFixes(resultString);
+                // fix at this moment is a empty string but will be replaced
+                // by actual fix while integrating this branch with fix-suggester 
+                String fix= new String();
+                resultString += " " + fix;
                 idx--;
             } else {
                 idx++;
             } 
-            resultString += " " + fix;
+            
             data.add(resultString);
         }
         return convertToJson(data);
@@ -124,8 +120,7 @@ public class PaginationServlet extends HttpServlet {
 
     // return empty json
     private String emptyObject() {
-        String json = convertToJson(new ArrayList());
-        return json;
+        return  convertToJson(new ArrayList());
     }
 
 }

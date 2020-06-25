@@ -54,6 +54,9 @@ public class LogDao implements DaoInterface {
     @Override 
     public ImmutableList < SearchHit > fullTextSearch(String fileName, 
     String searchString, String field, int start, int size)throws IOException {
+        // we check for matching keywords in a specific windowsize in each 
+        // iteration and do this until the the end of index .this way we 
+        // have traverse whole index 
         SearchRequest searchRequest = new SearchRequest(fileName);
         SimpleQueryStringBuilder simpleQueryBuilder = 
             QueryBuilders.simpleQueryStringQuery(searchString);
@@ -72,7 +75,7 @@ public class LogDao implements DaoInterface {
     //return a section of given index starting from start and of 
     // length equal to given size
     @Override 
-    public SearchHit[] getAll(String fileName, int start, int size) 
+    public ImmutableList<SearchHit> getAll(String fileName, int start, int size) 
     throws IOException {
         SearchRequest searchRequest = new SearchRequest(fileName);
         searchSourceBuilder.query(QueryBuilders.matchAllQuery())
@@ -82,7 +85,8 @@ public class LogDao implements DaoInterface {
             client.search(searchRequest, RequestOptions.DEFAULT);
         SearchHits hits = searchResponse.getHits();
         SearchHit[] searchHits = hits.getHits();
-        return searchHits;
+        ImmutableList<SearchHit> searchResult = ImmutableList.copyOf(Arrays.asList(searchHits));
+        return searchResult;
     }
 
     //search an index for errors using regex and keywords and store back in db
