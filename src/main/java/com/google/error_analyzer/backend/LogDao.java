@@ -54,9 +54,6 @@ public class LogDao implements DaoInterface {
     @Override 
     public ImmutableList < SearchHit > fullTextSearch(String fileName, 
     String searchString, String field, int start, int size)throws IOException {
-        // we check for matching keywords in a specific windowsize in each 
-        // iteration and do this until the the end of index .this way we 
-        // have traverse whole index 
         SearchRequest searchRequest = new SearchRequest(fileName);
         SimpleQueryStringBuilder simpleQueryBuilder = 
             QueryBuilders.simpleQueryStringQuery(searchString);
