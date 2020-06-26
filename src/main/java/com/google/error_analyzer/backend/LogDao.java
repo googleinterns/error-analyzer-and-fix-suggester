@@ -98,8 +98,8 @@ public class LogDao implements DaoInterface {
         return countResponse.getCount();
     }
 
-    //search db using regex and keywords and store back in db searchHits
-    //  sorted by logLineNumber
+    //search an index for errors using regex and keywords and store back in db
+    //Returns name of the new index 
     @Override 
     public String findAndStoreErrors(String fileName) throws IOException {
         SearchHits hits = findErrors(fileName);

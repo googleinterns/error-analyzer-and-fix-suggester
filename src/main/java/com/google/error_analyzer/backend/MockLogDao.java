@@ -78,6 +78,11 @@ public class MockLogDao implements DaoInterface {
         }
         return resultBuilder.build();
     }
+  
+    // returns no of documents in an index
+    public long getDocCount (String index) throws IOException {
+        return 0l;
+    }
 
     // returns no of documents in an index
     public long getDocCount (String index) throws IOException {
