@@ -45,7 +45,8 @@
 				<input type="text" id="searchBar" 
 				class="shadow inputDimension font"  name="searchBar" 
 				placeholder="Search">
-				<button onclick="search(); addclass();" class="themeButton">
+				<button onclick="search(); addclass();" 
+				class="themeButton">
 				    <i class="fas fa-search"></i>
 				</button>
             		</span>
@@ -57,10 +58,10 @@
 				<input type="text"  id="fileName" 
 				class="shadow inputDimension font" 
 				name="fileName" placeholder="File Name">
-				<!-- if user is changing file then show results starting 
-				from 1st page -->
-				<button onclick="drawChart(); changePage(1); addclass();" 
-				class="themeButton">submit</button>
+				<!-- if user is changing file then show results 
+				starting from 1st page -->
+				<button onclick="drawChart(); changePage(1); 
+				addclass();" class="themeButton">submit</button>
             		</span>
 
 		</div>
@@ -89,9 +90,10 @@
 			</a>
 		</li>
 		<li class="nav-item" role="presentation">
-			<a class="nav-link" id="errors" data-toggle="tab" href="#slide1" 
-			    role="tab" aria-controls="profile"aria-selected="false" 
-			    onclick="changePage(1); addclass();">
+			<a class="nav-link" id="errors" data-toggle="tab" 
+			   href="#slide1" role="tab" aria-controls="profile"
+			   aria-selected="false" 
+			   onclick="changePage(1); addclass();">
 				Errors
 			</a>
 		</li>
@@ -122,8 +124,9 @@
 				
                 <!-- navigate between pages -->
 				<a onclick="prevPage()" class="carousel-control-prev 
-				backgroundColor" id="btnPrev" href="#carouselExampleControls" 
-				role="button" data-slide="prev">
+				backgroundColor" id="btnPrev" 
+				href="#carouselExampleControls" role="button" 
+				data-slide="prev">
 					<span class="carousel-control-prev-icon"
                         		aria-hidden="true"></span>
 					<span class="sr-only" >
@@ -131,8 +134,9 @@
                     			</span>
 				</a>
 				<a onclick="nextPage()" class="carousel-control-next 
-				backgroundColor" id="btnNext" href="#carouselExampleControls" 
-				role="button" data-slide="next">
+				backgroundColor" id="btnNext" 
+				href="#carouselExampleControls" role="button"
+				data-slide="next">
 					<span class="carousel-control-next-icon"
                     			aria-hidden="true"></span>
 					<span class="sr-only">
@@ -149,7 +153,8 @@
 		<div id="navigation">
 			<div class="btn-group dropup">
 				<button type="button" class="btn btn-light dropdown-toggle"
-                		data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                		data-toggle="dropdown" aria-haspopup="true" 
+				aria-expanded="false">
                     			<i class="fas fa-trash"></i>
                 		</button>
 				<div class="dropdown-menu">
