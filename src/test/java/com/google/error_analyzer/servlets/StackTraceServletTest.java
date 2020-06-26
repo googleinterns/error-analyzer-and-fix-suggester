@@ -2,11 +2,13 @@ package com.google.error_analyzer;
 
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.servlets.StackTraceServlet;
+import com.google.error_analyzer.backend.MockLogDao;
 import java.io.*;
 import java.util.*;
 import javax.servlet.*;
 import javax.servlet.http.*;
 import org.apache.http.HttpHost;
+import org.elasticsearch.action.search.SearchRequest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -20,21 +22,19 @@ import org.mockito.Mockito.*;
 import org.mockito.runners.MockitoJUnitRunner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+// import static org.mockito.Mockito.thenThrow;
 
-//unit tests for TextServlet
 public class StackTraceServletTest {
-
+    private StackTraceServlet servlet;
     @Mock
     HttpServletRequest request;
 
     @Mock
     HttpServletResponse response;
-
-    @InjectMocks
-    StackTraceServlet servlet;
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -44,14 +44,10 @@ public class StackTraceServletTest {
         servlet = new StackTraceServlet();
         request = Mockito.mock(HttpServletRequest.class);
         response = Mockito.mock(HttpServletResponse.class);
-        MockitoAnnotations.initMocks(this);
         servlet.stackTrace.logDao = new MockLogDao();
 
     }
 
-    //store the log into the database when index with name same as the
-    //file name does not exist in the db and then trying to store another 
-    //file with different file name
     @Test
     public void servletTest() throws IOException {
         when(request.getParameter(LogFields.FILE_NAME)).thenReturn("file1");
@@ -59,45 +55,36 @@ public class StackTraceServletTest {
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);
         when(response.getWriter()).thenReturn(writer);
-        RequestDispatcher requestDispatcher =
-            Mockito.mock(RequestDispatcher.class);
-        when(request.getRequestDispatcher(PageConstants.LANDING_PAGE))
-            .thenReturn(requestDispatcher);
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
-        String expected = servlet.storeLog.FILE_STORED_RESPONSE;
-        assertTrue(actual.contains(expected));
-        when(request.getParameter(LogFields.FILE_NAME)).thenReturn("file2");
-        servlet.doPost(request, response);
-        actual = stringWriter.toString();
-        expected = servlet.storeLog.FILE_STORED_RESPONSE;
-        assertTrue(actual.contains(expected));
-
+        String expected = "[\"No stack found for this error\"]\n";
+        assertEquals(expected, actual);
     }
 
-    //store the log into the database when index with name same as the
-    //file name does not exist in the database and then trying to
-    //store another file with same fileName
     @Test
-    public void servletTestWhenFileAlreadyExists()
-    throws ServletException, IOException {
-        when(request.getParameter(LogFields.FILE_NAME)).thenReturn("file1");
-        when(request.getParameter(LogFields.LOG)).thenReturn("error");
+    public void numberParseError() throws IOException {
+        when(request.getParameter(LogFields.LOG_LINE_NUMBER)).thenReturn("a");
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);
         when(response.getWriter()).thenReturn(writer);
-        RequestDispatcher requestDispatcher =
-            Mockito.mock(RequestDispatcher.class);
-        when(request.getRequestDispatcher(PageConstants.LANDING_PAGE))
-            .thenReturn(requestDispatcher);
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
-        String expected = servlet.storeLog.FILE_STORED_RESPONSE;
-        assertTrue(actual.contains(expected));
-        servlet.doPost(request, response);
-        actual = stringWriter.toString();
-        expected = servlet.storeLog.FILE_ALREADY_EXISTS_RESPONSE;
-        assertTrue(actual.contains(expected));
+        String expected = "Could not parse logLineNumber java.lang.NumberFormatException: For input string: \"a\"\n";
+        assertEquals(expected, actual);
+    }
 
+    @Test
+    public void fileNameisNull() throws IOException {
+        when(request.getParameter(LogFields.LOG_LINE_NUMBER)).thenReturn("1");
+        when(request.getParameter(LogFields.FILE_NAME)).thenReturn(null);
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter writer = new PrintWriter(stringWriter);
+        servlet.stackTrace.logDao = Mockito.mock(MockLogDao.class);
+        when(response.getWriter()).thenReturn(writer);
+        servlet.doPost(request, response);
+        String actual = stringWriter.toString();
+        System.out.println(actual);
+        String expected = "Could not complete requestjava.lang.NullPointerException: index must not be null\n";
+        assertEquals(expected, actual);
     }
 }

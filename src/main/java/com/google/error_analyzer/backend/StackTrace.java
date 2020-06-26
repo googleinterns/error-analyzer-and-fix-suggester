@@ -25,22 +25,28 @@ import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-
+/**
+* Find the stack trace following an error. The algorithm fetches documents from
+* the index and see if they fit they stacktrace format.
+*/
 public class StackTrace {
-    private Integer BATCH_SIZE = 10;
+    private Integer BATCH_SIZE = 100;
     private Integer ALLOWED_MESSAGES = 5;
     private static final Logger logger = LogManager.getLogger(StackTrace.class);
     public DaoInterface logDao = new LogDao();
 
-    //returns logText of the document where the 
-    public ImmutableList < String > findStack(Integer errorLogLineNumber, String fileName)
-    throws IOException {
+    // Returns logText of the documents which form the stack trace
+    // following an error
+    public ImmutableList < String > findStack(Integer errorLogLineNumber,
+    String fileName) throws IOException {
         Builder < String > stackLogLines = ImmutableList.< String > builder();
         Integer countOfMsgsBeforeStack = 0;
         Integer lastCheckedLine = errorLogLineNumber;
         ArrayList < String > msgsBeforeStack = new ArrayList < String >();
-        logger.info("Creating a new search request for error at ".concat(errorLogLineNumber.toString()));
-        SearchRequest searchRequest = createSearchRequest(fileName, errorLogLineNumber);
+        logger.info("Creating a new search request for error at "
+        .concat(errorLogLineNumber.toString()));
+        SearchRequest searchRequest = createSearchRequest(fileName,
+        errorLogLineNumber);
         SearchHit[] rangeHits = logDao.getHitsFromIndex(searchRequest);
         Integer storedInStack = 0; //stackLogLines.size()
 
@@ -48,12 +54,13 @@ public class StackTrace {
             Map < String ,Object > sourceMap = rangeHit.getSourceAsMap();
             String logText = (String) sourceMap.get(LogFields.LOG_TEXT);
             Integer logLineNumber = (Integer) sourceMap.get(LogFields.LOG_LINE_NUMBER);
-            if(logLineNumber != lastCheckedLine + 1){
-                return (storedInStack == 0 ? noStackFound() : stackLogLines.build());
+            if (logLineNumber != lastCheckedLine + 1) {
+                break;
             }
             lastCheckedLine = logLineNumber;
             if ( StackTraceFormat.matchesFormat(logText) ) {
                 if (storedInStack == 0) {
+                    //add error msgs before stack starts
                     storedInStack += msgsBeforeStack.size();
                     logger.info("Adding messages before error to stack for "
                     .concat(errorLogLineNumber.toString()));
@@ -65,21 +72,25 @@ public class StackTrace {
                 stackLogLines.add(logText);
             } else {
                 if (storedInStack == 0 && countOfMsgsBeforeStack < ALLOWED_MESSAGES) {
+                    //temporary storage of log lines till stack trace is found
                     logger.info("Adding ".concat(logLineNumber.toString())
                     .concat(" to error msgs"));
                     msgsBeforeStack.add(logText);
                     countOfMsgsBeforeStack++;
                 } else {
-                    return (storedInStack == 0 ? noStackFound() : stackLogLines.build());
+                    //if no stack is  found or end of stack is found
+                    break;
                 }
             }
         }
-        
-        if(storedInStack == 0) {
+
+        if (storedInStack == 0) {
             return noStackFound();
         }
-        if(storedInStack == rangeHits.length){
-            stackLogLines.addAll(findStackExceedingBATCH_SIZE(lastCheckedLine, fileName));
+        //reaches the end of requested documents 
+        if (storedInStack == rangeHits.length) {
+            stackLogLines.addAll(
+            findStackExceedingBatchSize(lastCheckedLine, fileName));
         }
         return stackLogLines.build();
     }
@@ -89,23 +100,25 @@ public class StackTrace {
             .add("No stack found for this error").build(); 
     }
 
-    private ArrayList < String > findStackExceedingBATCH_SIZE(Integer errorLogLineNumber,
+    private ImmutableList < String > findStackExceedingBatchSize(Integer errorLogLineNumber,
     String fileName) throws IOException {
-        ArrayList < String > stackLogLines = new ArrayList < String >();
+        //Stack exceeded the batch request size
+        Builder < String > stackLogLines = ImmutableList.< String > builder();
         Integer lastCheckedLine = errorLogLineNumber;
         while (true) {
             logger.info("Exceeding batch size request. Creating a new search request");
             SearchRequest searchRequest = createSearchRequest(fileName, lastCheckedLine);
             SearchHit[] rangeHits = logDao.getHitsFromIndex(searchRequest);
             if (rangeHits.length == 0) {
-                return stackLogLines;
+                return stackLogLines.build();
             }
             for (SearchHit rangeHit : rangeHits) {
                 Map < String ,Object > sourceMap = rangeHit.getSourceAsMap();
                 String logText = (String) sourceMap.get(LogFields.LOG_TEXT);
-                Integer logLineNumber = (Integer) sourceMap.get(LogFields.LOG_LINE_NUMBER);
-                if(logLineNumber != lastCheckedLine + 1){
-                    return stackLogLines;
+                Integer logLineNumber = (Integer) sourceMap
+                .get(LogFields.LOG_LINE_NUMBER);
+                if (logLineNumber != lastCheckedLine + 1){
+                    return stackLogLines.build();
                 }
                 lastCheckedLine = logLineNumber;
                 if ( StackTraceFormat.matchesFormat(logText) ) {
@@ -113,16 +126,17 @@ public class StackTrace {
                     .concat(logLineNumber.toString()));
                     stackLogLines.add(logText);
                 } else {
-                    return stackLogLines;
+                    return stackLogLines.build();
                 }
             }
         }
     }
 
-    //create request for #BATCH_SIZE documents after found error
+    //create request for BATCH_SIZE documents after found error
     private SearchRequest createSearchRequest(String fileName, 
     Integer errorLogLineNumber) {
-        RangeQueryBuilder rangeQuery = buildRangeQuery(errorLogLineNumber, BATCH_SIZE);
+        RangeQueryBuilder rangeQuery = 
+        buildRangeQuery(errorLogLineNumber, BATCH_SIZE);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
             .query(rangeQuery)
             .sort(LogFields.LOG_LINE_NUMBER)
@@ -133,10 +147,11 @@ public class StackTrace {
     }
 
     private  RangeQueryBuilder buildRangeQuery(Integer logLineNumber, 
-    Integer BATCH_SIZE) {
-        RangeQueryBuilder rangeQuery = new RangeQueryBuilder(LogFields.LOG_LINE_NUMBER)
+    Integer batchSize) {
+        RangeQueryBuilder rangeQuery = 
+        new RangeQueryBuilder(LogFields.LOG_LINE_NUMBER)
             .gt(logLineNumber)
-            .lte(logLineNumber + BATCH_SIZE);
+            .lte(logLineNumber + batchSize);
         return rangeQuery;
     }
 }

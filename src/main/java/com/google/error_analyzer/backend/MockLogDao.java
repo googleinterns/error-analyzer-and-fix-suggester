@@ -142,6 +142,7 @@ public class MockLogDao implements DaoInterface {
         return result;
     }
 
+    //fetch documents from index according to searchRequest
     @Override
     public SearchHit[] getHitsFromIndex(SearchRequest searchRequest) {
         return new SearchHit[0];

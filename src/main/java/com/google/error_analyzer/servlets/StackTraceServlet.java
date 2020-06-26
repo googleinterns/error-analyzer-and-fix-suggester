@@ -29,39 +29,34 @@ import org.apache.http.HttpHost;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+/** Servlet to request for stack trace following an error 
+*/
 @WebServlet("/stackTrace")
 public class StackTraceServlet extends HttpServlet {
     private static final Logger logger = LogManager.getLogger(StackTraceServlet.class);
     public StackTrace stackTrace = new StackTrace();
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType("text/html");
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        response.setContentType("application/json");
         try {
             Integer errorLineNumber = Integer.parseInt(request.getParameter(LogFields.LOG_LINE_NUMBER));
             String indexName = request.getParameter(LogFields.FILE_NAME);
-            ImmutableList<String> stackList = stackTrace.findStack(errorLineNumber,indexName);
-            response.getWriter().println("<span>");
-            // response.getWriter().println("");
-            for (String logLine : stackList) {
-                response.getWriter().println(createListItem(logLine));
-            }
-            response.getWriter().println("</span>");
+            ImmutableList < String > stackList = stackTrace.findStack(errorLineNumber,indexName);
+            Gson gson = new Gson();
+            String json = gson.toJson(stackList);
+            response.getWriter().println(json);
         } catch (NumberFormatException numberFormatException) {
             String errorMsg = "Could not parse logLineNumber ".concat(numberFormatException.toString());
             logger.error(errorMsg);
-            response.getWriter().println("<h6>".concat(errorMsg).concat("</h6>"));
+            response.getWriter().println(errorMsg);
         } catch (IOException ioException) {
-            String errorMsg = "Could not connect to database ".concat(ioException.toString());
+            String errorMsg = "Could not connect to database";
             logger.error(errorMsg);
-            response.getWriter().println("<h6>".concat(errorMsg).concat("</h6>"));
-        } catch (Exception e) {
-            String errorMsg = "Runtime exception".concat(e.toString());
+            response.getWriter().println(errorMsg);
+        } catch (NullPointerException nullPointerException) {
+            String errorMsg = "Could not complete request".concat(nullPointerException.toString());
             logger.error(errorMsg);
-            response.getWriter().println("<h6>".concat(errorMsg).concat("</h6>"));
+            response.getWriter().println(errorMsg);
         }
-    }
-
-    private String createListItem(String listItem) {
-        return listItem.concat("<br>");
     }
 }
