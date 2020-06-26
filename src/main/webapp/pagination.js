@@ -10,6 +10,7 @@ let noOfRecordsOnLastPage = recordsPerPage;
 let lastPage = Number.MAX_VALUE;
 let data = new Array();
 
+
 // decrement by 1 on pressing previous button
 function prevPage() {
     currentPage--;
@@ -61,7 +62,7 @@ async function changePage(page) {
             fileNotFound();
             return;
         }
-        addToData(fetchedData, fetchedPage);    
+        addToData(fetchedData, fetchedPage, fileType, fileName);    
     }
     if(currentPage == 1 ) {
         display();
@@ -127,12 +128,35 @@ function fileNotFound() {
 }
 
 // add returned records to data
-function addToData(fetchedData, page) {
+function addToData(fetchedData, page, fileType, fileName) {
     let idx = recordsPerPage * ((page - 1) % noOfPages);
     for (let i = 0; i < fetchedData.length; i++) {
-        data[idx] = fetchedData[i].logText;
+        data[idx] = prepareResultantDomElement(fetchedData[i], fileType, fileName);
         idx++;
     }
+}
+
+// prepare resultant DOM element for resultPage
+function prepareResultantDomElement(document, fileType, fileName) {
+    const liElement = document.createElement('li');
+    const logLineNo=document.createElement('span');
+    logLineNo.innerText = document.logLineNo;
+    const logText=document.createElement('span');
+    logText.innerText = document.logText;
+
+    liElement.appendChild(logLineNo);
+    liElement.appendChild(logText);
+
+    if(fileType == ERRORS){
+        const stackTraceButton=document.createElement('button');
+        stackTraceButton.innerText="Stack Trace";
+        stackTraceButton.addEventListener('click', () => {
+            callStackTraceServlet(document.logLineNo, fileName);
+            stackTraceContainer.style.visibility = "visible";
+        });
+    }
+    
+    return liElement;
 }
 
 // return start and end indices for the section of data to be shown 
@@ -233,4 +257,8 @@ function search() {
         return;
     }
     changePage(1);
+}
+
+function callStackTraceServlet(logLineNo, fileName) {
+    
 }
