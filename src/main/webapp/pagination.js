@@ -142,18 +142,19 @@ function prepareResultantDomElement(logError, fileType, fileName) {
     const logLineNo = document.createElement('span');
     logLineNo.innerText = logError.logLineNumber + "  ";
     const logText = document.createElement('span');
-    logText.innerText = logError.logText;
+    logText.innerHTML = logError.logText;
     liElement.appendChild(logLineNo);
     liElement.appendChild(logText);
     
     if(fileType == ERRORS){
         const stackTraceButton = document.createElement('button');
         stackTraceButton.innerText="Stack Trace";
+        stackTraceButton.className = "stackTraceButton";
         stackTraceButton.addEventListener('click', () => {
             let stackTraceContainer = document.getElementById("stackTraceContainer");
             stackTraceContainer.className = "show";
-            let stackTraceContainer = document.getElementById("hideBtn");
-            hideBtn.className = "show";
+            let crossBtn = document.getElementById("crossBtn");
+            crossBtn.className = "show";
             stackTraceContainer.innerHTML = "";
             stackTraceContainer.innerHTML += logError.logText;
             callStackTraceServlet(logError.logLineNumber, fileName);
@@ -264,18 +265,25 @@ function search() {
 }
 
 async function callStackTraceServlet(logLineNo, fileName) {
-    // let stackTraceContainer = document.getElementById("stackTraceContainer");
-    // const params = new URLSearchParams();
-    // params.append('logLineNumber', logLineNo);
-    // params.append('fileName', fileName);
-    // const response = await fetch('/stackTrace', {
-    //     method: 'POST',
-    //     body: params
-    // });
-    // const stackTrace = await response.json();
-    // for(let i=0; i<stackTrace.length; i++) {
-    //     let stackTraceElement = document.createElement('li');
-    //     stackTraceElement.innerText = stackTraceContainer[i];
-    //     stackTraceContainer.appendChild(stackTraceElement);
-    // }
+    let stackTraceContainer = document.getElementById("stackTraceContainer");
+    const params = new URLSearchParams();
+    params.append('logLineNumber', logLineNo);
+    params.append('fileName', fileName);
+    const response = await fetch('/stackTrace', {
+        method: 'POST',
+        body: params
+    });
+    const stackTrace = await response.json();
+    for(let i=0; i<stackTrace.length; i++) {
+        let stackTraceElement = document.createElement('li');
+        stackTraceElement.innerText = stackTraceContainer[i];
+        stackTraceContainer.appendChild(stackTraceElement);
+    }
+}
+
+function addHideClass() {
+    let stackTraceContainer = document.getElementById("stackTraceContainer");
+    stackTraceContainer.className = "hide";
+    let crossBtn = document.getElementById("crossBtn");
+    crossBtn.className = "hide";
 }

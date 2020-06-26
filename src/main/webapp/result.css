@@ -28,7 +28,7 @@
 }
 
 /*common classes */
-.text-highlight {
+b{
     color: #2857a4;
     font-weight: 600;
 }
@@ -44,6 +44,9 @@
 .backgroundColor {
     background-color: rgb(0, 153, 153);
     color:white;
+}
+.colorRed {
+    color: red;
 }
 
 /* footer */
@@ -110,8 +113,17 @@ footer a {
     overflow: scroll;
 }
 .hide{
-  display:none;
+  display: none;
 }
 .show{
-  display:block;
+  display: block;
+}
+
+/* stackTraceButton */
+.stackTraceButton {
+    background-color: #2857a4;
+    color: white;
+    border-radius: 2rem;
+    min-width: 6vw;
+    padding: 2px;
 }
