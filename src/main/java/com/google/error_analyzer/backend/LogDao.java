@@ -46,7 +46,7 @@ import org.elasticsearch.search.SearchHits;
 public class LogDao implements DaoInterface {
 
     private static final RestHighLevelClient client = new RestHighLevelClient
-        (RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
+        (RestClient.builder(new HttpHost("localhost", 9200, "http")));
     private static final SearchSourceBuilder searchSourceBuilder 
         = new SearchSourceBuilder();
     private static final int windowSize = 10;
@@ -146,7 +146,8 @@ public class LogDao implements DaoInterface {
         SearchResponse searchResponse = client
             .search(searchRequest, RequestOptions.DEFAULT);
         return searchResponse.getHits().getHits();
-
+    }
+    
     //Stores the documents into the database by performing multiple indexing operations
     //in a single API call
     @Override

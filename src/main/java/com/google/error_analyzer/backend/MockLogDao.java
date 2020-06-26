@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.lang.*;
 import java.util.*;
 import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -159,6 +158,4 @@ public class MockLogDao implements DaoInterface {
         }
         logDatabase.add(index);
     }
-    
->>>>>>> 8be726008d8d061318c546d74cffaf41e118e316
 }

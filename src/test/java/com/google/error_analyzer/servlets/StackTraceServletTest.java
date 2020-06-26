@@ -45,7 +45,6 @@ public class StackTraceServletTest {
         request = Mockito.mock(HttpServletRequest.class);
         response = Mockito.mock(HttpServletResponse.class);
         servlet.stackTrace.logDao = new MockLogDao();
-
     }
 
     @Test
