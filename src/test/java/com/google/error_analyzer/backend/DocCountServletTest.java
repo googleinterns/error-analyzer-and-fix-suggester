@@ -10,8 +10,9 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package com.google.error_analyzer;
 
-import com.google.error_analyzer.servlets.DocCountServlet;
 import com.google.error_analyzer.backend.LogDao;
+import com.google.error_analyzer.data.constant.LogFields;
+import com.google.error_analyzer.servlets.DocCountServlet;
 import java.io.*;
 import java.util.*;
 import javax.servlet.http.HttpServletRequest;
@@ -65,7 +66,7 @@ public final class DocCountServletTest {
     // test dopost
     @Test
     public void doPost_returnCount() throws Exception {
-        when(request.getParameter("index")).thenReturn(fileName);
+        when(request.getParameter(LogFields.INDEX)).thenReturn(fileName);
         when(logDao.getDocCount(any(String.class))).thenReturn((long)5);
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);

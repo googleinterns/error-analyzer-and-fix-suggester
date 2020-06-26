@@ -13,6 +13,7 @@ package com.google.error_analyzer.servlets;
 import  com.google.error_analyzer.backend.LogDao;
 import  com.google.error_analyzer.backend.LogDaoHelper;
 import  com.google.error_analyzer.data.constant.FileConstants;
+import com.google.error_analyzer.data.constant.LogFields;
 import com.google.gson.Gson;
 import java.io.IOException;
 import java.lang.*;
@@ -36,7 +37,7 @@ public class DocCountServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, 
         HttpServletResponse response) throws IOException {
-        String index = request.getParameter("index");
+        String index = request.getParameter(LogFields.INDEX);
         long count = 0l;
         try {
             count = logDao.getDocCount(index);
