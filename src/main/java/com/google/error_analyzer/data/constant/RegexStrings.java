@@ -25,6 +25,7 @@ public class RegexStrings{
     private static final ArrayList < String > REGEX_LIST = new ArrayList < String > () {
         {
             add(".*exception");
+            add(".*error");
         }
     };
 

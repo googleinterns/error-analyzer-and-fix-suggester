@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.data.constant.Keywords;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.constant.RegexStrings;
+import com.google.error_analyzer.data.constant.StackTraceFormat;
 import com.google.error_analyzer.data.Document;
 import java.util.*;
 import org.elasticsearch.action.search.SearchRequest;
@@ -36,7 +37,7 @@ import org.elasticsearch.search.SearchHits;
 public class BooleanQuery {
     private final static Integer requestSize = 10000; //limited by ElasticSearch settings
     private final static Integer minimumMatch = 1;
-
+    private final StackTraceFormat stackTraceFormat = new StackTraceFormat();
     //create searchRequest to seach index file for errors
     public SearchRequest createSearchRequest(String fileName) {
         String matchQueryString = Keywords.getQueryString();
@@ -51,6 +52,18 @@ public class BooleanQuery {
         return searchRequest;
     }
 
+    public ImmutableList < Document > filterBoolQuesrySearchHits (SearchHits hits) {
+        Builder < Document > documentList = ImmutableList.< Document > builder();
+        for (SearchHit hit : hits) {
+            String logText = (String) hit.getSourceAsMap().get(LogFields.LOG_TEXT);
+            if (stackTraceFormat.matchesFormat(logText)) {
+                Document document = new Document(hit.getId(), hit.getSourceAsString());
+                documentList.add(document);
+            }
+        }
+        return documentList.build();
+    }
+    
     public ImmutableList < Document > creatIndexRequestForErrors (SearchHits hits) {
         Builder < Document > documentList = ImmutableList.< Document > builder();
         for (SearchHit hit : hits) {
