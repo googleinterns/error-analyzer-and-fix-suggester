@@ -13,6 +13,7 @@ package com.google.error_analyzer;
 import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.LogDaoHelper;
+import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.servlets.PaginationServlet;
 import java.io.*;
 import java.lang.reflect.Field;
@@ -86,11 +87,11 @@ public final class PaginationServletTest {
         when(logDao.fileExists(any(String.class))).thenReturn(true);	
         when(logDaoHelper.hitFieldContent(any(),any())).	
             thenReturn(hitContent);
-        when(request.getParameter("start")).thenReturn("1");
-        when(request.getParameter("size")).thenReturn("1");
-        when(request.getParameter("fileName")).thenReturn(fileName);
-        when(request.getParameter("fileType")).thenReturn(fileType2);
-        when(request.getParameter("searchString")).thenReturn("");
+        when(request.getParameter(LogFields.START)).thenReturn("1");
+        when(request.getParameter(LogFields.SIZE)).thenReturn("1");
+        when(request.getParameter(LogFields.FILE_NAME)).thenReturn(fileName);
+        when(request.getParameter(LogFields.FILE_TYPE)).thenReturn(fileType2);
+        when(request.getParameter(LogFields.SEARCH_STRING)).thenReturn("");
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);
         when(response.getWriter()).thenReturn(writer);
@@ -108,11 +109,11 @@ public final class PaginationServletTest {
         when(logDao.fileExists(any(String.class))).thenReturn(true);	
         when(logDaoHelper.hitFieldContent(any(),any())).	
             thenReturn(hitContent);
-        when(request.getParameter("start")).thenReturn("1");
-        when(request.getParameter("size")).thenReturn("1");
-        when(request.getParameter("fileName")).thenReturn(fileName);
-        when(request.getParameter("fileType")).thenReturn(fileType1);
-        when(request.getParameter("searchString")).thenReturn("");
+        when(request.getParameter(LogFields.START)).thenReturn("1");
+        when(request.getParameter(LogFields.SIZE)).thenReturn("1");
+        when(request.getParameter(LogFields.FILE_NAME)).thenReturn(fileName);
+        when(request.getParameter(LogFields.FILE_TYPE)).thenReturn(fileType1);
+        when(request.getParameter(LogFields.SEARCH_STRING)).thenReturn("");
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);
         when(response.getWriter()).thenReturn(writer);
@@ -124,11 +125,11 @@ public final class PaginationServletTest {
 
     @Test
     public void doPost_emptyFileName() throws Exception {
-        when(request.getParameter("start")).thenReturn("1");
-        when(request.getParameter("size")).thenReturn("1");
-        when(request.getParameter("fileName")).thenReturn("");
-        when(request.getParameter("fileType")).thenReturn(fileType2);
-        when(request.getParameter("searchString")).thenReturn("");
+        when(request.getParameter(LogFields.START)).thenReturn("1");
+        when(request.getParameter(LogFields.SIZE)).thenReturn("1");
+        when(request.getParameter(LogFields.FILE_NAME)).thenReturn("");
+        when(request.getParameter(LogFields.FILE_TYPE)).thenReturn(fileType2);
+        when(request.getParameter(LogFields.SEARCH_STRING)).thenReturn("");
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);
         when(response.getWriter()).thenReturn(writer);
@@ -141,11 +142,11 @@ public final class PaginationServletTest {
     @Test
     public void doPost_noMatchingIndexForFileName() throws Exception {
         when(logDao.fileExists(any(String.class))).thenReturn(false);
-        when(request.getParameter("start")).thenReturn("1");
-        when(request.getParameter("size")).thenReturn("1");
-        when(request.getParameter("fileName")).thenReturn(fileName);
-        when(request.getParameter("fileType")).thenReturn(fileType2);
-        when(request.getParameter("searchString")).thenReturn("");
+        when(request.getParameter(LogFields.START)).thenReturn("1");
+        when(request.getParameter(LogFields.SIZE)).thenReturn("1");
+        when(request.getParameter(LogFields.FILE_NAME)).thenReturn(fileName);
+        when(request.getParameter(LogFields.FILE_TYPE)).thenReturn(fileType2);
+        when(request.getParameter(LogFields.SEARCH_STRING)).thenReturn("");
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);
         when(response.getWriter()).thenReturn(writer);
@@ -162,11 +163,11 @@ public final class PaginationServletTest {
         when(logDao.fileExists(any(String.class))).thenReturn(true);	
         when(logDaoHelper.getHighLightedText(any(),any())).	
             thenReturn(immutableListContent);
-        when(request.getParameter("start")).thenReturn("1");
-        when(request.getParameter("size")).thenReturn("1");
-        when(request.getParameter("fileName")).thenReturn(fileName);
-        when(request.getParameter("fileType")).thenReturn(fileType2);
-        when(request.getParameter("searchString")).thenReturn("Intern");
+        when(request.getParameter(LogFields.START)).thenReturn("1");
+        when(request.getParameter(LogFields.SIZE)).thenReturn("1");
+        when(request.getParameter(LogFields.FILE_NAME)).thenReturn(fileName);
+        when(request.getParameter(LogFields.FILE_TYPE)).thenReturn(fileType2);
+        when(request.getParameter(LogFields.SEARCH_STRING)).thenReturn("Intern");
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);
         when(response.getWriter()).thenReturn(writer);

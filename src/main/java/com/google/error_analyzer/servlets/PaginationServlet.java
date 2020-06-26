@@ -44,11 +44,11 @@ public class PaginationServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) 
     throws IOException {
-        start = Integer.parseInt(request.getParameter("start"));
-        size = Integer.parseInt(request.getParameter("size"));
-        fileName = request.getParameter("fileName");
-        String fileType = request.getParameter("fileType");
-        String searchString = request.getParameter("searchString");
+        start = Integer.parseInt(request.getParameter(LogFields.START));
+        size = Integer.parseInt(request.getParameter(LogFields.SIZE));
+        fileName = request.getParameter(LogFields.FILE_NAME);
+        String fileType = request.getParameter(LogFields.FILE_TYPE);
+        String searchString = request.getParameter(LogFields.SEARCH_STRING);
         if(fileType.equals(ERROR))
             fileName = logDaoHelper.getErrorIndexName(fileName);
         response.setContentType(FileConstants.APPLICATION_JSON_CONTENT_TYPE);
@@ -101,7 +101,7 @@ public class PaginationServlet extends HttpServlet {
         for (int idx = startIdx; idx < hitFieldContent.size() && idx >= 0;) {
             String resultString = hitFieldContent.get(idx);
             if (fileType.equals(ERROR)) {
-                // fix at this moment is a empty string but will be replaced
+                // TODO : fix at this moment is a empty string but will be replaced
                 // by actual fix while integrating this branch with fix-suggester 
                 String fix= new String();
                 resultString += " " + fix;
