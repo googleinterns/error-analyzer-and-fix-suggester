@@ -65,14 +65,13 @@ public class LogDao implements DaoInterface {
             client.search(searchRequest, RequestOptions.DEFAULT);
         SearchHits hits= searchResponse.getHits();
         SearchHit[] searchHits= hits.getHits();
-        ImmutableList<SearchHit> searchResult = ImmutableList.copyOf(Arrays.asList(searchHits)); 
-        return searchResult;
+        return ImmutableList.copyOf(Arrays.asList(searchHits)); 
     }
 
     //return a section of given index starting from start and of 
     // length equal to given size
     @Override 
-    public SearchHit[] getAll(String fileName, int start, int size) 
+    public ImmutableList<SearchHit> getAll(String fileName, int start, int size) 
     throws IOException {
         SearchRequest searchRequest = new SearchRequest(fileName);
         searchSourceBuilder.query(QueryBuilders.matchAllQuery())
@@ -82,7 +81,7 @@ public class LogDao implements DaoInterface {
             client.search(searchRequest, RequestOptions.DEFAULT);
         SearchHits hits = searchResponse.getHits();
         SearchHit[] searchHits = hits.getHits();
-        return searchHits;
+        return ImmutableList.copyOf(Arrays.asList(searchHits));
     }
 
     //search an index for errors using regex and keywords and store back in db

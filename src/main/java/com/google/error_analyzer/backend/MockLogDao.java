@@ -66,27 +66,17 @@ public class MockLogDao implements DaoInterface {
     //return a section of given index starting from start and of length equal
     //  to given size
     @Override 
-    public SearchHit[] getAll(String fileName, int start, int size) 
-    throws IOException {
+    public ImmutableList < SearchHit > getAll( String fileName,
+    int start, int size) throws IOException {
         if (start >= database.length) {
-            return new SearchHit[0];
+            return ImmutableList.< SearchHit >builder().build();
         }
-        if (start < 0) {
-            start = 0;
+        Builder < SearchHit > resultBuilder = 
+            ImmutableList.< SearchHit >builder();
+        for (int idx = start; idx < start+size ; idx++) {
+            resultBuilder.add(new SearchHit(idx));
         }
-        int len = 0;
-        int databaseLength = database.length;
-        if (start + size - 1 < databaseLength) {
-            len = size;
-        }
-        else {
-            len = databaseLength - start;
-        }
-        SearchHit[] searchHits = new SearchHit[len];
-        for (int idx = start; idx < len; idx++) {
-            searchHits[idx] = new SearchHit(idx);
-        }
-        return searchHits;
+        return resultBuilder.build();
     }
 
     //search an index for errors using regex and keywords and store back in db
