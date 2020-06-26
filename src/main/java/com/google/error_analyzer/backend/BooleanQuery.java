@@ -11,9 +11,12 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.data.constant.Keywords;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.constant.RegexStrings;
+import com.google.error_analyzer.data.Document;
 import java.util.*;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -46,6 +49,15 @@ public class BooleanQuery {
         SearchRequest searchRequest = new SearchRequest(fileName);
         searchRequest.source(searchSourceBuilder);
         return searchRequest;
+    }
+
+    public ImmutableList < Document > creatIndexRequestForErrors (SearchHits hits) {
+        Builder < Document > documentList = ImmutableList.< Document > builder();
+        for (SearchHit hit : hits) {
+            Document document = new Document(hit.getId(), hit.getSourceAsString());
+            documentList.add(document);
+        }
+        return documentList.build();
     }
 
     //Combine matchquery and regex query and return a bool query

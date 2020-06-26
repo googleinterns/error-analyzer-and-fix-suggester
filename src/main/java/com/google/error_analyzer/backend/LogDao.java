@@ -164,10 +164,8 @@ public class LogDao implements DaoInterface {
     throws IOException {
         Integer numberOfErrorsFound = hits.getHits().length;
         logger.info("Storing ".concat(numberOfErrorsFound.toString()).concat(" into database"));
-        for (SearchHit hit : hits) {
-            String jsonSource =  hit.getSourceAsString();
-            String id = hit.getId();
-            storeLogLine(errorFileName, jsonSource, id);
-        }
+        BooleanQuery booleanQuery = new BooleanQuery();
+        ImmutableList < Document > documentList = booleanQuery.creatIndexRequestForErrors(hits);
+        bulkStoreLog(errorFileName, documentList);
     }
 }
