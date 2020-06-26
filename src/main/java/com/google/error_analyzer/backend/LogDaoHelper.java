@@ -22,7 +22,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
 public class LogDaoHelper {
-
+    public static final String SESSIONID = "JSESSIONID";
     // return ImmutableList of hit ids corresponding to given searchhit list
     public ImmutableList < String > hitId(SearchHit[] searchHits) {
         Builder<String> ids = ImmutableList.<String>builder();
@@ -92,7 +92,7 @@ public class LogDaoHelper {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie: cookies) {
-                if (cookie.getName().equals("JSESSIONID")) {
+                if (cookie.getName().equals(SESSIONID)) {
                     sessionID = cookie.getValue();
                 }
             }

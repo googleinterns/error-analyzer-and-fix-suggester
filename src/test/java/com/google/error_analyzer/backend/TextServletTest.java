@@ -1,5 +1,6 @@
 package com.google.error_analyzer;
 
+import com.google.error_analyzer.backend.LogDaoHelper;
 import com.google.error_analyzer.backend.MockLogDao;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.constant.PageConstants;
@@ -15,10 +16,12 @@ import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.junit.Test;
-import org.mockito.*;
+import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mockito.Mockito.*;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -28,15 +31,13 @@ import static org.mockito.Mockito.when;
 
 //unit tests for TextServlet
 public class TextServletTest {
+    private Cookie cookie;
 
     @Mock
     HttpServletRequest request;
 
     @Mock
     HttpServletResponse response;
-
-    @Mock
-    Cookie mockCookie;
 
     @InjectMocks
     TextServlet servlet;
@@ -49,7 +50,7 @@ public class TextServletTest {
         servlet = new TextServlet();
         request = Mockito.mock(HttpServletRequest.class);
         response = Mockito.mock(HttpServletResponse.class);
-        mockCookie = Mockito.mock(Cookie.class);
+        cookie = new Cookie(LogDaoHelper.SESSIONID, "abcd");
         MockitoAnnotations.initMocks(this);
         servlet.storeLog.logDao = new MockLogDao();
 
@@ -60,8 +61,11 @@ public class TextServletTest {
     //file with different file name
     @Test
     public void servletTest() throws ServletException, IOException {
-        when(request.getParameter(LogFields.FILE_NAME)).thenReturn("file1");
-        when(request.getParameter(LogFields.LOG)).thenReturn("error");
+        String fileName1 = "file1";
+        String fileName2 = "file2";
+        String log = "error";
+        when(request.getParameter(LogFields.FILE_NAME)).thenReturn(fileName1);
+        when(request.getParameter(LogFields.LOG)).thenReturn(log);
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);
         when(response.getWriter()).thenReturn(writer);
@@ -69,19 +73,17 @@ public class TextServletTest {
             Mockito.mock(RequestDispatcher.class);
         when(request.getRequestDispatcher(PageConstants.LANDING_PAGE))
             .thenReturn(requestDispatcher);
-        when(mockCookie.getValue()).thenReturn("abcd");
-        when(mockCookie.getName()).thenReturn("JSESSIONID");
-        when(request.getCookies()).thenReturn(new Cookie[] {mockCookie});
+        when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
         String expected = String.format(
-            servlet.storeLog.FILE_STORED_TEMPLATE_RESPONSE, "file1");
+            servlet.storeLog.FILE_STORED_TEMPLATE_RESPONSE, fileName1);
         assertTrue(actual.contains(expected));
-        when(request.getParameter(LogFields.FILE_NAME)).thenReturn("file2");
+        when(request.getParameter(LogFields.FILE_NAME)).thenReturn(fileName2);
         servlet.doPost(request, response);
         actual = stringWriter.toString();
         expected = String.format(
-            servlet.storeLog.FILE_STORED_TEMPLATE_RESPONSE, "file2");;
+            servlet.storeLog.FILE_STORED_TEMPLATE_RESPONSE, fileName2);;
         assertTrue(actual.contains(expected));
 
     }
@@ -92,8 +94,10 @@ public class TextServletTest {
     @Test
     public void servletTestWhenFileAlreadyExists()
     throws ServletException, IOException {
-        when(request.getParameter(LogFields.FILE_NAME)).thenReturn("file1");
-        when(request.getParameter(LogFields.LOG)).thenReturn("error");
+        String fileName1 = "file1";
+        String log = "error";
+        when(request.getParameter(LogFields.FILE_NAME)).thenReturn(fileName1);
+        when(request.getParameter(LogFields.LOG)).thenReturn(log);
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);
         when(response.getWriter()).thenReturn(writer);
@@ -101,18 +105,16 @@ public class TextServletTest {
             Mockito.mock(RequestDispatcher.class);
         when(request.getRequestDispatcher(PageConstants.LANDING_PAGE))
             .thenReturn(requestDispatcher);
-        when(mockCookie.getValue()).thenReturn("abcd");
-        when(mockCookie.getName()).thenReturn("JSESSIONID");
-        when(request.getCookies()).thenReturn(new Cookie[] {mockCookie});
+        when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
         String expected = String.format(
-            servlet.storeLog.FILE_STORED_TEMPLATE_RESPONSE, "file1");
+            servlet.storeLog.FILE_STORED_TEMPLATE_RESPONSE, fileName1);
         assertTrue(actual.contains(expected));
         servlet.doPost(request, response);
         actual = stringWriter.toString();
         expected = String.format(
-            servlet.storeLog.FILE_STORED_TEMPLATE_RESPONSE, "file1(1)");
+            servlet.storeLog.FILE_STORED_TEMPLATE_RESPONSE, fileName1 + "(1)");
         assertTrue(actual.contains(expected));
 
     }

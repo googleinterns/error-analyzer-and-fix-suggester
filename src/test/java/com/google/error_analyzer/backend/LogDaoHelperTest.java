@@ -26,9 +26,11 @@ import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.junit.Test;
-import org.mockito.*;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -38,6 +40,7 @@ import static org.mockito.Mockito.when;
 public final class LogDaoHelperTest {
     private final String field = "name";
     private LogDaoHelper logDaoHelper;
+    private Cookie cookie;
     private SearchHit[] searchHits;
     @Mock 
     SearchHit hit1;
@@ -48,9 +51,6 @@ public final class LogDaoHelperTest {
     @Mock
     HttpServletRequest request;
 
-    @Mock
-    Cookie mockCookie;
-
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
@@ -59,7 +59,7 @@ public final class LogDaoHelperTest {
         logDaoHelper = new LogDaoHelper();
         searchHits=new SearchHit[]{hit1, hit2};
         request = Mockito.mock(HttpServletRequest.class);
-        mockCookie = Mockito.mock(Cookie.class);
+        cookie = new Cookie(LogDaoHelper.SESSIONID, "abcd");
     }
 
     // hitId
@@ -113,10 +113,8 @@ public final class LogDaoHelperTest {
 
     //append sessionID to fileName to get indexName
     @Test
-    public void getIndexNameTest() {
-        when(mockCookie.getValue()).thenReturn("abcd"); 
-        when(mockCookie.getName()).thenReturn("JSESSIONID");    
-        when(request.getCookies()).thenReturn(new Cookie[]{mockCookie});
+    public void getIndexNameTest() {   
+        when(request.getCookies()).thenReturn(new Cookie[]{cookie});
         String fileName = "file1";
         String expected = "abcdfile1";
         String actual = logDaoHelper.getIndexName(request,fileName);
@@ -125,15 +123,13 @@ public final class LogDaoHelperTest {
 
     //remove sessionID from indexName to get fileName
     @Test
-    public void getFileNameTest() {
-        when(mockCookie.getValue()).thenReturn("abcd"); 
-        when(mockCookie.getName()).thenReturn("JSESSIONID");    
-        when(request.getCookies()).thenReturn(new Cookie[]{mockCookie});
+    public void getFileNameTest() { 
+        when(request.getCookies()).thenReturn(new Cookie[]{cookie});
         String indexName = "abcdfile1";
         String expected = "file1";
         String actual = logDaoHelper.getFileName(request,indexName);
         Assert.assertEquals(expected, actual);
-    }
+    } 
 
     private void getHitId(){
         when(hit1.getId()).thenReturn("1");

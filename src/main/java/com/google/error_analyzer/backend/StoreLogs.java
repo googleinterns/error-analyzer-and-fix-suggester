@@ -38,7 +38,7 @@ public class StoreLogs {
     public static final String FILE_STORED_TEMPLATE_RESPONSE =
         "\t\t\t<h2> File %1$s Stored</h2>";
     public static final String FILE_EMPTY_TEMPLATE_RESPONSE =
-        "\t\t\t<h2> Sorry! the file %1$s is empty";
+        "\t\t\t<h2> Sorry! the file %1$s is empty</h2>";
     public DaoInterface logDao = new LogDao();
 
     //stores the logs into database with appropriate filename
@@ -46,10 +46,15 @@ public class StoreLogs {
         String log) {
         try {
             String indexName = LogDaoHelper.getIndexName(request, fileName);
-            indexName = findIndexName(indexName);
+            indexName = getUniqueIndexName(indexName);
             final String response = storeLog(indexName, log);
             fileName = LogDaoHelper.getFileName(request, indexName);
-            logger.info(String.format("File %s stored", fileName));
+            if (response.equals(FILE_EMPTY_TEMPLATE_RESPONSE)) {
+                logger.info(String.format("File %s is empty", fileName));
+            }
+            else {
+                logger.info(String.format("File %s stored", fileName));
+            }
             return String.format(response, fileName);
         } catch (Exception e) {
             final String ERROR_RESPONSE =
@@ -77,7 +82,6 @@ public class StoreLogs {
             }
         }
         if ((documentList.build()).isEmpty()) {
-            logger.error("File %1$s is empty", fileName);
             return FILE_EMPTY_TEMPLATE_RESPONSE;
         }
         logDao.bulkStoreLog(fileName, documentList.build());
@@ -85,19 +89,14 @@ public class StoreLogs {
     }
 
     //find the name of the index in which the logs can be stored
-    private String findIndexName(String indexName) throws IOException {
-        if (logDao.fileExists(indexName)) {
-            int indexSuffix = 1;
-            String nextIndexName = String.format(
+    private String getUniqueIndexName(String indexName) throws IOException {
+        String nextIndexName = indexName;
+        int indexSuffix = 1;
+        while (logDao.fileExists(nextIndexName)) {
+            nextIndexName = String.format(
                 "%1$s(%2$s)", indexName, indexSuffix);
-            while (logDao.fileExists(nextIndexName)) {
-                indexSuffix++;
-                nextIndexName = String.format(
-                    "%1$s(%2$s)", indexName, indexSuffix);
-            }
-            indexName = nextIndexName;
+            indexSuffix++;
         }
-        return indexName;
+        return nextIndexName;
     }
-
 }
