@@ -137,25 +137,29 @@ function addToData(fetchedData, page, fileType, fileName) {
 }
 
 // prepare resultant DOM element for resultPage
-function prepareResultantDomElement(document, fileType, fileName) {
+function prepareResultantDomElement(logError, fileType, fileName) {
     const liElement = document.createElement('li');
-    const logLineNo=document.createElement('span');
-    logLineNo.innerText = document.logLineNo;
-    const logText=document.createElement('span');
-    logText.innerText = document.logText;
-
+    const logLineNo = document.createElement('span');
+    logLineNo.innerText = logError.logLineNumber + "  ";
+    const logText = document.createElement('span');
+    logText.innerText = logError.logText;
     liElement.appendChild(logLineNo);
     liElement.appendChild(logText);
-
+    
     if(fileType == ERRORS){
-        const stackTraceButton=document.createElement('button');
+        const stackTraceButton = document.createElement('button');
         stackTraceButton.innerText="Stack Trace";
         stackTraceButton.addEventListener('click', () => {
-            callStackTraceServlet(document.logLineNo, fileName);
-            stackTraceContainer.style.visibility = "visible";
+            let stackTraceContainer = document.getElementById("stackTraceContainer");
+            stackTraceContainer.className = "show";
+            let stackTraceContainer = document.getElementById("hideBtn");
+            hideBtn.className = "show";
+            stackTraceContainer.innerHTML = "";
+            stackTraceContainer.innerHTML += logError.logText;
+            callStackTraceServlet(logError.logLineNumber, fileName);
         });
+        liElement.appendChild(stackTraceButton);
     }
-    
     return liElement;
 }
 
@@ -226,7 +230,7 @@ function display() {
     listing_table.innerHTML = "";
     // dynamically add element to result page
     for(let i = offset[0] ; i <= offset[1] && data.length!=0 ; i++ ) {
-        listing_table.innerHTML += data[i] + "<br>";
+        listing_table.appendChild(data[i]);
     }
     page_span.innerHTML = currentPage;
     showAndHideBtn();
@@ -259,6 +263,19 @@ function search() {
     changePage(1);
 }
 
-function callStackTraceServlet(logLineNo, fileName) {
-    
+async function callStackTraceServlet(logLineNo, fileName) {
+    // let stackTraceContainer = document.getElementById("stackTraceContainer");
+    // const params = new URLSearchParams();
+    // params.append('logLineNumber', logLineNo);
+    // params.append('fileName', fileName);
+    // const response = await fetch('/stackTrace', {
+    //     method: 'POST',
+    //     body: params
+    // });
+    // const stackTrace = await response.json();
+    // for(let i=0; i<stackTrace.length; i++) {
+    //     let stackTraceElement = document.createElement('li');
+    //     stackTraceElement.innerText = stackTraceContainer[i];
+    //     stackTraceContainer.appendChild(stackTraceElement);
+    // }
 }
