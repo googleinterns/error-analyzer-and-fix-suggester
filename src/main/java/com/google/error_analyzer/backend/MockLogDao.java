@@ -147,4 +147,18 @@ public class MockLogDao implements DaoInterface {
     public SearchHit[] getHitsFromIndex(SearchRequest searchRequest) {
         return new SearchHit[0];
     }
+
+    //Stores the documents into the database by performing multiple indexing operations
+    @Override
+    public void bulkStoreLog(String fileName,
+     ImmutableList < Document > documentList) {
+        Index index = new Index();
+        index.setIndexName(fileName);
+        for (Document document: documentList) {
+            index.addDocument(document);
+        }
+        logDatabase.add(index);
+    }
+    
+>>>>>>> 8be726008d8d061318c546d74cffaf41e118e316
 }

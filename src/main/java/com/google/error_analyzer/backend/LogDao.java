@@ -15,12 +15,14 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.backend.BooleanQuery;
 import com.google.error_analyzer.backend.LogDaoHelper;
+import com.google.error_analyzer.data.Document;
 import java.io.IOException;
 import java.util.*;
 import org.apache.http.HttpHost;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
+import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -40,7 +42,6 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
-
 
 public class LogDao implements DaoInterface {
 
@@ -145,6 +146,22 @@ public class LogDao implements DaoInterface {
         SearchResponse searchResponse = client
             .search(searchRequest, RequestOptions.DEFAULT);
         return searchResponse.getHits().getHits();
+
+    //Stores the documents into the database by performing multiple indexing operations
+    //in a single API call
+    @Override
+    public void bulkStoreLog(String fileName, 
+    ImmutableList < Document > documentList) throws IOException {
+        BulkRequest request = new BulkRequest();
+        for (Document document: documentList) {
+            String jsonString = document.getJsonString();
+            IndexRequest indexRequest = new IndexRequest(fileName);
+            String id = document.getID();
+            indexRequest.id(id);
+            indexRequest.source(jsonString, XContentType.JSON);
+            request.add(indexRequest);
+        }
+        client.bulk(request, RequestOptions.DEFAULT);;
     }
 
     // highlight searched text

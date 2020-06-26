@@ -11,6 +11,7 @@ limitations under the License.*/
 package com.google.error_analyzer.backend;
 
 import com.google.common.collect.ImmutableList;
+import com.google.error_analyzer.data.Document;
 import java.io.IOException;
 import java.lang.*;
 import java.util.*;
@@ -39,6 +40,11 @@ public interface DaoInterface {
     // string
     public String storeLogLine (String filename, String jsonString, String id) 
     throws IOException;
+    
+    //Stores the documents into the database by performing multiple 
+    //indexing operations
+    public void bulkStoreLog(String fileName, 
+        ImmutableList < Document > documentList) throws IOException;
 
     //fetch documents from index according to searchRequest
     public SearchHit[] getHitsFromIndex(SearchRequest searchRequest)
