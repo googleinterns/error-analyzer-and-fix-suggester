@@ -13,6 +13,8 @@ package com.google.error_analyzer.backend;
 
 import javax.servlet.http.*;
 
+/*this class contains the methods to convert fileName to indexName and 
+indexName to fileName*/
 public class IndexName {
     public static final String SESSIONID = "JSESSIONID";
 

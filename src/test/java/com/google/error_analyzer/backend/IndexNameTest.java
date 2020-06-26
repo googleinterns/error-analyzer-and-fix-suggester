@@ -14,7 +14,6 @@ package com.google.error_analyzer;
 import com.google.error_analyzer.backend.IndexName;
 import java.io.IOException;
 import javax.servlet.http.*;
-import org.elasticsearch.common.text.Text;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
