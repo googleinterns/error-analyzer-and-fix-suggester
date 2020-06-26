@@ -21,7 +21,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
 public class LogDaoHelper {
-    
+
     // return ImmutableList of hit ids corresponding to given searchhit list
     public ImmutableList < String > hitId(SearchHit[] searchHits) {
         Builder<String> ids = ImmutableList.<String>builder();
@@ -65,5 +65,4 @@ public class LogDaoHelper {
     public static String getErrorIndexName (String fileName) {
         return fileName.concat("error");
     } 
-
 }
