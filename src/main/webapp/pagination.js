@@ -130,7 +130,7 @@ function fileNotFound() {
 function addToData(fetchedData, page) {
     let idx = recordsPerPage * ((page - 1) % noOfPages);
     for (let i = 0; i < fetchedData.length; i++) {
-        data[idx] = fetchedData[i];
+        data[idx] = fetchedData[i].logText;
         idx++;
     }
 }
