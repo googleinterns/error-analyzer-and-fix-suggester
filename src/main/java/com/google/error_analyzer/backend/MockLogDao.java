@@ -84,7 +84,7 @@ public class MockLogDao implements DaoInterface {
         return 0l;
     }
 
-    //search an index for errors using regex and keywords and store back in db	    // returns no of documents in an index
+    //search an index for errors using regex and keywords and store back in db	    
     //Returns name of the new index 
     @Override 
     public String findAndStoreErrors(String fileName) {
