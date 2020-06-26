@@ -43,3 +43,4 @@ function addclass() {
     const slide2 = document.getElementById("slide2Container");
     slide1.classList.add('active');
     slide2.classList.remove('active');
+}

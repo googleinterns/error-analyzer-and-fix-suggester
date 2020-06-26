@@ -84,13 +84,8 @@ public class MockLogDao implements DaoInterface {
         return 0l;
     }
 
-    // returns no of documents in an index
-    public long getDocCount (String index) throws IOException {
-        return 0l;
-    }
-    
-    //search db using regex and keywords and store back in db searchHits 
-    // sorted by logLineNumber
+    //search an index for errors using regex and keywords and store back in db	    // returns no of documents in an index
+    //Returns name of the new index 
     @Override 
     public String findAndStoreErrors(String fileName) {
         String errorFileName = LogDaoHelper.getErrorIndexName(fileName);
