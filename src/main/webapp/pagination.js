@@ -43,7 +43,6 @@ async function changePage(page) {
        
         const params = new URLSearchParams();
         const startAndSize = getPageStartAndSize(fileType, fetchedPage);
-         console.log(startAndSize);
         params.append('start', startAndSize[0]);
         params.append('size',  startAndSize[1]);
         params.append('searchString', searchString);
@@ -55,8 +54,6 @@ async function changePage(page) {
         });
         const fetchedData = await response.json();
         updateLastPage(fetchedData.length, fetchedPage);
-        console.log(fetchedData +" " +fileName+" "+lastPage);
-        
         if(fetchedData.length == 0 && currentPage == 1) {
             fileNotFound();
             return;
@@ -173,10 +170,12 @@ function getPageToBeFetched() {
 function updateLastPage(fetchedPageLength, page) {
     if (page == 1 && fetchedPageLength < recordsPerPage * noOfPages) {
         lastPage =  Math.ceil(fetchedPageLength / recordsPerPage);
-        if(fetchedPageLength % recordsPerPage != 0)
+        if(fetchedPageLength % recordsPerPage != 0){
              noOfRecordsOnLastPage = fetchedPageLength % recordsPerPage;
-        else
+        }
+        else{
             noOfRecordsOnLastPage = recordsPerPage;
+        }
     } else if (page != 1 && fetchedPageLength == 0) {
         lastPage = page - 1;
         noOfRecordsOnLastPage = recordsPerPage;
