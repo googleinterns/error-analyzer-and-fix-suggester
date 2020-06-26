@@ -14,7 +14,6 @@ package com.google.error_analyzer.backend;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import java.util.*;
-import javax.servlet.http.*;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder
                                                         .Field;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
@@ -22,7 +21,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
 public class LogDaoHelper {
-    public static final String SESSIONID = "JSESSIONID";
+    
     // return ImmutableList of hit ids corresponding to given searchhit list
     public ImmutableList < String > hitId(SearchHit[] searchHits) {
         Builder<String> ids = ImmutableList.<String>builder();
@@ -67,36 +66,4 @@ public class LogDaoHelper {
         return fileName.concat("error");
     } 
 
-    //returns index name for a given file name
-    public static String getIndexName(HttpServletRequest request,
-        String fileName) {
-        String sessionId = getSessionId(request);
-        String indexName = sessionId.concat(fileName);
-        return indexName;
-   }
-
-    //returns file name for a given index name
-    public static String getFileName(HttpServletRequest request,
-        String indexName) {
-        String sessionId = getSessionId(request);
-        int indexOfFileName = indexName.indexOf(sessionId) +
-            sessionId.length();
-        String fileName = indexName
-            .substring(indexOfFileName, indexName.length());
-        return fileName;
-   }
-
-    //get sessionID of the user
-    private static String getSessionId(HttpServletRequest request) {
-        String sessionID = null;
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie: cookies) {
-                if (cookie.getName().equals(SESSIONID)) {
-                    sessionID = cookie.getValue();
-                }
-            }
-        } 
-        return sessionID.toLowerCase();
-    }
 }

@@ -16,8 +16,8 @@ package com.google.error_analyzer.backend;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.error_analyzer.backend.IndexName;
 import com.google.error_analyzer.backend.LogDao;
-import com.google.error_analyzer.backend.LogDaoHelper;
 import com.google.error_analyzer.backend.StoreLogHelper;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.Document;
@@ -45,28 +45,22 @@ public class StoreLogs {
     public String checkAndStoreLog(HttpServletRequest request, String fileName,
         String log) {
         try {
-            String indexName = LogDaoHelper.getIndexName(request, fileName);
+            String indexName = IndexName.getIndexName(request, fileName);
             indexName = getUniqueIndexName(indexName);
-            final String response = storeLog(indexName, log);
-            fileName = LogDaoHelper.getFileName(request, indexName);
-            if (response.equals(FILE_EMPTY_TEMPLATE_RESPONSE)) {
-                logger.info(String.format("File %s is empty", fileName));
-            }
-            else {
-                logger.info(String.format("File %s stored", fileName));
-            }
-            return String.format(response, fileName);
+            final String response = storeLog(request, indexName, log);
+            return response;
         } catch (Exception e) {
-            final String ERROR_RESPONSE =
+            final String errorResponse =
                 String.format(ERROR_TEMPLATE_RESPONSE, e);
             logger.error(String.format("Could not store file %1$s %2$s",
                 fileName, e));
-            return ERROR_RESPONSE;
+            return errorResponse;
         }
     }
 
     //Stores the log in an index with name fileName
-    private String storeLog(String fileName, String log) throws IOException {
+    private String storeLog(HttpServletRequest request, String fileName, 
+     String log) throws IOException {
         Builder < Document > documentList = ImmutableList
             . < Document > builder();
         int logLineNumber = 1;
@@ -81,11 +75,18 @@ public class StoreLogs {
                 logLineNumber++;
             }
         }
+
         if ((documentList.build()).isEmpty()) {
-            return FILE_EMPTY_TEMPLATE_RESPONSE;
+            fileName = IndexName.getFileName(request, fileName);
+            String response = String.format(FILE_EMPTY_TEMPLATE_RESPONSE, fileName);
+            logger.info(String.format("File %s is empty", fileName));
+            return response;
         }
         logDao.bulkStoreLog(fileName, documentList.build());
-        return FILE_STORED_TEMPLATE_RESPONSE;
+        fileName = IndexName.getFileName(request, fileName);
+        String response = String.format(FILE_STORED_TEMPLATE_RESPONSE, fileName);
+        logger.info(String.format("File %s stored", fileName));
+        return response;
     }
 
     //find the name of the index in which the logs can be stored

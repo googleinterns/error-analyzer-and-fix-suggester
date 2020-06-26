@@ -1,6 +1,6 @@
 package com.google.error_analyzer;
 
-import com.google.error_analyzer.backend.LogDaoHelper;
+import com.google.error_analyzer.backend.IndexName;
 import com.google.error_analyzer.backend.MockLogDao;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.constant.PageConstants;
@@ -50,7 +50,7 @@ public class TextServletTest {
         servlet = new TextServlet();
         request = Mockito.mock(HttpServletRequest.class);
         response = Mockito.mock(HttpServletResponse.class);
-        cookie = new Cookie(LogDaoHelper.SESSIONID, "abcd");
+        cookie = new Cookie(IndexName.SESSIONID, "abcd");
         MockitoAnnotations.initMocks(this);
         servlet.storeLog.logDao = new MockLogDao();
 

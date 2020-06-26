@@ -40,16 +40,12 @@ import static org.mockito.Mockito.when;
 public final class LogDaoHelperTest {
     private final String field = "name";
     private LogDaoHelper logDaoHelper;
-    private Cookie cookie;
     private SearchHit[] searchHits;
     @Mock 
     SearchHit hit1;
 
     @Mock 
     SearchHit hit2;
-
-    @Mock
-    HttpServletRequest request;
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
@@ -58,8 +54,6 @@ public final class LogDaoHelperTest {
     public void setUp() {
         logDaoHelper = new LogDaoHelper();
         searchHits=new SearchHit[]{hit1, hit2};
-        request = Mockito.mock(HttpServletRequest.class);
-        cookie = new Cookie(LogDaoHelper.SESSIONID, "abcd");
     }
 
     // hitId
@@ -110,26 +104,6 @@ public final class LogDaoHelperTest {
         String actual = logDaoHelper.getErrorIndexName(fileName);
         Assert.assertEquals("fileerror", actual);
     }
-
-    //append sessionID to fileName to get indexName
-    @Test
-    public void getIndexNameTest() {   
-        when(request.getCookies()).thenReturn(new Cookie[]{cookie});
-        String fileName = "file1";
-        String expected = "abcdfile1";
-        String actual = logDaoHelper.getIndexName(request,fileName);
-        Assert.assertEquals(expected, actual);
-    }
-
-    //remove sessionID from indexName to get fileName
-    @Test
-    public void getFileNameTest() { 
-        when(request.getCookies()).thenReturn(new Cookie[]{cookie});
-        String indexName = "abcdfile1";
-        String expected = "file1";
-        String actual = logDaoHelper.getFileName(request,indexName);
-        Assert.assertEquals(expected, actual);
-    } 
 
     private void getHitId(){
         when(hit1.getId()).thenReturn("1");
