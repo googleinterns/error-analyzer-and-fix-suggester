@@ -11,7 +11,8 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
-import javax.servlet.http.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 
 /*this class contains the methods to convert fileName to indexName and 
 indexName to fileName*/
@@ -20,7 +21,7 @@ public class IndexName {
 
     //returns index name for a given file name
     public static String getIndexName(HttpServletRequest request,
-        String fileName) {
+        String fileName) throws NullPointerException {
         String sessionId = getSessionId(request);
         String indexName = sessionId.concat(fileName);
         return indexName;
@@ -28,7 +29,7 @@ public class IndexName {
 
     //returns file name for a given index name
     public static String getFileName(HttpServletRequest request,
-        String indexName) {
+        String indexName) throws NullPointerException {
         String sessionId = getSessionId(request);
         int indexOfFileName = indexName.indexOf(sessionId) +
             sessionId.length();
@@ -38,7 +39,7 @@ public class IndexName {
     }
 
     //get sessionID of the user
-    private static String getSessionId(HttpServletRequest request) {
+    private static String getSessionId(HttpServletRequest request) throws NullPointerException {
         String sessionID = null;
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {

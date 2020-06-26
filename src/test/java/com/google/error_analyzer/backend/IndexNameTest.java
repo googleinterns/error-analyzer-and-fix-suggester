@@ -13,7 +13,8 @@ package com.google.error_analyzer;
 
 import com.google.error_analyzer.backend.IndexName;
 import java.io.IOException;
-import javax.servlet.http.*;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -33,6 +34,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class IndexNameTest {
     private Cookie cookie;
+    private static final String SESSIONID_VALUE = "abcd";
 
     @Mock
     HttpServletRequest request;
@@ -43,7 +45,7 @@ public class IndexNameTest {
     @Before
     public void setUp() {
         request = Mockito.mock(HttpServletRequest.class);
-        cookie = new Cookie(IndexName.SESSIONID, "abcd");
+        cookie = new Cookie(IndexName.SESSIONID, SESSIONID_VALUE);
     }
 
     //append sessionID to fileName to get indexName

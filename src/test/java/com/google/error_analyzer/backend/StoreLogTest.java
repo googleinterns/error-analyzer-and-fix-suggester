@@ -43,6 +43,7 @@ storing logs to the database*/
 public final class StoreLogTest {
     private StoreLogs storeLogs;
     private Cookie cookie;
+    private static final String SESSIONID_VALUE = "abcd";
 
     @Mock
     HttpServletRequest request;
@@ -52,7 +53,7 @@ public final class StoreLogTest {
         storeLogs = new StoreLogs();
         storeLogs.logDao = new MockLogDao();
         request = Mockito.mock(HttpServletRequest.class);
-        cookie = new Cookie(IndexName.SESSIONID, "abcd");
+        cookie = new Cookie(IndexName.SESSIONID, SESSIONID_VALUE);
     }
 
     //store the log into the database when index with name same as the

@@ -32,6 +32,7 @@ import static org.mockito.Mockito.when;
 //unit tests for TextServlet
 public class TextServletTest {
     private Cookie cookie;
+    private static final String SESSIONID_VALUE = "abcd";
 
     @Mock
     HttpServletRequest request;
@@ -50,7 +51,7 @@ public class TextServletTest {
         servlet = new TextServlet();
         request = Mockito.mock(HttpServletRequest.class);
         response = Mockito.mock(HttpServletResponse.class);
-        cookie = new Cookie(IndexName.SESSIONID, "abcd");
+        cookie = new Cookie(IndexName.SESSIONID, SESSIONID_VALUE);
         MockitoAnnotations.initMocks(this);
         servlet.storeLog.logDao = new MockLogDao();
 

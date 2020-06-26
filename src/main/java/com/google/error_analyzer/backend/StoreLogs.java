@@ -60,7 +60,7 @@ public class StoreLogs {
 
     //Stores the log in an index with name fileName
     private String storeLog(HttpServletRequest request, String fileName, 
-     String log) throws IOException {
+     String log) throws IOException, NullPointerException  {
         Builder < Document > documentList = ImmutableList
             . < Document > builder();
         int logLineNumber = 1;
