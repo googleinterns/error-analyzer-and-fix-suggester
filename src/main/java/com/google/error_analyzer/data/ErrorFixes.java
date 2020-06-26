@@ -38,13 +38,15 @@ public class ErrorFixes{
 
             //Instance Customsearch
             Customsearch customeSearch = 
-                new Customsearch.Builder(GoogleNetHttpTransport.newTrustedTransport(), JacksonFactory.getDefaultInstance(), null) 
-                        .setApplicationName("errorFixes") 
-                        .setGoogleClientRequestInitializer(new CustomsearchRequestInitializer("your_api_key")) 
-                        .build();
+                new Customsearch.Builder(GoogleNetHttpTransport.newTrustedTransport(),
+                JacksonFactory.getDefaultInstance(), null) 
+                setApplicationName("errorFixes").setGoogleClientRequestInitializer(
+                new CustomsearchRequestInitializer("your_api_key")).build();
 
             //Set search parameter
-            Customsearch.Cse.List list = customeSearch.cse().list(searchQuery).setCx(searchEngine); 
+            Customsearch.Cse.List list = customeSearch.cse()
+                                                    .list(searchQuery)
+                                                    .setCx(searchEngine); 
             
             //Execute search
             Search result = list.execute();
