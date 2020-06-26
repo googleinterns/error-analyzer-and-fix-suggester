@@ -11,7 +11,7 @@ limitations under the License.*/
 
 package com.google.error_analyzer;
 
-import com.google.error_analyzer.data.StackTraceFormat;
+import com.google.error_analyzer.data.constant.StackTraceFormat;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.elasticsearch.action.search.SearchRequest;
