@@ -11,10 +11,10 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.LogManager;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /*this class contains the methods to convert fileName to indexName and 
 indexName to fileName*/
