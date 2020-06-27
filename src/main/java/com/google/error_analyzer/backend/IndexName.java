@@ -11,6 +11,8 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 indexName to fileName*/
 public class IndexName {
     public static final String SESSIONID = "JSESSIONID";
+    private static final Logger logger = LogManager.getLogger(IndexName.class);
 
     //returns index name for a given file name
     public static String getIndexName(HttpServletRequest request,
@@ -49,6 +52,9 @@ public class IndexName {
                 }
             }
         } 
+        if(sessionID == null) {
+            logger.fatal("Session ID is null");
+        }
         return sessionID.toLowerCase();
     }
 
