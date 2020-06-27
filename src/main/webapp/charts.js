@@ -9,9 +9,8 @@ async function drawChart() {
     } else {
         piechart.style.visibility = "visible";
     }
-    const errorFileName = fileName+"error";
-    const log = await getCount(fileName);
-    const error= await getCount(errorFileName);
+    const log = await getCount(fileName, LOGS);
+    const error= await getCount(fileName, ERRORS);
     let data = google.visualization.arrayToDataTable([
         ['logError',  '%'],
         ['Other Logs', log-error],
@@ -27,9 +26,10 @@ async function drawChart() {
     chart.draw(data, options);
 }
 
-async function getCount(index) {
+async function getCount(index, fileType) {
     const params = new URLSearchParams();
-    params.append('index', index);
+    params.append('fileName', index);
+    params.append('fileType', fileType);
     const response = await fetch('/getCount', {
         method: 'POST',
         body: params

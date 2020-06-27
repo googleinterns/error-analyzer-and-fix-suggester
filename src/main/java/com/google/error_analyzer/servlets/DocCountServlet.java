@@ -30,6 +30,7 @@ import org.apache.logging.log4j.LogManager;
 public class DocCountServlet extends HttpServlet {
 
     private LogDao logDao = new LogDao();
+    private LogDaoHelper logDaoHelper = new LogDaoHelper();
     private static final Logger logger = 
         LogManager.getLogger(DocCountServlet.class);
 
@@ -37,7 +38,7 @@ public class DocCountServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, 
         HttpServletResponse response) throws IOException {
-        String index = request.getParameter(LogFields.INDEX);
+        String index = request.getParameter(LogFields.FILE_NAME);
         String fileType = request.getParameter(LogFields.FILE_TYPE);
         if(fileType.equals(LogFields.ERROR))
             index = logDaoHelper.getErrorIndexName(index);

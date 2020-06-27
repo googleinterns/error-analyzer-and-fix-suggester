@@ -33,17 +33,26 @@ async function changePage(page) {
     const fetchedPage = getPageToBeFetched();
     let fileName = document.getElementById("fileName").value;
 
-    if(page == 1 && fileType == ERRORS){
-        fileLength = await getCount(fileName, fileType);
-    } 
+    // reset value of lastPage when on page 1 
+    if(page == 1){
+        lastPage = Number.MAX_VALUE;
+        noOfRecordsOnLastPage = recordsPerPage;
+        if(fileType == ERRORS){
+            fileLength = await getCount(fileName, fileType);
+            lastPage = Math.ceil(fileLength/recordsPerPage);
+            if(fileLength % recordsPerPage != 0)
+                noOfRecordsOnLastPage = fileLength % recordsPerPage;
+        }
+    }
     if(currentPage != 1 ) {
         display();
     }
     if(fetchedPage != -1) {
         const params = new URLSearchParams();
-        const startAndSize = getPageStartAndSize(fileType, fetchedPage);
-        params.append('start', startAndSize[0]);
-        params.append('size',  startAndSize[1]);
+        const pageSpecs = getPageStartAndSize(fileType, fetchedPage, searchString);
+        console.log(pageSpecs.start+" "+pageSpecs.size);
+        params.append('start', pageSpecs.start);
+        params.append('size',  pageSpecs.size);
         params.append('searchString', searchString);
         params.append('fileType', fileType);
         params.append('fileName', fileName);
@@ -52,6 +61,7 @@ async function changePage(page) {
             body: params
         });
         const fetchedData = await response.json();
+        console.log(fetchedData+" "+lastPage);
         updateLastPage(fetchedData.length, fetchedPage);
         if(fetchedData.length == 0 && currentPage == 1) {
             fileNotFound();
@@ -64,8 +74,8 @@ async function changePage(page) {
     }
 }
 // calculating starting index and size of block to be fetched from databasefor given page
-function getPageStartAndSize(fileType, page) {
-    if(fileType == LOGS) {
+getPageStartAndSize = (fileType, page, searchString) => {
+    if(fileType == LOGS || searchString != "") {
         return getPageStartAndSizeForLogFile(page);
     } else {
         return getPageStartAndSizeForErrorFile( page);
@@ -73,35 +83,33 @@ function getPageStartAndSize(fileType, page) {
 }
 
 //  calculating starting index and size of block to be fetched for log file 
-function getPageStartAndSizeForLogFile(page) {
-    let startAndSize = new Array();
-    startAndSize[0] = ((page - 1) * recordsPerPage);
-    startAndSize[1] = recordsPerPage;
+getPageStartAndSizeForLogFile = (page) => {
+    const start = ((page - 1) * recordsPerPage);
+    let size = recordsPerPage;
     if( page == 1) {
-        startAndSize[1] = (noOfPages * recordsPerPage);
+        size = (noOfPages * recordsPerPage);
     } 
-    return startAndSize;
+    return {"start": start, "size": size};
 }
 
 // calculating starting index and size of block to be fetched for file storing errors
-function getPageStartAndSizeForErrorFile(page) {
-    let startAndSize = new Array();
-    startAndSize[0] = ((lastPage - page )*recordsPerPage);
+getPageStartAndSizeForErrorFile = (page) => {
+    let start = ((lastPage - page )*recordsPerPage);
     if(fileLength % recordsPerPage != 0) {
-        startAndSize[0] = ((lastPage - page - 1)*recordsPerPage) + noOfRecordsOnLastPage;
+        start = ((lastPage - page - 1)*recordsPerPage) + noOfRecordsOnLastPage;
     }
-    startAndSize[1] = recordsPerPage;
+    let size = recordsPerPage;
     if(page == 1) {
-        startAndSize[0] = Math.max(0, fileLength-(noOfPages * recordsPerPage));
-        startAndSize[1] = Math.min(fileLength, (noOfPages * recordsPerPage));
+        start = Math.max(0, fileLength-(noOfPages * recordsPerPage));
+        size = Math.min(fileLength, (noOfPages * recordsPerPage));
     } 
-    return startAndSize;
+    return {"start": start, "size": size};
 }
 
 // return no of documents in a index
 async function getCount(fileName, fileType) {
     const params = new URLSearchParams();
-    params.append('index', fileName);
+    params.append('fileName', fileName);
     params.append('fileType', fileType);
     const response = await fetch('/getCount', {
         method: 'POST',
@@ -112,7 +120,7 @@ async function getCount(fileName, fileType) {
 }
 
 // display file not found message on UI
-function fileNotFound() {
+fileNotFound = () => {
     listing_table1  = document.getElementById("slide2");
     listing_table2 =  document.getElementById("slide1");
     listing_table1.innerHTML = "File Not Found";
@@ -124,7 +132,7 @@ function fileNotFound() {
 }
 
 // add returned records to data
-function addToData(fetchedData, page) {
+addToData = (fetchedData, page) => {
     let idx = recordsPerPage * ((page - 1) % noOfPages);
     for (let i = 0; i < fetchedData.length; i++) {
         data[idx] = fetchedData[i];
@@ -133,20 +141,17 @@ function addToData(fetchedData, page) {
 }
 
 // return start and end indices for the section of data to be shown 
-function getOffset(page) {
-    let offset = new Array();
+getOffset = (page) => {
     const start = recordsPerPage * ((page - 1) % noOfPages);
-    offset[0] = start;
+    let end = start + (recordsPerPage - 1);
     if(page == lastPage) {
-        offset[1] = start + (noOfRecordsOnLastPage - 1);
-    } else {
-        offset[1] = start + (recordsPerPage - 1);
-    }
-    return offset;
+        end = start + (noOfRecordsOnLastPage - 1);
+    } 
+    return {"start": start, "end": end};
 }
 
 // change no of records on a page 
-function changeNoOfRecordsOnPage() {
+changeNoOfRecordsOnPage = () => {
     const records = document.getElementById("records");
     recordsPerPage = records.value;
     currentPage=1;
@@ -154,7 +159,7 @@ function changeNoOfRecordsOnPage() {
 }
 
 // return page no to be fetched from database
-function getPageToBeFetched() {
+getPageToBeFetched = () => {
     if (currentPage == 1) {
         return 1;
     } else if(next == true && currentPage + extraPageInFrontAndBack <= lastPage) {
@@ -167,7 +172,7 @@ function getPageToBeFetched() {
 }
 
 // calculate last page and no of records on last page
-function updateLastPage(fetchedPageLength, page) {
+updateLastPage = (fetchedPageLength, page) => {
     if (page == 1 && fetchedPageLength < recordsPerPage * noOfPages) {
         lastPage =  Math.ceil(fetchedPageLength / recordsPerPage);
         if(fetchedPageLength % recordsPerPage != 0){
@@ -182,14 +187,11 @@ function updateLastPage(fetchedPageLength, page) {
     } else if (page != 1 && fetchedPageLength < recordsPerPage) {
         lastPage = page;
         noOfRecordsOnLastPage = fetchedPageLength;
-    } else {
-        lastPage = Number.MAX_VALUE;
-        noOfRecordsOnLastPage = recordsPerPage;
-    }
+    } 
 }
 
 // add logs or errors to result page
-function display() {
+display = () => {
     
     const offset = getOffset(currentPage);
     let listing_table;
@@ -200,7 +202,7 @@ function display() {
     const page_span = document.getElementById("page");
     listing_table.innerHTML = "";
     // dynamically add element to result page
-    for(let i = offset[0] ; i <= offset[1] && data.length!=0 ; i++ ) {
+    for(let i = offset.start ; i <= offset.end && data.length!=0 ; i++ ) {
         listing_table.innerHTML += data[i] + "<br>";
     }
     page_span.innerHTML = currentPage;
@@ -208,7 +210,7 @@ function display() {
 }
 
 // display next and previous button 
-function showAndHideBtn() {
+showAndHideBtn = () => {
     const btnPrev = document.getElementById("btnPrev");
     const btnNext = document.getElementById("btnNext");
     // hide previous button when on page 1
@@ -226,7 +228,7 @@ function showAndHideBtn() {
 }
 
 // search dataBase for the requested string
-function search() {
+search = () => {
     const searchString = document.getElementById("searchBar").value;
     if (searchString == "") {
         return;
