@@ -47,7 +47,7 @@ public class StoreLogs {
         String log) {
         try {
             String indexName = IndexName.getIndexName(request, fileName);
-                indexName = getUniqueIndexName(indexName);
+            indexName = getUniqueIndexName(indexName);
             final String response = storeLog(
                 request, indexName, log, OFFSET_FOR_PLAIN_TEXT );
             return response;
