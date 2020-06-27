@@ -66,7 +66,7 @@ public class StackTrace {
             rangeHits = logDao.getHitsFromIndex(searchRequest);
             stackList = iterateForFindingStack(rangeHits, 0);
             stackLogLinesBuilder.addAll(stackList);
-            if (stackList.size() != rangeHits.size()) {
+            if (stackList.size() != rangeHits.size() || rangeHits.size() == 0) {
                 return stackLogLinesBuilder.build();
             }
         }

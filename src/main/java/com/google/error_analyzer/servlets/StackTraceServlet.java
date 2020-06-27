@@ -38,7 +38,7 @@ public class StackTraceServlet extends HttpServlet {
     public StackTrace stackTrace = new StackTrace();
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType(FileConstants.APP_JSON_CONTENT_TYPE);
+        response.setContentType(FileConstants.APPLICATION_JSON_CONTENT_TYPE);
         try {
             Integer errorLineNumber = Integer.parseInt(request.getParameter(LogFields.LOG_LINE_NUMBER));
             String indexName = request.getParameter(LogFields.FILE_NAME);
