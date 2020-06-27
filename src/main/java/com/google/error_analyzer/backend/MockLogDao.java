@@ -80,7 +80,7 @@ public class MockLogDao implements DaoInterface {
     }
   
     // returns no of documents in an index
-    public long getDocCount (String index) throws IOException {
+    public long getDocumentCount (String index) throws IOException {
         return 0l;
     }
 

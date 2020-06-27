@@ -67,7 +67,7 @@ public final class DocCountServletTest {
     @Test
     public void doPost_returnCount() throws Exception {
         when(request.getParameter(LogFields.INDEX)).thenReturn(fileName);
-        when(logDao.getDocCount(any(String.class))).thenReturn((long)5);
+        when(logDao.getDocumentCount(any(String.class))).thenReturn((long)5);
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);
         when(response.getWriter()).thenReturn(writer);

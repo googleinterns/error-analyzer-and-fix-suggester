@@ -89,7 +89,7 @@ public class LogDao implements DaoInterface {
 
     // returns no of documents in an index
     @Override 
-    public long getDocCount (String index) throws IOException {
+    public long getDocumentCount (String index) throws IOException {
         CountRequest countRequest = new CountRequest(index);
         searchSourceBuilder.query(QueryBuilders.matchAllQuery());
         countRequest.source(searchSourceBuilder);

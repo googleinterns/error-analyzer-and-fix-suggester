@@ -40,7 +40,7 @@ public class DocCountServlet extends HttpServlet {
         String index = request.getParameter(LogFields.INDEX);
         long count = 0l;
         try {
-            count = logDao.getDocCount(index);
+            count = logDao.getDocumentCount(index);
         }  catch (Exception exception) {
             count = 0l;
             logger.error(exception);

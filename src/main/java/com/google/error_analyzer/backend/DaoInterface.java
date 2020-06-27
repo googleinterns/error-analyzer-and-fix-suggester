@@ -29,7 +29,7 @@ public interface DaoInterface {
     int size) throws IOException;
 
     // returns no of documents in an index
-    public long getDocCount (String index) throws IOException;
+    public long getDocumentCount (String index) throws IOException;
 
     //search an index for errors using regex and keywords and store back in db
     //Returns name of the new index 
