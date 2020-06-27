@@ -43,11 +43,13 @@ import org.apache.logging.log4j.LogManager;
 /*This class is for storing the logs provided by the user 
 as files to the database*/
 public class FileServlet extends HttpServlet {
-    private static final Logger logger = LogManager.getLogger(FileServlet.class);
+    private static final Logger logger =
+         LogManager.getLogger(FileServlet.class);
     public static final FileLogs fileLogs = new FileLogs();
 
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) {
+    public void doPost(HttpServletRequest request, 
+        HttpServletResponse response) {
         try {
             response.setContentType(FileConstants.TEXT_HTML_CONTENT_TYPE);
             Part filePart = request.getPart(LogFields.FILE);
