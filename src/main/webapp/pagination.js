@@ -1,7 +1,5 @@
 const noOfPages = 5;
 const extraPageInFrontAndBack = Math.floor(noOfPages/2);
-const LOGS = "logs" ;
-const ERRORS = "errors";
 let currentPage = 1;
 let next = true;
 let recordsPerPage = 3;
@@ -10,61 +8,25 @@ let noOfRecordsOnLastPage = recordsPerPage;
 let lastPage = Number.MAX_VALUE;
 let data = new Array();
 
-
-// decrement by 1 on pressing previous button
-prevPage = () => {
-    currentPage--;
-    next = false;
-    changePage(currentPage);
-}
-
-// increment by 1 on pressing next button
-nextPage = () => {
-    currentPage++;
-    next = true;
-    changePage(currentPage);
-}
-
 // change content of page 
 async function changePage(page) {
     currentPage = page;
-    const logs = document.getElementById("logs").getAttribute("aria-selected");
-    const searchString = document.getElementById("searchBar").value;
-    let fileName = document.getElementById("fileName").value;
-    fileName =  fileName.trim();
+    const logs = document.getElementById(LOGS).getAttribute("aria-selected");
+    const searchString = document.getElementById(SEARCH_BAR).value;
     const fileType = logs == "true" ? LOGS : ERRORS ;
     const fetchedPage = getPageToBeFetched();
-    let fileName = document.getElementById("fileName").value;
+    let fileName = document.getElementById(FILE_NAME).value;
+    fileName =  fileName.trim();
 
-    // reset value of lastPage when on page 1 
     if(page == 1){
-        lastPage = Number.MAX_VALUE;
-        noOfRecordsOnLastPage = recordsPerPage;
-        if(fileType == ERRORS){
-            fileLength = await getCount(fileName, fileType);
-            lastPage = Math.ceil(fileLength/recordsPerPage);
-            if(fileLength % recordsPerPage != 0)
-                noOfRecordsOnLastPage = fileLength % recordsPerPage;
-        }
-    }
-    if(currentPage != 1 ) {
+        await resetLastPage(fileName, fileType);
+    } else {
         display();
     }
+
     if(fetchedPage != -1) {
-        const params = new URLSearchParams();
         const pageSpecs = getPageStartAndSize(fileType, fetchedPage, searchString);
-        console.log(pageSpecs.start+" "+pageSpecs.size);
-        params.append('start', pageSpecs.start);
-        params.append('size',  pageSpecs.size);
-        params.append('searchString', searchString);
-        params.append('fileType', fileType);
-        params.append('fileName', fileName);
-        const response = await fetch('/pagination', {
-            method: 'POST',
-            body: params
-        });
-        const fetchedData = await response.json();
-        console.log(fetchedData+" "+lastPage);
+        fetchedData = await callPaginationServlet(fileName, fileType, searchString, pageSpecs);
         updateLastPage(fetchedData.length, fetchedPage);
         if(fetchedData.length == 0 && currentPage == 1) {
             fileNotFound();
@@ -72,10 +34,24 @@ async function changePage(page) {
         }
         addToData(fetchedData, fetchedPage, fileType, fileName);    
     }
+
     if(currentPage == 1 ) {
         display();
     }
 }
+
+// reset value of lastPage when on page 1 
+async function resetLastPage(fileName, fileType) {
+    lastPage = Number.MAX_VALUE;
+    noOfRecordsOnLastPage = recordsPerPage;
+    if(fileType == ERRORS){
+        fileLength = await getCount(fileName, fileType);
+        lastPage = Math.ceil(fileLength/recordsPerPage);
+        if(fileLength % recordsPerPage != 0)
+            noOfRecordsOnLastPage = fileLength % recordsPerPage;
+    }
+}
+
 // calculating starting index and size of block to be fetched from databasefor given page
 getPageStartAndSize = (fileType, page, searchString) => {
     if(fileType == LOGS || searchString != "") {
@@ -92,7 +68,7 @@ getPageStartAndSizeForLogFile = (page) => {
     if( page == 1) {
         size = (noOfPages * recordsPerPage);
     } 
-    return {"start": start, "size": size};
+    return {START: start, SIZE: size};
 }
 
 // calculating starting index and size of block to be fetched for file storing errors
@@ -106,69 +82,16 @@ getPageStartAndSizeForErrorFile = (page) => {
         start = Math.max(0, fileLength-(noOfPages * recordsPerPage));
         size = Math.min(fileLength, (noOfPages * recordsPerPage));
     } 
-    return {"start": start, "size": size};
-}
-
-// return no of documents in a index
-async function getCount(fileName, fileType) {
-    const params = new URLSearchParams();
-    params.append('fileName', fileName);
-    params.append('fileType', fileType);
-    const response = await fetch('/getCount', {
-        method: 'POST',
-        body: params
-    });
-    const count = await response.json();
-    return count;
-}
-
-// display file not found message on UI
-fileNotFound = () => {
-    listing_table1  = document.getElementById("slide2");
-    listing_table2 =  document.getElementById("slide1");
-    listing_table1.innerHTML = "File Not Found";
-    listing_table2.innerHTML = "File Not Found";
-    currentPage = 1;
-    lastPage = 1;
-    showAndHideBtn();
-     
+    return {START: start, SIZE: size};
 }
 
 // add returned records to data
 addToData = (fetchedData, page, fileType, fileName) => {
     let idx = recordsPerPage * ((page - 1) % noOfPages);
     for (let i = 0; i < fetchedData.length; i++) {
-        data[idx] = prepareResultantDomElement(fetchedData[i], fileType, fileName);
+        data[idx] = prepareLogDomElement(fetchedData[i], fileType, fileName);
         idx++;
     }
-}
-
-// prepare resultant DOM element for resultPage
-function prepareResultantDomElement(logError, fileType, fileName) {
-    const liElement = document.createElement('li');
-    const logLineNo = document.createElement('span');
-    logLineNo.innerText = logError.logLineNumber + "  ";
-    const logText = document.createElement('span');
-    logText.innerHTML = logError.logText;
-    liElement.appendChild(logLineNo);
-    liElement.appendChild(logText);
-    
-    if(fileType == ERRORS){
-        const stackTraceButton = document.createElement('button');
-        stackTraceButton.innerText="Stack Trace";
-        stackTraceButton.className = "stackTraceButton";
-        stackTraceButton.addEventListener('click', () => {
-            let stackTraceContainer = document.getElementById("stackTraceContainer");
-            stackTraceContainer.className = "show";
-            let crossBtn = document.getElementById("crossBtn");
-            crossBtn.className = "show";
-            stackTraceContainer.innerHTML = "";
-            stackTraceContainer.innerHTML += logError.logText;
-            callStackTraceServlet(logError.logLineNumber, fileName);
-        });
-        liElement.appendChild(stackTraceButton);
-    }
-    return liElement;
 }
 
 // return start and end indices for the section of data to be shown 
@@ -178,15 +101,7 @@ getOffset = (page) => {
     if(page == lastPage) {
         end = start + (noOfRecordsOnLastPage - 1);
     } 
-    return {"start": start, "end": end};
-}
-
-// change no of records on a page 
-changeNoOfRecordsOnPage = () => {
-    const records = document.getElementById("records");
-    recordsPerPage = records.value;
-    currentPage=1;
-    changePage(1);
+    return {START: start, END: end};
 }
 
 // return page no to be fetched from database
@@ -227,13 +142,13 @@ display = () => {
     const offset = getOffset(currentPage);
     let listing_table;
     if(currentPage % 2 == 0)
-        listing_table  = document.getElementById("slide2");
+        listing_table  = document.getElementById(SLIDE_2);
     else
-        listing_table =  document.getElementById("slide1");
-    const page_span = document.getElementById("page");
+        listing_table =  document.getElementById(SLIDE_1);
+    const page_span = document.getElementById(PAGE);
     listing_table.innerHTML = "";
     // dynamically add element to result page
-    for(let i = offset.start ; i <= offset.end && data.length!=0 ; i++ ) {
+    for(let i = offset.START ; i <= offset.END && data.length!=0 ; i++ ) {
          listing_table.appendChild(data[i]);
     }
     page_span.innerHTML = currentPage;
@@ -242,51 +157,19 @@ display = () => {
 
 // display next and previous button 
 showAndHideBtn = () => {
-    const btnPrev = document.getElementById("btnPrev");
-    const btnNext = document.getElementById("btnNext");
+    const btnPrev = document.getElementById(PREVIOUS_BUTTON);
+    const btnNext = document.getElementById(NEXT_BUTTON);
     // hide previous button when on page 1
     if (currentPage == 1) {
-        btnPrev.style.visibility = "hidden";
+        btnPrev.style.visibility = HIDDEN;
     } else {
-        btnPrev.style.visibility = "visible";
+        btnPrev.style.visibility = VISIBLE;
     }
     // hide next button when 
     if (lastPage == currentPage || data.length == 0) {
-        btnNext.style.visibility = "hidden";
+        btnNext.style.visibility = HIDDEN;
     } else if (lastPage != currentPage){
-        btnNext.style.visibility = "visible";
+        btnNext.style.visibility = VISIBLE;
     }
 }
 
-// search dataBase for the requested string
-search = () => {
-    const searchString = document.getElementById("searchBar").value;
-    if (searchString == "") {
-        return;
-    }
-    changePage(1);
-}
-
-async function callStackTraceServlet(logLineNo, fileName) {
-    let stackTraceContainer = document.getElementById("stackTraceContainer");
-    const params = new URLSearchParams();
-    params.append('logLineNumber', logLineNo);
-    params.append('fileName', fileName);
-    const response = await fetch('/stackTrace', {
-        method: 'POST',
-        body: params
-    });
-    const stackTrace = await response.json();
-    for(let i=0; i<stackTrace.length; i++) {
-        let stackTraceElement = document.createElement('li');
-        stackTraceElement.innerText = stackTraceContainer[i];
-        stackTraceContainer.appendChild(stackTraceElement);
-    }
-}
-
-function addHideClass() {
-    let stackTraceContainer = document.getElementById("stackTraceContainer");
-    stackTraceContainer.className = "hide";
-    let crossBtn = document.getElementById("crossBtn");
-    crossBtn.className = "hide";
-}
