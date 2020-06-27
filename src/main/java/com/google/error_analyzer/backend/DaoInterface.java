@@ -28,6 +28,9 @@ public interface DaoInterface {
     public ImmutableList < SearchHit > getAll (String fileName, int start, 
     int size) throws IOException;
 
+    // returns no of documents in an index
+    public long getDocumentCount (String index) throws IOException;
+
     //search an index for errors using regex and keywords and store back in db
     //Returns name of the new index 
     public String findAndStoreErrors (String filename) throws IOException;
