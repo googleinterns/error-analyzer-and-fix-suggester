@@ -42,48 +42,51 @@ public class StackTrace {
     String fileName) throws IOException {
         SearchRequest searchRequest = createSearchRequest(fileName,
         errorLogLineNumber);
+        logger.info("Finding stack for ".concat(errorLogLineNumber.toString()));
         ImmutableList < SearchHit > rangeHits = logDao.getHitsFromIndex(searchRequest);
-        Builder < String > stackLogLines = ImmutableList.< String > builder();
+        Builder < String > stackLogLinesBuilder = ImmutableList.< String > builder();
         Integer startOfStack = findStartOfStack(rangeHits);
         if (startOfStack == -1) {
-            return stackLogLines.build();
-        }else{
+            return stackLogLinesBuilder.build();
+        } else {
             //add message brfore stack starts to stackLogLines
-            logger.info("Adding ".concat(startOfStack.toString()).concat(" messages to stack list"));
-            stackLogLines.addAll(extractLogTextFormHits(rangeHits, 0, startOfStack));
+            logger.info("Adding ".concat(startOfStack.toString())
+            .concat(" messages to stack list"));
+            stackLogLinesBuilder.addAll(extractLogTextFormHits(rangeHits, 0, startOfStack));
         }
-        ImmutableList < String > stackList = iterateForStack(rangeHits, startOfStack);
-        stackLogLines.addAll(stackList);
+        ImmutableList < String > stackList = iterateForFindingStack(rangeHits, startOfStack);
+        stackLogLinesBuilder.addAll(stackList);
         if (stackList.size() != rangeHits.size() - startOfStack) {
-            return stackLogLines.build();
+            return stackLogLinesBuilder.build();
         }
         while (true) {
             logger.info("Exceeding batch size request");
-            Integer nextLine = errorLogLineNumber + stackLogLines.build().size();
+            Integer nextLine = errorLogLineNumber + stackLogLinesBuilder.build().size();
             searchRequest = createSearchRequest(fileName, nextLine);
             rangeHits = logDao.getHitsFromIndex(searchRequest);
-            stackList = iterateForStack(rangeHits, 0);
-            stackLogLines.addAll(stackList);
+            stackList = iterateForFindingStack(rangeHits, 0);
+            stackLogLinesBuilder.addAll(stackList);
             if (stackList.size() != rangeHits.size()) {
-                return stackLogLines.build();
+                return stackLogLinesBuilder.build();
             }
         }
     }
 
-    private ImmutableList < String > iterateForStack (ImmutableList < SearchHit > hits,
+    // Iterate over range query to find call stack. Return if end is found
+    private ImmutableList < String > iterateForFindingStack (ImmutableList < SearchHit > hits,
     Integer start) {
-        Builder < String > stackLogLines = ImmutableList.< String > builder();
+        Builder < String > stackLogLinesBuilder = ImmutableList.< String > builder();
         for (int i = start; i < hits.size(); i++) {
             String logText = (String) hits.get(i)
                 .getSourceAsMap().get(LogFields.LOG_TEXT);
             if (StackTraceFormat.matchesFormat(logText)) {
-                stackLogLines.add(logText);
-            }else{
+                stackLogLinesBuilder.add(logText);
+            } else {
                 logger.info("End of stack trace found");
-                return stackLogLines.build();
+                return stackLogLinesBuilder.build();
             }
         }
-        return stackLogLines.build();
+        return stackLogLinesBuilder.build();
     }
 
     //returns index of the first searchHit that matches the stack format
@@ -111,7 +114,6 @@ public class StackTrace {
             logTextListBuilder.add(logText);
         }
         return logTextListBuilder.build();
-
     }
 
     //create request for BATCH_SIZE documents after found error

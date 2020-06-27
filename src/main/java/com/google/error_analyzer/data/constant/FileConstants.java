@@ -14,4 +14,5 @@ package com.google.error_analyzer.data.constant;
 /** This class contains all the constants related to files*/
 public class FileConstants {
     public static final String TEXT_HTML_CONTENT_TYPE = "text/html";
+    public static final String APP_JSON_CONTENT_TYPE = "application/json";
 }
