@@ -23,4 +23,5 @@ public class LogFields {
     public static final String SIZE = "size";
     public static final String FILE_TYPE = "fileType";
     public static final String SEARCH_STRING = "searchString";
+    public static final String ERROR = "errors";
 }

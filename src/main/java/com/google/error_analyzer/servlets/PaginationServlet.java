@@ -31,8 +31,6 @@ import org.elasticsearch.search.SearchHits;
 
 @WebServlet("/pagination")
 public class PaginationServlet extends HttpServlet {
-
-    private static final String ERROR = "errors";
     private static final Logger logger =
         LogManager.getLogger(PaginationServlet.class);
     private static int start;
@@ -49,7 +47,7 @@ public class PaginationServlet extends HttpServlet {
         fileName = request.getParameter(LogFields.FILE_NAME);
         String fileType = request.getParameter(LogFields.FILE_TYPE);
         String searchString = request.getParameter(LogFields.SEARCH_STRING);
-        if(fileType.equals(ERROR))
+        if(fileType.equals(LogFields.ERROR))
             fileName = logDaoHelper.getErrorIndexName(fileName);
         response.setContentType(FileConstants.APPLICATION_JSON_CONTENT_TYPE);
         if (fileName.isEmpty() || !logDao.fileExists(fileName)) {
@@ -95,12 +93,12 @@ public class PaginationServlet extends HttpServlet {
     String searchString,ImmutableList < String > hitFieldContent) {
         ArrayList < String > data = new ArrayList();
         int startIdx = 0;
-        if(fileType.equals(ERROR) && searchString.isEmpty()) { 
+        if(fileType.equals(LogFields.ERROR) && searchString.isEmpty()) { 
             startIdx = hitFieldContent.size() -1 ;
         }
         for (int idx = startIdx; idx < hitFieldContent.size() && idx >= 0;) {
             String resultString = hitFieldContent.get(idx);
-            if (fileType.equals(ERROR)) {
+            if (fileType.equals(LogFields.ERROR)) {
                 // TODO : fix at this moment is a empty string but will be replaced
                 // by actual fix while integrating this branch with fix-suggester 
                 String fix= new String();

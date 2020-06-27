@@ -40,6 +40,7 @@ import static org.mockito.Mockito.when;
 public final class DocCountServletTest {
 
     private final String fileName = "file";
+    private final String fileType = "logs";
     
     @Mock
     HttpServletRequest request;
@@ -67,6 +68,7 @@ public final class DocCountServletTest {
     @Test
     public void doPost_returnCount() throws Exception {
         when(request.getParameter(LogFields.INDEX)).thenReturn(fileName);
+        when(request.getParameter(LogFields.FILE_TYPE)).thenReturn(fileType);
         when(logDao.getDocumentCount(any(String.class))).thenReturn((long)5);
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);

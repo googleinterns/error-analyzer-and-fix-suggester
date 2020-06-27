@@ -38,6 +38,9 @@ public class DocCountServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, 
         HttpServletResponse response) throws IOException {
         String index = request.getParameter(LogFields.INDEX);
+        String fileType = request.getParameter(LogFields.FILE_TYPE);
+        if(fileType.equals(LogFields.ERROR))
+            index = logDaoHelper.getErrorIndexName(index);
         long count = 0l;
         try {
             count = logDao.getDocumentCount(index);

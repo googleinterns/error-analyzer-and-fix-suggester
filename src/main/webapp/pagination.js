@@ -1,24 +1,24 @@
-let currentPage = 1;
-let next = true;
-let recordsPerPage = 3;
 const noOfPages = 5;
 const extraPageInFrontAndBack = Math.floor(noOfPages/2);
 const LOGS = "logs" ;
 const ERRORS = "errors";
+let currentPage = 1;
+let next = true;
+let recordsPerPage = 3;
 let fileLength = Number.MAX_VALUE;
 let noOfRecordsOnLastPage = recordsPerPage;
 let lastPage = Number.MAX_VALUE;
 let data = new Array();
 
 // decrement by 1 on pressing previous button
-function prevPage() {
+prevPage = () => {
     currentPage--;
     next = false;
     changePage(currentPage);
 }
 
 // increment by 1 on pressing next button
-function nextPage() {
+nextPage = () => {
     currentPage++;
     next = true;
     changePage(currentPage);
@@ -26,21 +26,20 @@ function nextPage() {
 
 // change content of page 
 async function changePage(page) {
+    currentPage = page;
     const logs = document.getElementById("logs").getAttribute("aria-selected");
     const searchString = document.getElementById("searchBar").value;
-    let fileName = document.getElementById("fileName").value;
     const fileType = logs == "true" ? LOGS : ERRORS ;
+    const fetchedPage = getPageToBeFetched();
+    let fileName = document.getElementById("fileName").value;
 
-    currentPage = page;
     if(page == 1 && fileType == ERRORS){
-        fileLength = await getCount(fileName+"error");
-    }
-    const fetchedPage = getPageToBeFetched(); 
+        fileLength = await getCount(fileName, fileType);
+    } 
     if(currentPage != 1 ) {
         display();
     }
     if(fetchedPage != -1) {
-       
         const params = new URLSearchParams();
         const startAndSize = getPageStartAndSize(fileType, fetchedPage);
         params.append('start', startAndSize[0]);
@@ -100,9 +99,10 @@ function getPageStartAndSizeForErrorFile(page) {
 }
 
 // return no of documents in a index
-async function getCount(fileName) {
+async function getCount(fileName, fileType) {
     const params = new URLSearchParams();
     params.append('index', fileName);
+    params.append('fileType', fileType);
     const response = await fetch('/getCount', {
         method: 'POST',
         body: params
