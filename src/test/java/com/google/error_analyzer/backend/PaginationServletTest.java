@@ -14,7 +14,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.LogDaoHelper;
 import com.google.error_analyzer.data.constant.LogFields;
+import com.google.error_analyzer.data.Document;
 import com.google.error_analyzer.servlets.PaginationServlet;
+import com.google.gson.Gson;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -39,6 +41,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.test.util.ReflectionTestUtils;
 import static org.mockito.BDDMockito.any;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.when;	
 
 
@@ -82,11 +85,17 @@ public final class PaginationServletTest {
     // test dopost
     @Test
     public void doPost_validLogFileName() throws Exception {	
-        ImmutableList<String> hitContent = 	
-            ImmutableList.of("log2");	
+        ImmutableList<String> logText = ImmutableList.<String>builder() 
+                                                    .add("log2")
+                                                    .build();	
+        ImmutableList<String> logLineNo = ImmutableList.<String>builder() 
+                                                    .add("2")
+                                                    .build();	
         when(logDao.fileExists(any(String.class))).thenReturn(true);	
-        when(logDaoHelper.hitFieldContent(any(),any())).	
-            thenReturn(hitContent);
+        when(logDaoHelper.hitFieldContent(any(),eq(LogFields.LOG_TEXT))).	
+            thenReturn(logText);
+        when(logDaoHelper.hitFieldContent(any(),eq(LogFields.LOG_LINE_NUMBER))).	
+            thenReturn(logLineNo);
         when(request.getParameter(LogFields.START)).thenReturn("1");
         when(request.getParameter(LogFields.SIZE)).thenReturn("1");
         when(request.getParameter(LogFields.FILE_NAME)).thenReturn(fileName);
@@ -97,18 +106,25 @@ public final class PaginationServletTest {
         when(response.getWriter()).thenReturn(writer);
         pagination.doPost(request, response);
         String actual = stringWriter.toString();
-        String expected =  new String("[\"log2\"]\n");
+        ArrayList < Document > data = new ArrayList();
+        data.add(new Document("",2,"log2"));
+        String expected = convertToJson(data)+"\n";
         Assert.assertEquals(expected, actual);
     }
 
     @Test
     public void doPost_validErrorFileName() throws Exception {	
-        ImmutableList<String> hitContent = ImmutableList.<String>builder() 
+        ImmutableList<String> logText = ImmutableList.<String>builder() 
                                                     .add("error1","error2")
                                                     .build();	
+        ImmutableList<String> logLineNo = ImmutableList.<String>builder() 
+                                                    .add("1","2")
+                                                    .build();	                                           
         when(logDao.fileExists(any(String.class))).thenReturn(true);	
-        when(logDaoHelper.hitFieldContent(any(),any())).	
-            thenReturn(hitContent);
+        when(logDaoHelper.hitFieldContent(any(),eq(LogFields.LOG_TEXT))).	
+            thenReturn(logText);
+        when(logDaoHelper.hitFieldContent(any(),eq(LogFields.LOG_LINE_NUMBER))).	
+            thenReturn(logLineNo);
         when(request.getParameter(LogFields.START)).thenReturn("1");
         when(request.getParameter(LogFields.SIZE)).thenReturn("1");
         when(request.getParameter(LogFields.FILE_NAME)).thenReturn(fileName);
@@ -119,7 +135,12 @@ public final class PaginationServletTest {
         when(response.getWriter()).thenReturn(writer);
         pagination.doPost(request, response);
         String actual = stringWriter.toString();
-        String expected = new String("[\"error2 \",\"error1 \"]\n");
+        ArrayList < Document > data = new ArrayList();
+        Document document1 =new Document("",2,"error2 ");
+        Document document2 =new Document("",1,"error1 ");
+        data.add(document1);
+        data.add(document2);
+        String expected = convertToJson(data)+"\n";
         Assert.assertEquals(expected, actual);
     }
 
@@ -135,7 +156,7 @@ public final class PaginationServletTest {
         when(response.getWriter()).thenReturn(writer);
         pagination.doPost(request, response);
         String actual = stringWriter.toString();
-        String expected =  new String("[]\n");
+        String expected = convertToJson(new ArrayList<Document>())+"\n";
         Assert.assertEquals(expected, actual);
     }
 
@@ -152,17 +173,20 @@ public final class PaginationServletTest {
         when(response.getWriter()).thenReturn(writer);
         pagination.doPost(request, response);
         String actual = stringWriter.toString();
-        String expected =  new String("[]\n");
+        String expected = convertToJson(new ArrayList<Document>())+"\n";
         Assert.assertEquals(expected, actual);
     }
 
     @Test
     public void doPost_searchStringNotEmpty() throws Exception {
-        ImmutableList<String> immutableListContent = 	
+        ImmutableList<String> searchResult = 	
             ImmutableList.of("Google Intern");
+        ImmutableList<String> logLineNo = ImmutableList.of("7");
         when(logDao.fileExists(any(String.class))).thenReturn(true);	
-        when(logDaoHelper.getHighLightedText(any(),any())).	
-            thenReturn(immutableListContent);
+        when(logDaoHelper.getHighLightedText(any(),eq(LogFields.LOG_TEXT))).	
+            thenReturn(searchResult);
+        when(logDaoHelper.hitFieldContent(any(),eq(LogFields.LOG_LINE_NUMBER))).	
+            thenReturn(logLineNo);
         when(request.getParameter(LogFields.START)).thenReturn("1");
         when(request.getParameter(LogFields.SIZE)).thenReturn("1");
         when(request.getParameter(LogFields.FILE_NAME)).thenReturn(fileName);
@@ -173,8 +197,15 @@ public final class PaginationServletTest {
         when(response.getWriter()).thenReturn(writer);
         pagination.doPost(request, response);
         String actual = stringWriter.toString();
-        String expected =  new String("[\"Google Intern\"]\n");
+        ArrayList < Document > data = new ArrayList();
+        data.add(new Document("",7,"Google Intern"));
+        String expected = convertToJson(data)+"\n";
         Assert.assertEquals(expected, actual);
     }
 
+    private String convertToJson(ArrayList < Document > data) {
+        Gson gson = new Gson();
+        String json = gson.toJson(data);
+        return json;
+    }
 }

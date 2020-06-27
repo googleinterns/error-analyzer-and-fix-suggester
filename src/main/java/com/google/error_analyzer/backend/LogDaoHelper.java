@@ -11,6 +11,7 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
+import com.google.error_analyzer.data.constant.LogFields;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import java.util.*;
@@ -64,5 +65,6 @@ public class LogDaoHelper {
     //returns index name which stores the error logs
     public static String getErrorIndexName (String fileName) {
         return fileName.concat("error");
-    } 
+    }
+
 }

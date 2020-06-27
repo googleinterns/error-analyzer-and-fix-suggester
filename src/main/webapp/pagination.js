@@ -10,6 +10,7 @@ let noOfRecordsOnLastPage = recordsPerPage;
 let lastPage = Number.MAX_VALUE;
 let data = new Array();
 
+
 // decrement by 1 on pressing previous button
 prevPage = () => {
     currentPage--;
@@ -29,6 +30,8 @@ async function changePage(page) {
     currentPage = page;
     const logs = document.getElementById("logs").getAttribute("aria-selected");
     const searchString = document.getElementById("searchBar").value;
+    let fileName = document.getElementById("fileName").value;
+    fileName =  fileName.trim();
     const fileType = logs == "true" ? LOGS : ERRORS ;
     const fetchedPage = getPageToBeFetched();
     let fileName = document.getElementById("fileName").value;
@@ -67,7 +70,7 @@ async function changePage(page) {
             fileNotFound();
             return;
         }
-        addToData(fetchedData, fetchedPage);    
+        addToData(fetchedData, fetchedPage, fileType, fileName);    
     }
     if(currentPage == 1 ) {
         display();
@@ -132,12 +135,40 @@ fileNotFound = () => {
 }
 
 // add returned records to data
-addToData = (fetchedData, page) => {
+addToData = (fetchedData, page, fileType, fileName) => {
     let idx = recordsPerPage * ((page - 1) % noOfPages);
     for (let i = 0; i < fetchedData.length; i++) {
-        data[idx] = fetchedData[i];
+        data[idx] = prepareResultantDomElement(fetchedData[i], fileType, fileName);
         idx++;
     }
+}
+
+// prepare resultant DOM element for resultPage
+function prepareResultantDomElement(logError, fileType, fileName) {
+    const liElement = document.createElement('li');
+    const logLineNo = document.createElement('span');
+    logLineNo.innerText = logError.logLineNumber + "  ";
+    const logText = document.createElement('span');
+    logText.innerHTML = logError.logText;
+    liElement.appendChild(logLineNo);
+    liElement.appendChild(logText);
+    
+    if(fileType == ERRORS){
+        const stackTraceButton = document.createElement('button');
+        stackTraceButton.innerText="Stack Trace";
+        stackTraceButton.className = "stackTraceButton";
+        stackTraceButton.addEventListener('click', () => {
+            let stackTraceContainer = document.getElementById("stackTraceContainer");
+            stackTraceContainer.className = "show";
+            let crossBtn = document.getElementById("crossBtn");
+            crossBtn.className = "show";
+            stackTraceContainer.innerHTML = "";
+            stackTraceContainer.innerHTML += logError.logText;
+            callStackTraceServlet(logError.logLineNumber, fileName);
+        });
+        liElement.appendChild(stackTraceButton);
+    }
+    return liElement;
 }
 
 // return start and end indices for the section of data to be shown 
@@ -203,7 +234,7 @@ display = () => {
     listing_table.innerHTML = "";
     // dynamically add element to result page
     for(let i = offset.start ; i <= offset.end && data.length!=0 ; i++ ) {
-        listing_table.innerHTML += data[i] + "<br>";
+         listing_table.appendChild(data[i]);
     }
     page_span.innerHTML = currentPage;
     showAndHideBtn();
@@ -234,4 +265,28 @@ search = () => {
         return;
     }
     changePage(1);
+}
+
+async function callStackTraceServlet(logLineNo, fileName) {
+    let stackTraceContainer = document.getElementById("stackTraceContainer");
+    const params = new URLSearchParams();
+    params.append('logLineNumber', logLineNo);
+    params.append('fileName', fileName);
+    const response = await fetch('/stackTrace', {
+        method: 'POST',
+        body: params
+    });
+    const stackTrace = await response.json();
+    for(let i=0; i<stackTrace.length; i++) {
+        let stackTraceElement = document.createElement('li');
+        stackTraceElement.innerText = stackTraceContainer[i];
+        stackTraceContainer.appendChild(stackTraceElement);
+    }
+}
+
+function addHideClass() {
+    let stackTraceContainer = document.getElementById("stackTraceContainer");
+    stackTraceContainer.className = "hide";
+    let crossBtn = document.getElementById("crossBtn");
+    crossBtn.className = "hide";
 }
