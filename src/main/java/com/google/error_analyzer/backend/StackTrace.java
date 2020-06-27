@@ -17,6 +17,7 @@ import com.google.error_analyzer.backend.LogDaoHelper;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.constant.StackTraceFormat;
 import java.io.IOException;
+import java.lang.*;
 import java.util.*;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -39,97 +40,78 @@ public class StackTrace {
     // following an error
     public ImmutableList < String > findStack(Integer errorLogLineNumber,
     String fileName) throws IOException {
-        Builder < String > stackLogLines = ImmutableList.< String > builder();
-        Integer countOfMsgsBeforeStack = 0;
-        Integer lastCheckedLine = errorLogLineNumber;
-        ArrayList < String > msgsBeforeStack = new ArrayList < String >();
-        logger.info("Creating a new search request for error at "
-        .concat(errorLogLineNumber.toString()));
         SearchRequest searchRequest = createSearchRequest(fileName,
         errorLogLineNumber);
-        SearchHit[] rangeHits = logDao.getHitsFromIndex(searchRequest);
-        Integer storedInStack = 0; //stackLogLines.size()
-
-        for (SearchHit rangeHit : rangeHits) {
-            Map < String ,Object > sourceMap = rangeHit.getSourceAsMap();
-            String logText = (String) sourceMap.get(LogFields.LOG_TEXT);
-            Integer logLineNumber = (Integer) sourceMap.get(LogFields.LOG_LINE_NUMBER);
-            if (logLineNumber != lastCheckedLine + 1) {
-                break;
+        ImmutableList < SearchHit > rangeHits = logDao.getHitsFromIndex(searchRequest);
+        Builder < String > stackLogLines = ImmutableList.< String > builder();
+        Integer startOfStack = findStartOfStack(rangeHits);
+        if (startOfStack == -1) {
+            return stackLogLines.build();
+        }else{
+            //add message brfore stack starts to stackLogLines
+            logger.info("Adding ".concat(startOfStack.toString()).concat(" messages to stack list"));
+            stackLogLines.addAll(extractLogTextFormHits(rangeHits, 0, startOfStack));
+        }
+        ImmutableList < String > stackList = iterateForStack(rangeHits, startOfStack);
+        stackLogLines.addAll(stackList);
+        if (stackList.size() != rangeHits.size() - startOfStack) {
+            return stackLogLines.build();
+        }
+        while (true) {
+            logger.info("Exceeding batch size request");
+            Integer nextLine = errorLogLineNumber + stackLogLines.build().size();
+            searchRequest = createSearchRequest(fileName, nextLine);
+            rangeHits = logDao.getHitsFromIndex(searchRequest);
+            stackList = iterateForStack(rangeHits, 0);
+            stackLogLines.addAll(stackList);
+            if (stackList.size() != rangeHits.size()) {
+                return stackLogLines.build();
             }
-            lastCheckedLine = logLineNumber;
-            if ( StackTraceFormat.matchesFormat(logText) ) {
-                if (storedInStack == 0) {
-                    //add error msgs before stack starts
-                    storedInStack += msgsBeforeStack.size();
-                    logger.info("Adding messages before error to stack for "
-                    .concat(errorLogLineNumber.toString()));
-                    stackLogLines.addAll(msgsBeforeStack);
-                }
-                logger.info("Adding to stack list log line number "
-                .concat(logLineNumber.toString()));
-                storedInStack++;
+        }
+    }
+
+    private ImmutableList < String > iterateForStack (ImmutableList < SearchHit > hits,
+    Integer start) {
+        Builder < String > stackLogLines = ImmutableList.< String > builder();
+        for (int i = start; i < hits.size(); i++) {
+            String logText = (String) hits.get(i)
+                .getSourceAsMap().get(LogFields.LOG_TEXT);
+            if (StackTraceFormat.matchesFormat(logText)) {
                 stackLogLines.add(logText);
-            } else {
-                if (storedInStack == 0 && countOfMsgsBeforeStack < ALLOWED_MESSAGES) {
-                    //temporary storage of log lines till stack trace is found
-                    logger.info("Adding ".concat(logLineNumber.toString())
-                    .concat(" to error msgs"));
-                    msgsBeforeStack.add(logText);
-                    countOfMsgsBeforeStack++;
-                } else {
-                    //if no stack is  found or end of stack is found
-                    break;
-                }
+            }else{
+                logger.info("End of stack trace found");
+                return stackLogLines.build();
             }
-        }
-
-        if (storedInStack == 0) {
-            return noStackFound();
-        }
-        //reaches the end of requested documents 
-        if (storedInStack == rangeHits.length) {
-            stackLogLines.addAll(
-            findStackExceedingBatchSize(lastCheckedLine, fileName));
         }
         return stackLogLines.build();
     }
 
-    public ImmutableList < String > noStackFound() {
-        return ImmutableList.<String>builder() 
-            .add("No stack found for this error").build(); 
-    }
-
-    private ImmutableList < String > findStackExceedingBatchSize(Integer errorLogLineNumber,
-    String fileName) throws IOException {
-        //Stack exceeded the batch request size
-        Builder < String > stackLogLines = ImmutableList.< String > builder();
-        Integer lastCheckedLine = errorLogLineNumber;
-        while (true) {
-            logger.info("Exceeding batch size request. Creating a new search request");
-            SearchRequest searchRequest = createSearchRequest(fileName, lastCheckedLine);
-            SearchHit[] rangeHits = logDao.getHitsFromIndex(searchRequest);
-            if (rangeHits.length == 0) {
-                return stackLogLines.build();
-            }
-            for (SearchHit rangeHit : rangeHits) {
-                Map < String ,Object > sourceMap = rangeHit.getSourceAsMap();
-                String logText = (String) sourceMap.get(LogFields.LOG_TEXT);
-                Integer logLineNumber = (Integer) sourceMap
-                .get(LogFields.LOG_LINE_NUMBER);
-                if (logLineNumber != lastCheckedLine + 1){
-                    return stackLogLines.build();
-                }
-                lastCheckedLine = logLineNumber;
-                if ( StackTraceFormat.matchesFormat(logText) ) {
-                    logger.info("Adding to stack list log line number "
-                    .concat(logLineNumber.toString()));
-                    stackLogLines.add(logText);
-                } else {
-                    return stackLogLines.build();
-                }
+    //returns index of the first searchHit that matches the stack format
+    // -1 if start is not found
+    private Integer findStartOfStack(ImmutableList < SearchHit > hits) {
+        Integer end = Math.min(ALLOWED_MESSAGES+1, hits.size());
+        for (int i = 0; i < end; i++) {
+            Map < String ,Object > sourceMap = hits.get(i).getSourceAsMap();
+            String logText = (String) sourceMap.get(LogFields.LOG_TEXT);
+            if(StackTraceFormat.matchesFormat(logText)) {
+                return i;
             }
         }
+        logger.info("No stack found");
+        return -1;
+    }
+
+    //create list of logText from SearchHits[start, end)
+    private ImmutableList < String > extractLogTextFormHits(ImmutableList < SearchHit > hits,
+    int start, int end) {
+        Builder < String > logTextListBuilder = ImmutableList.< String > builder();
+        for (int i = start;i < end; i++) {
+            String logText = (String) hits.get(i)
+                .getSourceAsMap().get(LogFields.LOG_TEXT);
+            logTextListBuilder.add(logText);
+        }
+        return logTextListBuilder.build();
+
     }
 
     //create request for BATCH_SIZE documents after found error

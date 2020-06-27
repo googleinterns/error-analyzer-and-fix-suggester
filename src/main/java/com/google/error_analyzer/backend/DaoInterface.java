@@ -47,6 +47,6 @@ public interface DaoInterface {
         ImmutableList < Document > documentList) throws IOException;
 
     //fetch documents from index according to searchRequest
-    public SearchHit[] getHitsFromIndex(SearchRequest searchRequest)
+    public ImmutableList < SearchHit > getHitsFromIndex(SearchRequest searchRequest)
     throws IOException;
 }

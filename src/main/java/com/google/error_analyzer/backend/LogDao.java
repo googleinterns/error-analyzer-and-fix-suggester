@@ -141,11 +141,16 @@ public class LogDao implements DaoInterface {
 
     //fetch documents from index according to searchRequest
     @Override
-    public SearchHit[] getHitsFromIndex(SearchRequest searchRequest)
+    public ImmutableList < SearchHit > getHitsFromIndex(SearchRequest searchRequest)
     throws IOException {
+        Builder < SearchHit > searchResultBuilder = ImmutableList.< SearchHit > builder();
         SearchResponse searchResponse = client
             .search(searchRequest, RequestOptions.DEFAULT);
-        return searchResponse.getHits().getHits();
+        SearchHits hits = searchResponse.getHits();
+        for (SearchHit hit : hits){
+            searchResultBuilder.add(hit);
+        }
+        return searchResultBuilder.build();
     }
     
     //Stores the documents into the database by performing multiple indexing operations

@@ -56,7 +56,7 @@ public class StackTraceServletTest {
         when(response.getWriter()).thenReturn(writer);
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
-        String expected = "[\"No stack found for this error\"]\n";
+        String expected = "[]\n";
         assertEquals(expected, actual);
     }
 

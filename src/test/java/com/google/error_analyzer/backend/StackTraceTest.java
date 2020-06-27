@@ -65,65 +65,71 @@ public final class StackTraceTest {
     @Test
     public void noHitsFromRangeQuery() throws IOException {
         // No hit is returned from searchRequest i.e. End of file
-        SearchHit[] searchHits = new SearchHit[0]; 
+        ImmutableList < SearchHit > searchHits = ImmutableList.< SearchHit > builder().build();
         when(stackTrace.logDao.getHitsFromIndex(any(SearchRequest.class)))
         .thenReturn(searchHits);
-        ImmutableList < String > actual = stackTrace.findStack(ERROR_LINE,
-        FILE_NAME);
-        ImmutableList < String > expected = stackTrace.noStackFound();
+
+        ImmutableList < String > actual = stackTrace.findStack(ERROR_LINE, FILE_NAME);
+        ImmutableList < String > expected = ImmutableList.<String>builder() .build(); 
         Assert.assertEquals(expected, expected);
     }
 
     @Test
     public void notEnoughRangeHits() throws IOException {
-        // When there are not enough searchHits, stored messages get disrcarded and no stack
-        // found is returned
-        SearchHit[] searchHits = new SearchHit[1];
-        searchHits[0] = Mockito.mock(SearchHit.class);
+        // When there are not enough searchHits, stored messages get disrcarded
+        Builder < SearchHit > searchHitsBuilder = ImmutableList.< SearchHit > builder();
+        SearchHit hit = Mockito.mock(SearchHit.class);
         Map<String ,Object> sourceMap = createSourceMap(ERROR_LINE+1,
         MSG_BEFORE_STACK);
-        when(searchHits[0].getSourceAsMap()).thenReturn(sourceMap);
+        when(hit.getSourceAsMap()).thenReturn(sourceMap);
+        searchHitsBuilder.add(hit);
         when(stackTrace.logDao.getHitsFromIndex(any(SearchRequest.class)))
-        .thenReturn(searchHits);
-        ImmutableList < String > actual = stackTrace.findStack(1, FILE_NAME);
-        ImmutableList < String > expected = stackTrace.noStackFound();
+        .thenReturn(searchHitsBuilder.build());
+
+        ImmutableList < String > actual = stackTrace.findStack(ERROR_LINE, FILE_NAME);
+        ImmutableList < String > expected = ImmutableList.<String>builder() .build(); 
         Assert.assertEquals(expected, actual);
     }
 
     @Test
     public void exceedNumberOfAllowedMsgs() throws IOException {
-        // Number of allowed messages before stack trace is exceeded 
-        SearchHit[] searchHits = new SearchHit[ALLOWED_MESSAGES+1];
+        // Number of allowed messages before stack trace is exceeded
+        Builder < SearchHit > searchHitsBuilder = ImmutableList.< SearchHit > builder();
         for (int i = 0; i <= ALLOWED_MESSAGES; i++) {
             Map<String ,Object> sourceMap = createSourceMap(ERROR_LINE+1+i,
             MSG_BEFORE_STACK);
-            searchHits[i] = Mockito.mock(SearchHit.class);
-            when(searchHits[i].getSourceAsMap()).thenReturn(sourceMap);
+            SearchHit hit = Mockito.mock(SearchHit.class);
+            when(hit.getSourceAsMap()).thenReturn(sourceMap);
+            searchHitsBuilder.add(hit);
         }
         when(stackTrace.logDao.getHitsFromIndex(any(SearchRequest.class)))
-        .thenReturn(searchHits);
+        .thenReturn(searchHitsBuilder.build());
+
         ImmutableList < String > actual = stackTrace.findStack(ERROR_LINE, FILE_NAME);
-        ImmutableList < String > expected = stackTrace.noStackFound();
+        ImmutableList < String > expected = ImmutableList.<String>builder() .build(); 
         Assert.assertEquals(expected, actual);
     }
     
     @Test
     public void fitInAllowedNumberOfMsgs() throws IOException {
         // Number of log lines before stack trace <= allowed messages before stack
-        SearchHit[] searchHits = new SearchHit[ALLOWED_MESSAGES+1];
-        for (int i = 0; i < ALLOWED_MESSAGES; i++) {
-            Map<String ,Object> sourceMap = createSourceMap(ERROR_LINE+1+i, 
-            MSG_BEFORE_STACK);
-            searchHits[i] = Mockito.mock(SearchHit.class);
-            when(searchHits[i].getSourceAsMap()).thenReturn(sourceMap);
+        Builder < SearchHit > searchHitsBuilder = ImmutableList.< SearchHit > builder();
+        for (int i = 0; i < ALLOWED_MESSAGES+1; i++) {
+            SearchHit hit = Mockito.mock(SearchHit.class);
+            searchHitsBuilder.add(hit);
+            Map<String ,Object> sourceMap;
+            if (i == ALLOWED_MESSAGES) {
+                sourceMap = createSourceMap
+                (ERROR_LINE+i+1, STACK_LOG_LINE);
+            } else {
+                sourceMap = createSourceMap(ERROR_LINE+1+i,
+                MSG_BEFORE_STACK);
+            }
+            when(hit.getSourceAsMap()).thenReturn(sourceMap);
         }
-        Map<String ,Object> sourceMap = createSourceMap
-        (ERROR_LINE+ALLOWED_MESSAGES+1, STACK_LOG_LINE);
-        searchHits[ALLOWED_MESSAGES] = Mockito.mock(SearchHit.class);
-        when(searchHits[ALLOWED_MESSAGES].getSourceAsMap())
-        .thenReturn(sourceMap);
         when(stackTrace.logDao.getHitsFromIndex(any(SearchRequest.class)))
-        .thenReturn(searchHits);
+        .thenReturn(searchHitsBuilder.build());
+
         ImmutableList < String > actual = stackTrace.findStack(ERROR_LINE, FILE_NAME);
         Builder < String > expected = ImmutableList.< String > builder();
         for(int i = 0 ; i < ALLOWED_MESSAGES; i++) {
@@ -136,27 +142,28 @@ public final class StackTraceTest {
     @Test
     public void stackExceedsBatchSizeRequest() throws IOException {
         //Stack exceeds number of loglines fetched. Enters while loop
-        SearchHit[] searchHits1 = new SearchHit[BATCH_SIZE];
+        Builder < SearchHit > searchHitsBuilder1 = ImmutableList.< SearchHit > builder();
         for (int i = 0; i < BATCH_SIZE; i++) {
             Map<String ,Object> sourceMap = createSourceMap(ERROR_LINE+1+i,
             STACK_LOG_LINE);
-            searchHits1[i] = Mockito.mock(SearchHit.class);
-            when(searchHits1[i].getSourceAsMap()).thenReturn(sourceMap);
+            SearchHit hit = Mockito.mock(SearchHit.class);
+            when(hit.getSourceAsMap()).thenReturn(sourceMap);
+            searchHitsBuilder1.add(hit);
         }
-        SearchHit[] searchHits2 = new SearchHit[1];
-        Map<String ,Object> sourceMap2 = createSourceMap(ERROR_LINE+BATCH_SIZE+1, 
-        MSG_BEFORE_STACK);
-        searchHits2[0] = Mockito.mock(SearchHit.class);
-        when(searchHits2[0].getSourceAsMap()).thenReturn(sourceMap2);
+        Builder < SearchHit > searchHitsBuilder2 = ImmutableList.< SearchHit > builder();
+        Map<String ,Object> sourceMap2 = createSourceMap(ERROR_LINE+BATCH_SIZE+1, MSG_BEFORE_STACK);
+        SearchHit hit = Mockito.mock(SearchHit.class);
+        when(hit.getSourceAsMap()).thenReturn(sourceMap2);
+        searchHitsBuilder2.add(hit);
         when(stackTrace.logDao.getHitsFromIndex(any(SearchRequest.class)))
         .thenAnswer(new Answer() {
             private int count = 0;
-            public SearchHit[] answer(InvocationOnMock invocation) {
+            public Object answer(InvocationOnMock invocation) {
                 if (count == 0){
                     count++;
-                    return searchHits1;
+                    return searchHitsBuilder1.build();
                 }
-                return searchHits2;
+                return searchHitsBuilder2.build();
             }
         });
 
