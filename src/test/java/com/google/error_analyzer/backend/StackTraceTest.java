@@ -50,7 +50,7 @@ public final class StackTraceTest {
     private final String STACK_LOG_LINE = 
     "cvr123 At com.stack.stacktrace.StackTraceExample.methodB";
     private final static Integer ALLOWED_MESSAGES = 1; 
-    private final static Integer BATCH_SIZE = 1;
+    private final static Integer BATCH_SIZE = 2;
     private final Integer ERROR_LINE = 1;
 
     @Before

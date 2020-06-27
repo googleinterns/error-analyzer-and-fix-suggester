@@ -54,9 +54,9 @@ public class StackTrace {
             .concat(" messages to stack list"));
             stackLogLinesBuilder.addAll(extractLogTextFormHits(rangeHits, 0, startOfStack));
         }
-        ImmutableList < String > stackList = iterateForFindingStack(rangeHits, startOfStack);
+        ImmutableList < String > stackList = iterateHitsForFindingStack(rangeHits, startOfStack);
         stackLogLinesBuilder.addAll(stackList);
-        if (stackList.size() != rangeHits.size() - startOfStack) {
+        if (stackList.size() < rangeHits.size() - startOfStack) {
             return stackLogLinesBuilder.build();
         }
         while (true) {
@@ -64,22 +64,25 @@ public class StackTrace {
             Integer nextLine = errorLogLineNumber + stackLogLinesBuilder.build().size();
             searchRequest = createSearchRequest(fileName, nextLine);
             rangeHits = logDao.getHitsFromIndex(searchRequest);
-            stackList = iterateForFindingStack(rangeHits, 0);
+            stackList = iterateHitsForFindingStack(rangeHits, 0);
             stackLogLinesBuilder.addAll(stackList);
-            if (stackList.size() != rangeHits.size() || rangeHits.size() == 0) {
+            if (stackList.size() < rangeHits.size() || rangeHits.size() == 0) {
                 return stackLogLinesBuilder.build();
             }
         }
     }
 
     // Iterate over range query to find call stack. Return if end is found
-    private ImmutableList < String > iterateForFindingStack (ImmutableList < SearchHit > hits,
+    private ImmutableList < String > iterateHitsForFindingStack (ImmutableList < SearchHit > hits,
     Integer start) {
         Builder < String > stackLogLinesBuilder = ImmutableList.< String > builder();
         for (int i = start; i < hits.size(); i++) {
-            String logText = (String) hits.get(i)
-                .getSourceAsMap().get(LogFields.LOG_TEXT);
+            Map < String ,Object > sourceMap = hits.get(i).getSourceAsMap();
+            String logText = (String) sourceMap.get(LogFields.LOG_TEXT);
+            Integer logLineNumber = (Integer) sourceMap.get(LogFields.LOG_LINE_NUMBER);
             if (StackTraceFormat.matchesFormat(logText)) {
+                logger.info("Adding line:"
+                .concat(logLineNumber.toString()).concat(" to stack list"));
                 stackLogLinesBuilder.add(logText);
             } else {
                 logger.info("End of stack trace found");
