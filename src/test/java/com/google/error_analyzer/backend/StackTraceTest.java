@@ -63,7 +63,7 @@ public final class StackTraceTest {
     }
 
     @Test
-    public void noHitsFromRangeQuery() throws IOException {
+    public void findStack_noHitsFromRangeQuery() throws IOException {
         // No hit is returned from searchRequest i.e. End of file
         ImmutableList < SearchHit > searchHits = ImmutableList.< SearchHit > builder().build();
         when(stackTrace.logDao.getHitsFromIndex(any(SearchRequest.class)))
@@ -75,7 +75,7 @@ public final class StackTraceTest {
     }
 
     @Test
-    public void notEnoughRangeHits() throws IOException {
+    public void findStack_notEnoughRangeHits() throws IOException {
         // When there are not enough searchHits, stored messages get disrcarded
         Builder < SearchHit > searchHitsBuilder = ImmutableList.< SearchHit > builder();
         SearchHit hit = Mockito.mock(SearchHit.class);
@@ -92,7 +92,7 @@ public final class StackTraceTest {
     }
 
     @Test
-    public void exceedNumberOfAllowedMsgs() throws IOException {
+    public void findStack_exceedNumberOfAllowedMsgs() throws IOException {
         // Number of allowed messages before stack trace is exceeded
         Builder < SearchHit > searchHitsBuilder = ImmutableList.< SearchHit > builder();
         for (int i = 0; i <= ALLOWED_MESSAGES; i++) {
@@ -111,7 +111,7 @@ public final class StackTraceTest {
     }
     
     @Test
-    public void fitInAllowedNumberOfMsgs() throws IOException {
+    public void findStack_fitInAllowedNumberOfMsgs() throws IOException {
         // Number of log lines before stack trace <= allowed messages before stack
         Builder < SearchHit > searchHitsBuilder = ImmutableList.< SearchHit > builder();
         for (int i = 0; i < ALLOWED_MESSAGES+1; i++) {
@@ -140,7 +140,7 @@ public final class StackTraceTest {
     }
 
     @Test
-    public void stackExceedsBatchSizeRequest() throws IOException {
+    public void findStack_stackExceedsBatchSizeRequest() throws IOException {
         //Stack exceeds number of loglines fetched. Enters while loop
         Builder < SearchHit > searchHitsBuilder1 = ImmutableList.< SearchHit > builder();
         for (int i = 0; i < BATCH_SIZE; i++) {
