@@ -18,4 +18,5 @@ public class LogFields {
     public static final String LOG_LINE_NUMBER = "logLineNumber";
     public static final String LOG = "Log";
     public static final String FILE_NAME = "filename";
+    public static final String FILE = "file";
 }
