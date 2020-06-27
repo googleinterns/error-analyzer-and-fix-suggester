@@ -38,14 +38,19 @@ async function getCount(index) {
     return count;
 }
 
-function addclass() {
+addclass = () => {
     const slide1 = document.getElementById("slide1Container");
     const slide2 = document.getElementById("slide2Container");
     slide1.classList.add('active');
     slide2.classList.remove('active');
 }
 
-
+addToSearch = (searchString) => {
+    const searchBar = document.getElementById("searchBar");
+    searchBar.value += " " + searchString;
+    search();
+    addclass();
+}
 
 
 

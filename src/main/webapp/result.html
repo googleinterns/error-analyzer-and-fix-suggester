@@ -50,9 +50,20 @@
                 <button onclick="search(); addclass();" class="themeButton">
                     <i class="fas fa-search"></i>
                 </button>
+                <span class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" 
+                    id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" 
+                    aria-expanded="false">
+                        Filters
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item" href="#" onclick="addToSearch('ERROR');">ERROR</a>
+                        <a class="dropdown-item" href="#" onclick="addToSearch('INFO');">INFO</a>
+                        <a class="dropdown-item" href="#" onclick="addToSearch('WARNING');">WARNING</a>
+                    </div>
+                </span>
             </span>
 		</div>
-		<!-- choose file  -->
 		<div>
 			<span>
                 <input type="text"  id="fileName" 

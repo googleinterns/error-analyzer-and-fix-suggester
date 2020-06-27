@@ -6,7 +6,7 @@
     margin-bottom: 2vh;
 }
 
-#body-header div {
+#body-header > div {
     display: flex;
     flex-direction: column;
     align-items: center;

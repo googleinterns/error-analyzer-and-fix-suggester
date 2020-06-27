@@ -30,6 +30,7 @@ async function changePage(page) {
     const logs = document.getElementById("logs").getAttribute("aria-selected");
     const searchString = document.getElementById("searchBar").value;
     let fileName = document.getElementById("fileName").value;
+    fileName =  fileName.trim();
     const fileType = logs == "true" ? LOGS : ERRORS ;
 
     currentPage = page;
@@ -230,7 +231,7 @@ function display() {
     const page_span = document.getElementById("page");
     listing_table.innerHTML = "";
     // dynamically add element to result page
-    for(let i = offset[0] ; i <= offset[1] && data.length!=0 ; i++ ) {
+    for(let i = offset[0] ; i <= offset[1] && data.length !=0 ; i++ ) {
         listing_table.appendChild(data[i]);
     }
     page_span.innerHTML = currentPage;
