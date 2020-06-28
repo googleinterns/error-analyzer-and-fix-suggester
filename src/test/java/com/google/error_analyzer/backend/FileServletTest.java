@@ -141,10 +141,7 @@ public class FileServletTest {
         String actual = stringWriter.toString();
         String expected = String.format(
            servlet.fileAndUrlLogs.storeLogs.FILE_EMPTY_TEMPLATE_RESPONSE, fileName1);
-        assertTrue(actual.contains(expected));
-        
+        assertTrue(actual.contains(expected));    
     }
-
     
-
 }

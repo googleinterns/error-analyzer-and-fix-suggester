@@ -20,5 +20,4 @@ public class LogFields {
     public static final String FILE_NAME = "filename";
     public static final String FILE = "file";
     public static final String URL = "url";
-
 }

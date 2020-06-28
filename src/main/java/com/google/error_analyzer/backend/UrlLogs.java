@@ -43,6 +43,4 @@ public class UrlLogs {
                 new Document.OutputSettings().prettyPrint(false));
     }
 
-
-
 }
