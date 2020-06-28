@@ -31,8 +31,8 @@ import org.elasticsearch.search.SearchHits;
 * the index and see if they fit the stacktrace format.
 */
 public class StackTrace {
-    private Integer BATCH_SIZE = 100;
-    private Integer ALLOWED_MESSAGES = 5;
+    private Integer BATCH_SIZE_OF_REQUEST = 100;
+    private Integer ALLOWED_MESSAGES_BEFORE_STACK = 5;
     private static final Logger logger = LogManager.getLogger(StackTrace.class);
     public DaoInterface logDao = new LogDao();
 
@@ -54,7 +54,8 @@ public class StackTrace {
             .concat(" messages to stack list"));
             stackLogLinesBuilder.addAll(extractLogTextFromHits(rangeHits, 0, startOfStack));
         }
-        ImmutableList < String > stackList = iterateHitsForFindingStack(rangeHits, startOfStack);
+        ImmutableList < String > stackList = iterateHitsForFindingStack
+        (rangeHits, startOfStack);
         stackLogLinesBuilder.addAll(stackList);
         if (stackList.size() < rangeHits.size() - startOfStack) {
             return stackLogLinesBuilder.build();
@@ -95,7 +96,7 @@ public class StackTrace {
     //returns index of the first searchHit that matches the stack format
     // -1 if start is not found
     private Integer findStartOfStack(ImmutableList < SearchHit > hits) {
-        Integer end = Math.min(ALLOWED_MESSAGES+1, hits.size());
+        Integer end = Math.min(ALLOWED_MESSAGES_BEFORE_STACK+1, hits.size());
         for (int i = 0; i < end; i++) {
             Map < String ,Object > sourceMap = hits.get(i).getSourceAsMap();
             String logText = (String) sourceMap.get(LogFields.LOG_TEXT);
@@ -108,8 +109,8 @@ public class StackTrace {
     }
 
     //create list of logText from SearchHits[start, end)
-    private ImmutableList < String > extractLogTextFromHits(ImmutableList < SearchHit > hits,
-    int start, int end) {
+    private ImmutableList < String > extractLogTextFromHits
+    (ImmutableList < SearchHit > hits, int start, int end) {
         Builder < String > logTextListBuilder = ImmutableList.< String > builder();
         for (int i = start;i < end; i++) {
             String logText = (String) hits.get(i)
@@ -123,11 +124,11 @@ public class StackTrace {
     private SearchRequest createSearchRequest(String fileName, 
     Integer errorLogLineNumber) {
         RangeQueryBuilder rangeQuery = 
-        buildRangeQuery(errorLogLineNumber, BATCH_SIZE);
+        buildRangeQuery(errorLogLineNumber, BATCH_SIZE_OF_REQUEST);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
             .query(rangeQuery)
             .sort(LogFields.LOG_LINE_NUMBER)
-            .size(BATCH_SIZE);
+            .size(BATCH_SIZE_OF_REQUEST);
         SearchRequest searchRequest = new SearchRequest(fileName);
         searchRequest.source(searchSourceBuilder);
         return searchRequest;
