@@ -23,13 +23,9 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.safety.Whitelist;
 
 //this class contains all the file related methods
-public class FileLogs {
+public class FileAndUrlLogs {
     private static final Logger logger = LogManager.getLogger(FileLogs.class);
     public static int MaxLogLines = 10000;
     public StoreLogs storeLogs = new StoreLogs();
