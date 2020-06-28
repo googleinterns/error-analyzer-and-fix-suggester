@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.backend.BooleanQuery;
 import com.google.error_analyzer.backend.LogDaoHelper;
+import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.Document;
 import java.io.IOException;
 import java.util.*;
@@ -61,7 +62,7 @@ public class LogDao implements DaoInterface {
         SimpleQueryStringBuilder simpleQueryBuilder = 
             QueryBuilders.simpleQueryStringQuery(searchString);
         searchSourceBuilder.query(simpleQueryBuilder)
-            .size(size).from(start);
+            .size(size).from(start).sort(LogFields.LOG_LINE_NUMBER);
         searchSourceBuilder.highlighter(addHighLighter(field));
         searchRequest.source(searchSourceBuilder);
         SearchResponse searchResponse = 
