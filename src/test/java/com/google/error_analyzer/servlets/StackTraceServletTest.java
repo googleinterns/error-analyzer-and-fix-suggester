@@ -66,7 +66,7 @@ public class StackTraceServletTest {
         when(response.getWriter()).thenReturn(writer);
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
-        String expected = "\"No stack found\"\n";
+        String expected = "[\"No stack found\"]\n";
         assertEquals(expected, actual);
     }
 
@@ -78,8 +78,7 @@ public class StackTraceServletTest {
         when(response.getWriter()).thenReturn(writer);
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
-        String expected = 
-        "\"Could not parse logLineNumber java.lang.NumberFormatException: For input string: \\\"a\\\"\"\n";
+        String expected = "[\"Unable to find stack\"]\n";
         assertEquals(expected, actual);
     }
 
@@ -93,8 +92,7 @@ public class StackTraceServletTest {
         when(response.getWriter()).thenReturn(writer);
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
-        String expected = 
-        "\"Could not complete requestjava.lang.NullPointerException: index must not be null\"\n";
+        String expected = "[\"Unable to find stack\"]\n";
         assertEquals(expected, actual);
     }
 }

@@ -40,15 +40,14 @@ public class StackTraceServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType(FileConstants.APPLICATION_JSON_CONTENT_TYPE);
         try {
-            Integer errorLineNumber = Integer
-            .parseInt(request.getParameter(LogFields.LOG_LINE_NUMBER));
+            Integer errorLineNumber = Integer.parseInt(request.getParameter(LogFields.LOG_LINE_NUMBER));
             String indexName = request.getParameter(LogFields.FILE_NAME);
             ImmutableList < String > stackList = stackTrace.findStack(errorLineNumber,indexName);
             
             if (stackList.size() == 0) {
-                String json = new Gson().toJson("No stack found");
+                String json = convertMsgToJsonList("No stack found");
                 response.getWriter().println(json);
-            } else {
+            }else{
                 String json = new Gson().toJson(stackList);
                 response.getWriter().println(json);
             }
@@ -56,19 +55,25 @@ public class StackTraceServlet extends HttpServlet {
             String errorMsg = "Could not parse logLineNumber "
             .concat(numberFormatException.toString());
             logger.error(errorMsg);
-            String json = new Gson().toJson(errorMsg);
+            String json = convertMsgToJsonList("Unable to find stack");
             response.getWriter().println(json);
         } catch (IOException ioException) {
-            String errorMsg = "Could not connect to database"
-            .concat(ioException.toString());
+            String errorMsg = "Could not connect to database";
             logger.error(errorMsg);
-            String json = new Gson().toJson(errorMsg);
+            String json = convertMsgToJsonList("Unable to find stack");
             response.getWriter().println(json);
         } catch (NullPointerException nullPointerException) {
             String errorMsg = "Could not complete request".concat(nullPointerException.toString());
             logger.error(errorMsg);
-            String json = new Gson().toJson(errorMsg);
+            String json = convertMsgToJsonList("Unable to find stack");
             response.getWriter().println(json);
         }
+    }
+
+    private String convertMsgToJsonList (String errorMsg) {
+        String[] jsonErrorString = new String[]{errorMsg};
+        String json = new Gson().toJson(jsonErrorString);
+        System.out.println(json);
+        return json;
     }
 }
