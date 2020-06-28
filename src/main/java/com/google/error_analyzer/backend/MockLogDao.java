@@ -151,5 +151,26 @@ public class MockLogDao implements DaoInterface {
         }
         logDatabase.add(index);
     }
+
+    //returns the jsonString stored in the document
+    @Override
+    public String getJsonStringById (String fileName, String id) {
+        String result = null;
+        Iterator < Index > indexListIterator = logDatabase.iterator();
+        while (indexListIterator.hasNext()) {
+            Index searchIndex = indexListIterator.next();
+            if (fileName.equals(searchIndex.getIndexName())) {
+                ArrayList < Document > DocList = searchIndex.getDocumentList();
+                Iterator < Document > docListIterator = DocList.iterator();
+                while (docListIterator.hasNext()) {
+                    Document doc = docListIterator.next();
+                    if (id.equals(doc.getID())) {
+                        result = doc.getJsonString();
+                    }
+                }
+            }
+        }
+        return result;
+    }
     
 }

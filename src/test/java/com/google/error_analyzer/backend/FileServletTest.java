@@ -121,7 +121,7 @@ public class FileServletTest {
 
     /*Storing empty file to the database*/
     @Test
-    public void FileServletTestWithEmptyFile()
+    public void fileServletTestWithEmptyFile()
     throws ServletException, IOException {
         String fileName1 = "file1";
         when(request.getParameter(LogFields.FILE_NAME)).thenReturn(fileName1);

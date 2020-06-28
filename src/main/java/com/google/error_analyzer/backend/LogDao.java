@@ -155,6 +155,16 @@ public class LogDao implements DaoInterface {
         }
         client.bulk(request, RequestOptions.DEFAULT);;
     }
+    
+    //returns the jsonString stored in the document
+    @Override
+    public String getJsonStringById (String fileName, String id)
+     throws IOException {
+        GetRequest getRequest = new GetRequest(fileName, id);
+        GetResponse getResponse =
+            client.get(getRequest, RequestOptions.DEFAULT);
+        return getResponse.getSourceAsString();  
+    }
 
     // highlight searched text
     private HighlightBuilder addHighLighter(String field) {

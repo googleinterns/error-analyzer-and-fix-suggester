@@ -75,4 +75,46 @@ public final class StoreLogTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    public void storeLogTestWithZeroOffset () throws IOException {
+        String log = "error1\nerror2\nerror3";
+        String fileName = "file1";
+        int offset = 0;
+        when(request.getCookies()).thenReturn(new Cookie[] {cookie});
+        storeLogs.storeLog(request, fileName, log, offset);
+        String actual = storeLogs.logDao.getJsonStringById(fileName, "1");
+        String expected = "{\"logLineNumber\":1,\"logText\":\"error1\"}";
+        assertEquals(expected, actual);
+        actual = storeLogs.logDao.getJsonStringById(fileName, "2");
+        expected = "{\"logLineNumber\":2,\"logText\":\"error2\"}";
+        assertEquals(expected, actual);
+        actual = storeLogs.logDao.getJsonStringById(fileName, "3");
+        expected = "{\"logLineNumber\":3,\"logText\":\"error3\"}";
+        assertEquals(expected, actual);
+        actual = storeLogs.logDao.getJsonStringById(fileName, "4");
+        expected = null;
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void storeLogTestWithNonZeroOffset () throws IOException {
+        String log = "error1\nerror2\nerror3";
+        String fileName = "file1";
+        int offset = 3;
+        when(request.getCookies()).thenReturn(new Cookie[] {cookie});
+        storeLogs.storeLog(request, fileName, log, offset);
+        String actual = storeLogs.logDao.getJsonStringById(fileName, "4");
+        String expected = "{\"logLineNumber\":4,\"logText\":\"error1\"}";
+        assertEquals(expected, actual);
+        actual = storeLogs.logDao.getJsonStringById(fileName, "5");
+        expected = "{\"logLineNumber\":5,\"logText\":\"error2\"}";
+        assertEquals(expected, actual);
+        actual = storeLogs.logDao.getJsonStringById(fileName, "6");
+        expected = "{\"logLineNumber\":6,\"logText\":\"error3\"}";
+        assertEquals(expected, actual);
+        actual = storeLogs.logDao.getJsonStringById(fileName, "1");
+        expected = null;
+        assertEquals(expected, actual);
+    }
+
 }

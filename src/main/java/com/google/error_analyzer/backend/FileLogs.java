@@ -26,7 +26,7 @@ import org.apache.logging.log4j.LogManager;
 //this class contains all the file related methods
 public class FileLogs {
     private static final Logger logger = LogManager.getLogger(FileLogs.class);
-    private static final int MAX_LOG_LINES = 10000;
+    public static int MaxLogLines = 10000;
     public StoreLogs storeLogs = new StoreLogs();
 
     //stores the logs into database with appropriate filename
@@ -56,16 +56,16 @@ public class FileLogs {
         String response = String.format(storeLogs.FILE_EMPTY_TEMPLATE_RESPONSE,
             IndexName.getFileName(request, fileName));
         String log = "";
-        int LineCount = 0;
+        int lineCount = 0;
         while ((logLine = reader.readLine()) != null) {
             log = log + logLine + "\n";
-            LineCount++;
-            if (LineCount >= MAX_LOG_LINES) {
+            lineCount++;
+            if (lineCount >= MaxLogLines) {
                 response =
                     storeLogs.storeLog(request, fileName, log, offset);
                 log = "";
-                LineCount = 0;
-                offset = offset + MAX_LOG_LINES;
+                lineCount = 0;
+                offset = offset + MaxLogLines;
             }
         }
         if (!log.isEmpty()) {

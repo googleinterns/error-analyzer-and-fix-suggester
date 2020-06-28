@@ -49,7 +49,7 @@ public class FileServlet extends HttpServlet {
 
     @Override
     public void doPost(HttpServletRequest request, 
-        HttpServletResponse response) {
+        HttpServletResponse response) throws IOException, ServletException {
         try {
             response.setContentType(FileConstants.TEXT_HTML_CONTENT_TYPE);
             Part filePart = request.getPart(LogFields.FILE);
@@ -64,6 +64,11 @@ public class FileServlet extends HttpServlet {
             requestDispatcher.include(request, response);
         } catch (Exception e) {
             logger.error("Could not store file", e);
+            response.getWriter().println(String.format(
+                fileLogs.storeLogs.ERROR_TEMPLATE_RESPONSE, e));
+            RequestDispatcher requestDispatcher =
+                request.getRequestDispatcher(PageConstants.LANDING_PAGE);
+            requestDispatcher.include(request, response);
         }
     }
 }
