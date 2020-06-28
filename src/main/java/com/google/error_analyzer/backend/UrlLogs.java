@@ -11,7 +11,6 @@
 
 package com.google.error_analyzer.backend;
 
-import com.google.error_analyzer.backend.FileLogs;
 import java.nio.charset.Charset;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;

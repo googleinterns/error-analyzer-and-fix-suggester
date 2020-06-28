@@ -26,17 +26,19 @@ import org.apache.logging.log4j.LogManager;
 
 //this class contains all the file related methods
 public class FileAndUrlLogs {
-    private static final Logger logger = LogManager.getLogger(FileLogs.class);
+    private static final Logger logger = 
+        LogManager.getLogger(FileAndUrlLogs.class);
     public static int MaxLogLines = 10000;
     public StoreLogs storeLogs = new StoreLogs();
 
     //stores the logs into database with appropriate filename
-    public String checkAndStoreFileLog(HttpServletRequest request,
+    public String checkAndStoreFileAndUrlLog(HttpServletRequest request,
         String fileName, InputStream fileContent, boolean isUrl) {
         try {
             String indexName = IndexName.getIndexName(request, fileName);
             indexName = storeLogs.getUniqueIndexName(indexName);
-            final String response = storeFileLogs(request, indexName, fileContent, isUrl);
+            final String response = storeFileAndUrlLogs(
+                request, indexName, fileContent, isUrl);
             return response;
         } catch (Exception e) {
             final String errorResponse =
@@ -48,8 +50,9 @@ public class FileAndUrlLogs {
     }
 
     // stores maximum 10000 log lines in a single API  call
-    public String storeFileLogs(HttpServletRequest request, String fileName,
-        InputStream fileContent, boolean isUrl) throws IOException {
+    public String storeFileAndUrlLogs(HttpServletRequest request, 
+        String fileName, InputStream fileContent, boolean isUrl) 
+        throws IOException {
         InputStreamReader isReader = new InputStreamReader(fileContent);
         BufferedReader reader = new BufferedReader(isReader);
         String logLine;

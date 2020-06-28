@@ -43,9 +43,9 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 
-/*this class contains tests for the methods of FileLogs*/
+/*this class contains tests for the methods of FileAndUrlLogs*/
 public final class FileAndUrlLogTest {
-    private FileLogs fileLogs;
+    private FileAndUrlLogs fileAndUrlLogs;
     private Cookie cookie;
     private static final String SESSIONID_VALUE = "abcd";
     private static final String FILE_CONTENT =
@@ -56,9 +56,9 @@ public final class FileAndUrlLogTest {
 
     @Before
     public void setUp() {
-        fileLogs = new FileLogs();
-        fileLogs.storeLogs.logDao = new MockLogDao();
-        fileLogs.MaxLogLines = 5;
+        fileAndUrlLogs = new FileAndUrlLogs();
+        fileAndUrlLogs.storeLogs.logDao = new MockLogDao();
+        fileAndUrlLogs.MaxLogLines = 5;
         request = Mockito.mock(HttpServletRequest.class);
         cookie = new Cookie(IndexName.SESSIONID, SESSIONID_VALUE);
     }
@@ -71,11 +71,12 @@ public final class FileAndUrlLogTest {
         InputStream inputStream =
             new ByteArrayInputStream(FILE_CONTENT.getBytes());
         boolean isUrl = false;
-        String actual = fileLogs.checkAndStoreFileLog(request, fileName, inputStream, isUrl);
+        String actual = fileAndUrlLogs
+            .checkAndStoreFileAndUrlLog(request, fileName, inputStream, isUrl);
         System.out.println(actual);
         String nullPointerExceptionString = "java.lang.NullPointerException";
-        String expected = String.format(
-            fileLogs.storeLogs.ERROR_TEMPLATE_RESPONSE, nullPointerExceptionString);
+        String expected = String.format(fileAndUrlLogs
+            .storeLogs.ERROR_TEMPLATE_RESPONSE, nullPointerExceptionString);
         Assert.assertEquals(expected, actual);
     }
 
@@ -87,15 +88,16 @@ public final class FileAndUrlLogTest {
             new ByteArrayInputStream(FILE_CONTENT.getBytes());
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         boolean isUrl = false;
-        fileLogs.storeFileLogs(request, fileName, inputStream, isUrl);
+        fileAndUrlLogs.storeFileAndUrlLogs(
+            request, fileName, inputStream, isUrl);
         for (int id = 1; id < 7; id++) {
-            String actual = fileLogs.storeLogs.logDao
+            String actual = fileAndUrlLogs.storeLogs.logDao
                 .getJsonStringById(fileName, Integer.toString(id));
             String expected = String.format(
                 "{\"logLineNumber\":%1$s,\"logText\":\"error%1$s\"}", id);
             assertEquals(expected, actual);
         }
-        String actual = fileLogs.storeLogs.logDao
+        String actual = fileAndUrlLogs.storeLogs.logDao
             .getJsonStringById(fileName, "7");
         String expected = null;
         assertEquals(expected, actual);

@@ -82,7 +82,7 @@ public class FileServletTest {
         filePart = Mockito.mock(Part.class);
         cookie = new Cookie(IndexName.SESSIONID, SESSIONID_VALUE);
         MockitoAnnotations.initMocks(this);
-        servlet.fileLogs.storeLogs.logDao = new MockLogDao();
+        servlet.fileAndUrlLogs.storeLogs.logDao = new MockLogDao();
     }
 
     //store the log into the database when index with name same as the
@@ -106,14 +106,14 @@ public class FileServletTest {
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
-        String expected = String.format(
-          servlet.fileLogs.storeLogs.FILE_STORED_TEMPLATE_RESPONSE, fileName1);
+        String expected = String.format(servlet.fileAndUrlLogs.storeLogs
+            .FILE_STORED_TEMPLATE_RESPONSE, fileName1);
         assertTrue(actual.contains(expected));
         inputStream = new ByteArrayInputStream(FILE_CONTENT.getBytes());
         when(filePart.getInputStream()).thenReturn(inputStream);
         servlet.doPost(request, response);
         actual = stringWriter.toString();
-        expected = String.format(servlet.fileLogs
+        expected = String.format(servlet.fileAndUrlLogs
             .storeLogs.FILE_STORED_TEMPLATE_RESPONSE, fileName1 + "(1)");
         assertTrue(actual.contains(expected));
 
@@ -140,7 +140,7 @@ public class FileServletTest {
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
         String expected = String.format(
-           servlet.fileLogs.storeLogs.FILE_EMPTY_TEMPLATE_RESPONSE, fileName1);
+           servlet.fileAndUrlLogs.storeLogs.FILE_EMPTY_TEMPLATE_RESPONSE, fileName1);
         assertTrue(actual.contains(expected));
         
     }

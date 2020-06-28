@@ -10,7 +10,7 @@
 // limitations under the License.
 package com.google.error_analyzer;
 
-import com.google.error_analyzer.backend.FileLogs;
+import com.google.error_analyzer.backend.FileAndUrlLogs;
 import com.google.error_analyzer.backend.IndexName;
 import com.google.error_analyzer.backend.MockLogDao;
 import com.google.error_analyzer.data.constant.LogFields;
@@ -55,7 +55,7 @@ import static org.mockito.Mockito.when;
 UrlServlet*/
 public class UrlServletTest {
     private Cookie cookie;
-    private FileLogs fileLogs;
+    private FileAndUrlLogs fileAndUrlLogs;
     private static final String SESSIONID_VALUE = "abcd";
     private static final String URL_CONTENT =
         "<html>error1\nerror2\nerror3\nerror4\nerror5\n<html>";
@@ -74,13 +74,13 @@ public class UrlServletTest {
 
     @Before
     public void setUp() {
-        fileLogs = new FileLogs();
+        fileAndUrlLogs = new FileAndUrlLogs();
         request = Mockito.mock(HttpServletRequest.class);
         response = Mockito.mock(HttpServletResponse.class);
         cookie = new Cookie(IndexName.SESSIONID, SESSIONID_VALUE);
         MockitoAnnotations.initMocks(this);
-        fileLogs.storeLogs.logDao = new MockLogDao();
-        servlet.fileLogs.storeLogs.logDao = new MockLogDao();
+        fileAndUrlLogs.storeLogs.logDao = new MockLogDao();
+        servlet.fileAndUrlLogs.storeLogs.logDao = new MockLogDao();
     }
 
     /*store the url content using storeFileLogs method*/
@@ -91,15 +91,16 @@ public class UrlServletTest {
             new ByteArrayInputStream(URL_CONTENT.getBytes());
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         boolean isUrl = true;
-        fileLogs.storeFileLogs(request, fileName, inputStream, isUrl);
+        fileAndUrlLogs.storeFileAndUrlLogs(
+            request, fileName, inputStream, isUrl);
         for (int id = 1; id < 6; id++) {
-            String actual = fileLogs.storeLogs.logDao
+            String actual = fileAndUrlLogs.storeLogs.logDao
                 .getJsonStringById(fileName, Integer.toString(id));
             String expected = String.format(
                 "{\"logLineNumber\":%1$s,\"logText\":\"error%1$s\"}", id);
             assertEquals(expected, actual);
         }
-        String actual = fileLogs.storeLogs.logDao
+        String actual = fileAndUrlLogs.storeLogs.logDao
             .getJsonStringById(fileName, "6");
         String expected = null;
         assertEquals(expected, actual);   
@@ -122,7 +123,7 @@ public class UrlServletTest {
         String actual = stringWriter.toString();
         System.out.println(actual);
         String nullPointerExceptionString = "java.lang.NullPointerException";
-        String expected = String.format(fileLogs.storeLogs.ERROR_TEMPLATE_RESPONSE, 
+        String expected = String.format(fileAndUrlLogs.storeLogs.ERROR_TEMPLATE_RESPONSE, 
             nullPointerExceptionString);
         assertTrue(actual.contains(expected));
     }
