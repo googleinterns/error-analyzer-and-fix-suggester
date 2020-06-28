@@ -86,27 +86,16 @@ public final class FileLogTest {
             new ByteArrayInputStream(FILE_CONTENT.getBytes());
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         fileLogs.storeFileLogs(request, fileName, inputStream);
-        String actual =
-            fileLogs.storeLogs.logDao.getJsonStringById(fileName, "1");
-        String expected = "{\"logLineNumber\":1,\"logText\":\"error1\"}";
-        assertEquals(expected, actual);
-        actual = fileLogs.storeLogs.logDao.getJsonStringById(fileName, "2");
-        expected = "{\"logLineNumber\":2,\"logText\":\"error2\"}";
-        assertEquals(expected, actual);
-        actual = fileLogs.storeLogs.logDao.getJsonStringById(fileName, "3");
-        expected = "{\"logLineNumber\":3,\"logText\":\"error3\"}";
-        assertEquals(expected, actual);
-        actual = fileLogs.storeLogs.logDao.getJsonStringById(fileName, "4");
-        expected = "{\"logLineNumber\":4,\"logText\":\"error4\"}";
-        assertEquals(expected, actual);
-        actual = fileLogs.storeLogs.logDao.getJsonStringById(fileName, "5");
-        expected = "{\"logLineNumber\":5,\"logText\":\"error5\"}";
-        assertEquals(expected, actual);
-        actual = fileLogs.storeLogs.logDao.getJsonStringById(fileName, "6");
-        expected = "{\"logLineNumber\":6,\"logText\":\"error6\"}";
-        assertEquals(expected, actual);
-        actual = fileLogs.storeLogs.logDao.getJsonStringById(fileName, "7");
-        expected = null;
+        for (int id = 1; id < 7; id++) {
+            String actual = fileLogs.storeLogs.logDao
+                .getJsonStringById(fileName, Integer.toString(id));
+            String expected = String.format(
+                "{\"logLineNumber\":%1$s,\"logText\":\"error%1$s\"}", id);
+            assertEquals(expected, actual);
+        }
+        String actual = fileLogs.storeLogs.logDao
+            .getJsonStringById(fileName, "7");
+        String expected = null;
         assertEquals(expected, actual);
     }
 
