@@ -65,5 +65,4 @@ public class LogDaoHelper {
     public static String getErrorIndexName (String fileName) {
         return fileName.concat("error");
     }
-
 }
