@@ -75,6 +75,7 @@ public final class StoreLogTest {
         assertEquals(expected, actual);
     }
 
+    /*unit test for storeLog method when offset is 0*/
     @Test
     public void storeLogTestWithZeroOffset () throws IOException {
         String log = "error1\nerror2\nerror3";
@@ -96,6 +97,7 @@ public final class StoreLogTest {
         assertEquals(expected, actual);
     }
 
+    /*unit test for storeLog method when offset is 3*/
     @Test
     public void storeLogTestWithNonZeroOffset () throws IOException {
         String log = "error1\nerror2\nerror3";

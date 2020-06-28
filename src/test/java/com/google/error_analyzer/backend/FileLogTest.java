@@ -84,9 +84,7 @@ public final class FileLogTest {
         String fileName = "file1";
         InputStream inputStream =
             new ByteArrayInputStream(FILE_CONTENT.getBytes());
-        when(request.getCookies()).thenReturn(new Cookie[] {
-            cookie
-        });
+        when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         fileLogs.storeFileLogs(request, fileName, inputStream);
         String actual =
             fileLogs.storeLogs.logDao.getJsonStringById(fileName, "1");
@@ -113,3 +111,4 @@ public final class FileLogTest {
     }
 
 }
+
