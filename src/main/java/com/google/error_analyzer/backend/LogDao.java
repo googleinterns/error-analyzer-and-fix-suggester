@@ -89,10 +89,12 @@ public class LogDao implements DaoInterface {
     //Returns name of the new index 
     @Override 
     public String findAndStoreErrors(String fileName) throws IOException {
-        SearchHits hits = findErrors(fileName);
+        ImmutableList < Document > errorHits = findErrors(fileName);
         String errorFileName = LogDaoHelper.getErrorIndexName(fileName);
-        storeErrors(errorFileName, hits);
-        logger.info("Errors stored in index ".concat(errorFileName));
+        Integer size = errorHits.size();
+        logger.info("storing ".concat(size.toString())
+        .concat(" in index ").concat(errorFileName));
+        bulkStoreLog(errorFileName, errorHits);
         return errorFileName;
     }
 
@@ -149,23 +151,15 @@ public class LogDao implements DaoInterface {
     }
 
     //find errors in a given index
-    private SearchHits findErrors(String fileName) 
+    private ImmutableList < Document > findErrors(String fileName) 
     throws IOException {
         logger.info("Finding errors in ".concat(fileName));
         BooleanQuery booleanQuery = new BooleanQuery();
         SearchRequest searchRequest = booleanQuery.createSearchRequest(fileName);
         SearchResponse searchResponse = client
             .search(searchRequest, RequestOptions.DEFAULT);
-        return searchResponse.getHits();
-    }
-
-    //store errors found in the log file
-    private void storeErrors(String errorFileName, SearchHits hits)
-    throws IOException {
-        Integer numberOfErrorsFound = hits.getHits().length;
-        logger.info("Storing ".concat(numberOfErrorsFound.toString()).concat(" into database"));
-        BooleanQuery booleanQuery = new BooleanQuery();
-        ImmutableList < Document > documentList = booleanQuery.filterBoolQuesrySearchHits(hits);
-        bulkStoreLog(errorFileName, documentList);
+        SearchHits hits = searchResponse.getHits();
+        ImmutableList < Document > documentList = booleanQuery.filterBoolQuerySearchHits(hits);
+        return documentList;
     }
 }
