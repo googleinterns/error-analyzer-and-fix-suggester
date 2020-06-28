@@ -70,7 +70,8 @@ public final class FileLogTest {
         when(request.getCookies()).thenThrow(NullPointerException.class);
         InputStream inputStream =
             new ByteArrayInputStream(FILE_CONTENT.getBytes());
-        String actual = fileLogs.checkAndStoreFileLog(request, fileName, inputStream);
+        boolean isUrl = false;
+        String actual = fileLogs.checkAndStoreFileLog(request, fileName, inputStream, isUrl);
         System.out.println(actual);
         String nullPointerExceptionString = "java.lang.NullPointerException";
         String expected = String.format(
@@ -85,7 +86,8 @@ public final class FileLogTest {
         InputStream inputStream =
             new ByteArrayInputStream(FILE_CONTENT.getBytes());
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
-        fileLogs.storeFileLogs(request, fileName, inputStream);
+        boolean isUrl = false;
+        fileLogs.storeFileLogs(request, fileName, inputStream, isUrl);
         for (int id = 1; id < 7; id++) {
             String actual = fileLogs.storeLogs.logDao
                 .getJsonStringById(fileName, Integer.toString(id));

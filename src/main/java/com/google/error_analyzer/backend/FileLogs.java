@@ -14,6 +14,7 @@
 package com.google.error_analyzer.backend;
 
 import com.google.error_analyzer.backend.StoreLogs;
+import com.google.error_analyzer.backend.UrlLogs;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -22,6 +23,10 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.safety.Whitelist;
 
 //this class contains all the file related methods
 public class FileLogs {
@@ -31,11 +36,11 @@ public class FileLogs {
 
     //stores the logs into database with appropriate filename
     public String checkAndStoreFileLog(HttpServletRequest request,
-        String fileName, InputStream fileContent) {
+        String fileName, InputStream fileContent, boolean isUrl) {
         try {
             String indexName = IndexName.getIndexName(request, fileName);
             indexName = storeLogs.getUniqueIndexName(indexName);
-            final String response = storeFileLogs(request, indexName, fileContent);
+            final String response = storeFileLogs(request, indexName, fileContent, isUrl);
             return response;
         } catch (Exception e) {
             final String errorResponse =
@@ -48,7 +53,7 @@ public class FileLogs {
 
     // stores maximum 10000 log lines in a single API  call
     public String storeFileLogs(HttpServletRequest request, String fileName,
-        InputStream fileContent) throws IOException {
+        InputStream fileContent, boolean isUrl) throws IOException {
         InputStreamReader isReader = new InputStreamReader(fileContent);
         BufferedReader reader = new BufferedReader(isReader);
         String logLine;
@@ -61,6 +66,9 @@ public class FileLogs {
             log = log + logLine + "\n";
             lineCount++;
             if (lineCount >= MaxLogLines) {
+                if(isUrl) {
+                    log = UrlLogs.removeHtmlTags(log);
+                }
                 response =
                     storeLogs.storeLog(request, fileName, log, offset);
                 log = "";
@@ -69,6 +77,9 @@ public class FileLogs {
             }
         }
         if (!log.isEmpty()) {
+            if(isUrl) {
+                log = UrlLogs.removeHtmlTags(log);
+            }
             response =
                 storeLogs.storeLog(request, fileName, log, offset);
         }
