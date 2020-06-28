@@ -14,7 +14,7 @@ limitations under the License.*/
 
 package com.google.error_analyzer;
 
-import com.google.error_analyzer.backend.FileLogs;
+import com.google.error_analyzer.backend.FileAndUrlLogs;
 import com.google.error_analyzer.backend.IndexName;
 import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.MockLogDao;
@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 
 /*this class contains tests for the methods of FileLogs*/
-public final class FileLogTest {
+public final class FileAndUrlLogTest {
     private FileLogs fileLogs;
     private Cookie cookie;
     private static final String SESSIONID_VALUE = "abcd";
