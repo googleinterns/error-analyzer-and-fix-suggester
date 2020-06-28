@@ -89,7 +89,6 @@ public final class LogDaoHelperTest {
     public void getHighLightedText() throws Exception {
         when(hit1.getHighlightFields()).thenReturn(highlight("error1"));
         when(hit2.getHighlightFields()).thenReturn(highlight("error2"));
-        getHitId();
         ImmutableList<SearchHit> searchHits = ImmutableList
                                           .<SearchHit>builder() 
                                           .add(hit1, hit2) 
