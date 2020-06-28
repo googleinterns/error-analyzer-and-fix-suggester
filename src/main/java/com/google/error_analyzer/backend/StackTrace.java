@@ -28,7 +28,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 /**
 * Find the stack trace following an error. The algorithm fetches documents from
-* the index and see if they fit they stacktrace format.
+* the index and see if they fit the stacktrace format.
 */
 public class StackTrace {
     private Integer BATCH_SIZE = 100;
@@ -52,7 +52,7 @@ public class StackTrace {
             //add message brfore stack starts to stackLogLines
             logger.info("Adding ".concat(startOfStack.toString())
             .concat(" messages to stack list"));
-            stackLogLinesBuilder.addAll(extractLogTextFormHits(rangeHits, 0, startOfStack));
+            stackLogLinesBuilder.addAll(extractLogTextFromHits(rangeHits, 0, startOfStack));
         }
         ImmutableList < String > stackList = iterateHitsForFindingStack(rangeHits, startOfStack);
         stackLogLinesBuilder.addAll(stackList);
@@ -108,7 +108,7 @@ public class StackTrace {
     }
 
     //create list of logText from SearchHits[start, end)
-    private ImmutableList < String > extractLogTextFormHits(ImmutableList < SearchHit > hits,
+    private ImmutableList < String > extractLogTextFromHits(ImmutableList < SearchHit > hits,
     int start, int end) {
         Builder < String > logTextListBuilder = ImmutableList.< String > builder();
         for (int i = start;i < end; i++) {

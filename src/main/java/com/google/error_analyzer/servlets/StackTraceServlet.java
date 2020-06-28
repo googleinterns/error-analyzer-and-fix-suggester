@@ -40,24 +40,27 @@ public class StackTraceServlet extends HttpServlet {
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType(FileConstants.APPLICATION_JSON_CONTENT_TYPE);
         try {
-            Integer errorLineNumber = Integer.parseInt(request.getParameter(LogFields.LOG_LINE_NUMBER));
+            Integer errorLineNumber = Integer
+            .parseInt(request.getParameter(LogFields.LOG_LINE_NUMBER));
             String indexName = request.getParameter(LogFields.FILE_NAME);
             ImmutableList < String > stackList = stackTrace.findStack(errorLineNumber,indexName);
             
             if (stackList.size() == 0) {
                 String json = new Gson().toJson("No stack found");
                 response.getWriter().println(json);
-            }else{
+            } else {
                 String json = new Gson().toJson(stackList);
                 response.getWriter().println(json);
             }
         } catch (NumberFormatException numberFormatException) {
-            String errorMsg = "Could not parse logLineNumber ".concat(numberFormatException.toString());
+            String errorMsg = "Could not parse logLineNumber "
+            .concat(numberFormatException.toString());
             logger.error(errorMsg);
             String json = new Gson().toJson(errorMsg);
             response.getWriter().println(json);
         } catch (IOException ioException) {
-            String errorMsg = "Could not connect to database";
+            String errorMsg = "Could not connect to database"
+            .concat(ioException.toString());
             logger.error(errorMsg);
             String json = new Gson().toJson(errorMsg);
             response.getWriter().println(json);

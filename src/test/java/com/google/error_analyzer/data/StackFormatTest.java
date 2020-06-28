@@ -33,7 +33,7 @@ public final class StackFormatTest {
     }
 
     @Test
-    public void AtPreceededBy20Characters() {
+    public void atPreceededBy20Characters() {
         String logText = "01234567890123456789 at com.stack.stacktrace.StackTraceExample.methodB";
         boolean actual = StackTraceFormat.matchesFormat(logText);
         boolean expected = true;
@@ -41,7 +41,7 @@ public final class StackFormatTest {
     }
 
     @Test
-    public void AtInUpperCase() {
+    public void atInUpperCase() {
         String logText = "cvr123 At com.stack.stacktrace.StackTraceExample.methodB";
         boolean actual = StackTraceFormat.matchesFormat(logText);
         boolean expected = true;
@@ -49,7 +49,7 @@ public final class StackFormatTest {
     }
 
     @Test
-    public void AtAppearsLaterInString() {
+    public void atAppearsLaterInString() {
         String logText = "Running com.google.error_analyzer at maven";
         boolean actual = StackTraceFormat.matchesFormat(logText);
         boolean expected = false;
@@ -57,7 +57,7 @@ public final class StackFormatTest {
     }
 
     @Test
-    public void AtPreceededBy21Characters() {
+    public void atPreceededBy21Characters() {
         String logText = "012345678901234567890 at com.stack.stacktrace.StackTraceExample.methodB";
         boolean actual = StackTraceFormat.matchesFormat(logText);
         boolean expected = false;
