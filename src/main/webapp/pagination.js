@@ -277,7 +277,7 @@ async function callStackTraceServlet(logLineNo, fileName) {
     const stackTrace = await response.json();
     for(let i=0; i<stackTrace.length; i++) {
         let stackTraceElement = document.createElement('li');
-        stackTraceElement.innerText = stackTraceContainer[i];
+        stackTraceElement.innerText = stackTrace[i];
         stackTraceContainer.appendChild(stackTraceElement);
     }
 }
