@@ -37,7 +37,7 @@ import org.elasticsearch.search.SearchHits;
 public class BooleanQuery {
     private final static Integer requestSize = 10000; //limited by ElasticSearch settings
     private final static Integer minimumMatch = 1;
-    private final StackTraceFormat stackTraceFormat = new StackTraceFormat();
+    private Set<String> hash_Set = new HashSet<String>();
 
     //create searchRequest to seach index file for errors
     public SearchRequest createSearchRequest(String fileName) {
@@ -54,7 +54,7 @@ public class BooleanQuery {
     }
 
     public ImmutableList < Document > filterBoolQuerySearchHits (SearchHits hits) {
-        Builder < Document > documentList = ImmutableList.< Document > builder();
+        Builder < Document > documentList = ImmutableList.< Document > builder(); 
         for (SearchHit hit : hits) {
             String logText = (String) hit.getSourceAsMap().get(LogFields.LOG_TEXT);
             if (filterForError(logText)) {
@@ -66,9 +66,14 @@ public class BooleanQuery {
     }
 
     private Boolean filterForError(String logText) {
-        if(stackTraceFormat.matchesFormat(logText)){
+        if(StackTraceFormat.matchesFormat(logText)){
             return false;
         }
+        logText = logText.replaceAll("[^a-zA-Z]", " ");
+        if(hash_Set.contains(logText)) {
+            return false;
+        }
+        hash_Set.add(logText);
         return true;
     }
     
