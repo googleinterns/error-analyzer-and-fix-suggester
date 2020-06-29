@@ -1,0 +1,64 @@
+<!-- header -->
+<header id="body-header" class="backgroundColor">	
+        	<!-- search bar -->
+		<div>
+			<span>
+				<input type="text" id="searchBar" 
+				class="shadow inputDimension font"  name="searchBar" 
+				placeholder="Search">
+				<button onclick="search(); moveToFirstSlide();" 
+				class="themeButton">
+				    <i class="fas fa-search"></i>
+				</button>
+                		<span class="dropdown">
+				    <button class="btn btn-light dropdown-toggle" 
+				    type="button" id="dropdownMenuButton" 
+				    data-toggle="dropdown"aria-haspopup="true" 
+				    aria-expanded="false">
+					Filters
+				    </button>
+				    <div class="dropdown-menu" 
+				    aria-labelledby="dropdownMenuButton">
+					<a class="dropdown-item" href="#" 
+					onclick="addFilterToSearch('ERROR');">
+						ERROR
+					</a>
+					<a class="dropdown-item" href="#" 
+					onclick="addFilterToSearch('INFO');">
+						INFO
+					</a>
+					<a class="dropdown-item" href="#" 
+					onclick="addFilterToSearch('WARNING');">
+						WARNING
+					</a>
+				    </div>
+                		</span>
+            		</span>
+		</div>
+		<!-- choose file  -->
+		<div>
+			<span>
+				<input type="text"  id="fileName" 
+				class="shadow inputDimension font" 
+				name="fileName" placeholder="File Name">
+				<!-- if user is changing file then show results 
+				starting from 1st page -->
+				<button onclick="checkAndDrawChart(); changePage(1); 
+				moveToFirstSlide();" class="themeButton">submit</button>
+
+            		</span>
+
+		</div>
+
+		<!-- choose no of lines per page -->
+		<div>
+			<span>
+				<input type="number" min="1" max="14" class="shadow" 
+				id="records" name="records" placeholder="Lines per page">
+				<button onclick="changeNoOfRecordsOnPage(); moveToFirstSlide();" 
+				class="themeButton"> 
+				    apply 
+				</button>
+           		</span>
+		</div>
+	</header>
