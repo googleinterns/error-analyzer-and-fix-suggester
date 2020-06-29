@@ -46,7 +46,7 @@
     <%@include  file="carousel.html" %>
     
 	<!-- page no and delete button -->
-    <%@include  file="resultPageFooter.html" %>/>
+    <%@include  file="resultPageFooter.html" %>
 
 	<!--  JS  -->
 	<script src="pagination.js"></script>
