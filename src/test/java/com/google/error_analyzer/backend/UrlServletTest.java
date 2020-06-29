@@ -94,12 +94,10 @@ public class UrlServletTest {
             Mockito.mock(RequestDispatcher.class);
         when(request.getRequestDispatcher(PageConstants.LANDING_PAGE))
             .thenReturn(requestDispatcher);
-        when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
         String nullPointerExceptionString = "java.lang.NullPointerException";
-        String expected = String.format(fileAndUrlLogs.storeLogs
-        .ERROR_TEMPLATE_RESPONSE, nullPointerExceptionString);
+        String expected = String.format(fileAndUrlLogs.storeLogs.ERROR_TEMPLATE_RESPONSE, nullPointerExceptionString);
         assertTrue(actual.contains(expected));
     }
 
