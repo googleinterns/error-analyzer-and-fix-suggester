@@ -57,7 +57,7 @@ public class IndexName {
     }
 
     //get sessionID of the user
-    private static String getSessionId(HttpServletRequest request) throws NullPointerException {
+    public static String getSessionId(HttpServletRequest request) throws NullPointerException {
         String sessionID = "";
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {

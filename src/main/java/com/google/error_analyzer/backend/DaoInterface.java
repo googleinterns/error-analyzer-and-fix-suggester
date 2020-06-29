@@ -49,4 +49,7 @@ public interface DaoInterface {
     public String getJsonStringById (String fileName, String id)
      throws IOException;
 
+    //delete indices
+    public String deleteIndices(String sessionId) throws IOException ;
+
 }

@@ -10,15 +10,12 @@
 // limitations under the License.
 package com.google.error_analyzer;
 
-import com.google.error_analyzer.backend.FileAndUrlLogs;
 import com.google.error_analyzer.backend.IndexName;
+import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.MockLogDao;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.constant.PageConstants;
-import com.google.error_analyzer.servlets.UrlServlet;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
+import com.google.error_analyzer.servlets.DeleteServlet;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -51,56 +48,58 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/*this class contains the unit test for the methods used in 
-UrlServlet*/
-public class UrlServletTest {
+public class DeleteServletTest {
     private Cookie cookie;
-    private FileAndUrlLogs fileAndUrlLogs;
     private static final String SESSIONID_VALUE = "abcd";
 
     @Mock
     HttpServletRequest request;
- 
+
     @Mock
     HttpServletResponse response;
- 
+
     @InjectMocks
-    UrlServlet servlet;
+    DeleteServlet servlet;
 
     @Rule
     public MockitoRule rule = MockitoJUnit.rule();
 
     @Before
     public void setUp() {
-        fileAndUrlLogs = new FileAndUrlLogs();
+        servlet = new DeleteServlet();
         request = Mockito.mock(HttpServletRequest.class);
         response = Mockito.mock(HttpServletResponse.class);
         cookie = new Cookie(IndexName.SESSIONID, SESSIONID_VALUE);
         MockitoAnnotations.initMocks(this);
-        fileAndUrlLogs.storeLogs.logDao = new MockLogDao();
-        servlet.fileAndUrlLogs.storeLogs.logDao = new MockLogDao();
+        servlet.logDao = new MockLogDao();
     }
 
-    //unit test for catch block of UrlServlet 
     @Test
-    public void urlServletTestExceptionCase() throws ServletException,
-     IOException {
-        when(request.getParameter(LogFields.URL))
-            .thenThrow(NullPointerException.class);
-        StringWriter stringWriter = new StringWriter();
-        PrintWriter writer = new PrintWriter(stringWriter);
-        when(response.getWriter()).thenReturn(writer);
-        RequestDispatcher requestDispatcher =
-            Mockito.mock(RequestDispatcher.class);
-        when(request.getRequestDispatcher(PageConstants.LANDING_PAGE))
-            .thenReturn(requestDispatcher);
-        servlet.doPost(request, response);
-        String actual = stringWriter.toString();
-        String nullPointerExceptionString = "java.lang.NullPointerException";
-        String expected = String.format(fileAndUrlLogs.storeLogs
-        .ERROR_TEMPLATE_RESPONSE, nullPointerExceptionString);
-        assertTrue(actual.contains(expected));
-    }
+    public void deleteServletTest() throws ServletException,
+        IOException {
+            StringWriter stringWriter = new StringWriter();
+            PrintWriter writer = new PrintWriter(stringWriter);
+            when(response.getWriter()).thenReturn(writer);
+            when(request.getCookies()).thenReturn(new Cookie[] {cookie});
+            servlet.doPost(request, response);
+            String actual = stringWriter.toString();
+            String expected = String.format(LogDao.DELETE_RESPONSE);
+            assertTrue(actual.contains(expected));
+        }
 
+    @Test
+    public void deleteServletTestExceptionCase() throws ServletException,
+        IOException {
+            StringWriter stringWriter = new StringWriter();
+            PrintWriter writer = new PrintWriter(stringWriter);
+            when(response.getWriter()).thenReturn(writer);
+            when(request.getCookies()).thenThrow(NullPointerException.class);
+            servlet.doPost(request, response);
+            String actual = stringWriter.toString();
+            String nullPointerExceptionString = "java.lang.NullPointerException";
+            String expected = String.format(servlet.ERROR_RESPONSE_TEMPLATE,
+                nullPointerExceptionString);
+            assertTrue(actual.contains(expected));
+        }
 
 }
