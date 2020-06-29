@@ -20,6 +20,7 @@ import org.apache.logging.log4j.LogManager;
 indexName to fileName*/
 public class IndexName {
     public static final String SESSIONID = "JSESSIONID";
+    private static final String STUFF_STRING = "i";
     private static final Logger logger = LogManager.getLogger(IndexName.class);
 
     //returns index name for a given file name
@@ -27,12 +28,14 @@ public class IndexName {
         String fileName) throws NullPointerException {
         String sessionId = getSessionId(request);
         String indexName = sessionId.concat(fileName);
+        indexName = encodeIndexName(indexName);
         return indexName;
     }
 
     //returns file name for a given index name
     public static String getFileName(HttpServletRequest request,
         String indexName) throws NullPointerException {
+        indexName = decodeIndexName (indexName);
         String sessionId = getSessionId(request);
         int indexOfFileName = indexName.indexOf(sessionId) +
             sessionId.length();
@@ -42,8 +45,8 @@ public class IndexName {
     }
 
     //get sessionID of the user
-    private static String getSessionId(HttpServletRequest request) throws NullPointerException {
-        String sessionID = null;
+    public static String getSessionId(HttpServletRequest request) throws NullPointerException {
+        String sessionID = "";
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie: cookies) {
@@ -52,10 +55,34 @@ public class IndexName {
                 }
             }
         } 
-        if(sessionID == null) {
-            logger.fatal("Session ID is null");
+        if(sessionID == "") {
+            logger.fatal("Invalid Session");
         }
-        return sessionID.toLowerCase();
+        return sessionID;
+    }
+
+    public static String encodeIndexName(String indexName) {
+        String encodedIndexName = "";
+        for(int stringIndex = 0; stringIndex < indexName.length(); stringIndex++){ 
+            int asciiValue = (int) indexName.charAt(stringIndex);
+            String hex = Integer.toHexString(asciiValue);
+            encodedIndexName = encodedIndexName.concat(STUFF_STRING);
+            encodedIndexName = encodedIndexName.concat(hex);
+        }
+        return encodedIndexName;
+    }
+
+    public static String decodeIndexName(String indexName) throws NumberFormatException {
+        String decodedIndexName = "";
+        String decimalStrings[] = indexName.split(STUFF_STRING);
+        for (String decimalString: decimalStrings) {
+            if(!decimalString.isEmpty()){
+            int decimalValue =Integer.parseInt(decimalString,16);
+            char character = (char)decimalValue;
+            String characterString = Character.toString(character);
+            decodedIndexName = decodedIndexName.concat(characterString);
+        }}
+        return decodedIndexName;    
     }
 
 }

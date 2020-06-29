@@ -53,7 +53,7 @@ public class IndexNameTest {
     public void getIndexNameTest() {   
         when(request.getCookies()).thenReturn(new Cookie[]{cookie});
         String fileName = "file1";
-        String expected = "abcdfile1";
+        String expected = "i61i62i63i64i66i69i6ci65i31";
         String actual = IndexName.getIndexName(request,fileName);
         Assert.assertEquals(expected, actual);
     }
@@ -62,7 +62,7 @@ public class IndexNameTest {
     @Test
     public void getFileNameTest() { 
         when(request.getCookies()).thenReturn(new Cookie[]{cookie});
-        String indexName = "abcdfile1";
+        String indexName =  "i61i62i63i64i66i69i6ci65i31";
         String expected = "file1";
         String actual = IndexName.getFileName(request,indexName);
         Assert.assertEquals(expected, actual);

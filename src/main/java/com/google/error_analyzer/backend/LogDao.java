@@ -21,7 +21,9 @@ import java.util.*;
 import org.apache.http.HttpHost;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
+import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
@@ -46,7 +48,7 @@ import org.elasticsearch.search.SearchHits;
 public class LogDao implements DaoInterface {
 
     private static final RestHighLevelClient client = new RestHighLevelClient
-        (RestClient.builder(new HttpHost("localhost", 9200, "http")));
+        (RestClient.builder(new HttpHost("35.194.181.238", 9200, "http")));
     private static final SearchSourceBuilder searchSourceBuilder 
         = new SearchSourceBuilder();
     private static final int windowSize = 10;
@@ -154,6 +156,14 @@ public class LogDao implements DaoInterface {
             request.add(indexRequest);
         }
         client.bulk(request, RequestOptions.DEFAULT);;
+    }
+
+    public String deleteIndices(String sessionId) throws IOException {
+        String indexName = sessionId.concat("*");
+        DeleteIndexRequest request = new DeleteIndexRequest(indexName);
+        client.indices().delete(request, RequestOptions.DEFAULT);
+        String deleteResponse = "Files Successfully Deleted";
+        return deleteResponse;
     }
 
     // highlight searched text

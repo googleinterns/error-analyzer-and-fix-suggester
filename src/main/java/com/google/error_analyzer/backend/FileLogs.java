@@ -21,6 +21,7 @@ public class FileLogs {
         String fileName, InputStream fileContent) {
         try {
             String indexName = IndexName.getIndexName(request, fileName);
+            System.out.println(indexName);
             indexName = storeLogs.getUniqueIndexName(indexName);
             final String response = storeFileLogs(request, indexName, fileContent);
             return response;
