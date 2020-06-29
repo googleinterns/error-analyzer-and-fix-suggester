@@ -82,9 +82,9 @@ public final class FileAndUrlLogTest {
         Assert.assertEquals(expected, actual);
     }
 
-    /*store the url logs maximum 5 lines in a single API call*/
+    /*store the file logs maximum 5 lines in a single API call*/
     @Test
-    public void toreFileAndUrlLogsForFile() throws IOException {
+    public void storeFileAndUrlLogsForFile() throws IOException {
         String fileName = "file1";
         InputStream inputStream =
             new ByteArrayInputStream(FILE_CONTENT.getBytes());
