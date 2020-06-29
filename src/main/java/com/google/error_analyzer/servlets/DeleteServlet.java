@@ -52,7 +52,6 @@ public class DeleteServlet extends HttpServlet {
             String status = logDao.deleteIndices(encodedSessionId);
             String json = new Gson().toJson(status);
             response.getWriter().println(json);
-
         } catch (Exception e) {
             String status = String.format(ERROR_RESPONSE_TEMPLATE, e);
             logger.error(status);
