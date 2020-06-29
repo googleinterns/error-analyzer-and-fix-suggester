@@ -81,7 +81,7 @@ public class FilterErrorsTest {
         Document errorDocument = new Document ("1", ERROR_LOG_LINE_JSON);
         ImmutableList < Document > expected = ImmutableList.<Document>builder() 
             .add(errorDocument).build();
-        Assert.assertTrue(Document.compareDocumentList(expected, actual));
+        Assert.assertEquals(expected, actual);
     }
 
     @Test
@@ -94,7 +94,7 @@ public class FilterErrorsTest {
         Document errorDocument = new Document ("1", ERROR_LOG_LINE_JSON);
         ImmutableList < Document > expected = ImmutableList.<Document>builder() 
             .add(errorDocument).build();
-        Assert.assertTrue(Document.compareDocumentList(expected, actual));
+        Assert.assertEquals(expected, actual);
     }
     
     private Map <String, Object > createSourceMap(Integer logLineNumber, 

@@ -73,7 +73,6 @@ public class StackTraceServlet extends HttpServlet {
     private String convertMsgToJsonList (String errorMsg) {
         String[] jsonErrorString = new String[]{errorMsg};
         String json = new Gson().toJson(jsonErrorString);
-        System.out.println(json);
         return json;
     }
 }

@@ -48,23 +48,12 @@ import java.util.*;
         return id;
     }
 
-    public boolean equals(Document other) {
-        return (other.getID().equals(this.id) && other.getJsonString().equals(this.jsonString));
+    private boolean equals(Document a, Document b) {
+        return (a.getID().equals(b.id) && a.getJsonString().equals(b.jsonString));
     }
 
-    public static Boolean compareDocumentList(List < Document > expected, List < Document > actual) {
-        if(expected.size() != actual.size()) {
-            return false;
-        }
-        int size = expected.size();
-        for (int i = 0; i < size; i++) {
-            Document d1 = expected.get(i);
-            Document d2 = actual.get(i);
-            if (!d1.equals(d2)){
-                return false;
-            }
-        }
-        return true;
+    @Override
+    public boolean equals(Object other) {
+        return other instanceof Document && equals(this, (Document) other);
     }
-
 }
