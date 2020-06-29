@@ -15,6 +15,7 @@ import com.google.error_analyzer.data.Document;
 import java.io.IOException;
 import java.lang.*;
 import java.util.*;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.search.SearchHit;
 
 public interface DaoInterface {
@@ -48,4 +49,7 @@ public interface DaoInterface {
     public void bulkStoreLog(String fileName, 
         ImmutableList < Document > documentList) throws IOException;
 
+    //fetch documents from index according to searchRequest
+    public ImmutableList < SearchHit > getHitsFromIndex(SearchRequest searchRequest)
+    throws IOException;
 }

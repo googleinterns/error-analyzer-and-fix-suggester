@@ -20,6 +20,7 @@ public class StackTraceFormat {
     private static final ArrayList < Pattern > regexStrings = new ArrayList < Pattern > () {
         {
             add(Pattern.compile(".{0,20} at .+"));
+            add(Pattern.compile(".{0,20} trace .+"));
             add(Pattern.compile(".{0,20} new .+"));
             add(Pattern.compile(".{0,20} runnable .+"));
             add(Pattern.compile(".{0,20} lock .+"));
