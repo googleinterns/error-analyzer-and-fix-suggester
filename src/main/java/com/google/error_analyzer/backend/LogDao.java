@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.backend.BooleanQuery;
 import com.google.error_analyzer.backend.LogDaoHelper;
+import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.Document;
 import java.io.IOException;
 import java.util.*;
@@ -29,6 +30,8 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -59,7 +62,7 @@ public class LogDao implements DaoInterface {
         SimpleQueryStringBuilder simpleQueryBuilder = 
             QueryBuilders.simpleQueryStringQuery(searchString);
         searchSourceBuilder.query(simpleQueryBuilder)
-            .size(size).from(start);
+            .size(size).from(start).sort(LogFields.LOG_LINE_NUMBER);
         searchSourceBuilder.highlighter(addHighLighter(field));
         searchRequest.source(searchSourceBuilder);
         SearchResponse searchResponse = 
@@ -83,6 +86,17 @@ public class LogDao implements DaoInterface {
         SearchHits hits = searchResponse.getHits();
         SearchHit[] searchHits = hits.getHits();
         return ImmutableList.copyOf(Arrays.asList(searchHits));
+    }
+
+    // returns no of documents in an index
+    @Override 
+    public long getDocumentCount (String index) throws IOException {
+        CountRequest countRequest = new CountRequest(index);
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        countRequest.source(searchSourceBuilder);
+        CountResponse countResponse = 
+            client.count(countRequest, RequestOptions.DEFAULT);
+        return countResponse.getCount();
     }
 
     //search an index for errors using regex and keywords and store back in db
