@@ -49,6 +49,13 @@ b{
     color: red;
 }
 
+.flexWithSpaceBetween {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+}
+
+
 /* footer */
 footer {
    position: relative;
@@ -64,13 +71,6 @@ footer a {
     text-decoration: none;
     color: white;
     padding: 10px;
-}
-
-/* navigation */
-#navigation {
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
 }
 
 /* error-log nav */
