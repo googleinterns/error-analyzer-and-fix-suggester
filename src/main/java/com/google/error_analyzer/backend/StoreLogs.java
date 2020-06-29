@@ -96,8 +96,10 @@ public class StoreLogs {
         String nextIndexName = indexName;
         int indexSuffix = 1;
         while (logDao.fileExists(nextIndexName)) {
+            String encodedSuffix = IndexName
+                .encodeIndexName(String.format("(%s)",indexSuffix));
             nextIndexName = String.format(
-                "%1$s(%2$s)", indexName, indexSuffix);
+                "%1$s%2$s", indexName, encodedSuffix);
             indexSuffix++;
         }
         return nextIndexName;

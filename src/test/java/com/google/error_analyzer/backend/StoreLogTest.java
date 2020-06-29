@@ -79,7 +79,7 @@ public final class StoreLogTest {
     @Test
     public void storeLogTestWithZeroOffset () throws IOException {
         String log = "error1\nerror2\nerror3";
-        String fileName = "file1";
+        String fileName = "i66i69i6ci65i31";
         int offset = 0;
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         storeLogs.storeLog(request, fileName, log, offset);
@@ -101,7 +101,7 @@ public final class StoreLogTest {
     @Test
     public void storeLogTestWithNonZeroOffset () throws IOException {
         String log = "error1\nerror2\nerror3";
-        String fileName = "file1";
+        String fileName = "i66i69i6ci65i31";
         int offset = 3;
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         storeLogs.storeLog(request, fileName, log, offset);

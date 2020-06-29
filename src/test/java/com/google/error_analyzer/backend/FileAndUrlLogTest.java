@@ -85,7 +85,7 @@ public final class FileAndUrlLogTest {
     /*store the file logs maximum 5 lines in a single API call*/
     @Test
     public void storeFileAndUrlLogsForFile() throws IOException {
-        String fileName = "file1";
+        String fileName = "i66i69i6ci65i31";
         InputStream inputStream =
             new ByteArrayInputStream(FILE_CONTENT.getBytes());
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
@@ -108,7 +108,7 @@ public final class FileAndUrlLogTest {
     /*store the url logs maximum 5 lines in a single API call*/
     @Test
     public void storeFileAndUrlLogsForUrl() throws  IOException {
-        String fileName = "file1";
+        String fileName = "i66i69i6ci65i31";
         InputStream inputStream =
             new ByteArrayInputStream(URL_CONTENT.getBytes());
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
