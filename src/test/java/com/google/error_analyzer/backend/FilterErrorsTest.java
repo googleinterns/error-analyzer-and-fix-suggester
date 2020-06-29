@@ -39,11 +39,15 @@ import static org.mockito.Mockito.doAnswer;
 public class FilterErrorsTest {
     private final FilterErrors filterErrors = new FilterErrors();
     private final String ERROR_LOG_LINE = "01 Error: nullPointerException";
-    private final String ERROR_LOG_LINE_JSON = "{\"logLineNumber\" : 1, \"logText\" : \"01 Error: nullPointerException\"}";
+    private final String ERROR_LOG_LINE_JSON = 
+    "{\"logLineNumber\" : 1, \"logText\" : \"01 Error: nullPointerException\"}";
     private final String REPEATED_ERROR_LOG_LINE = "02 Error: nullPointerException";
-    private final String REPEATED_ERROR_LOG_LINE_JSON = "{\"logLineNumber\" : 2, \"logText\" : \"01 Error: nullPointerException\"}";
-    private final String STACK_LOG_LINE = "cvr123 At com.stack.stacktrace.StackTraceExample.methodB";
-    private final String STACK_LOG_LINE_JSON = "{\"logLineNumber\" : 3, \"logText\" : \"cvr123 At com.stack.stacktrace.StackTraceExample.methodB\"}";
+    private final String REPEATED_ERROR_LOG_LINE_JSON = 
+    "{\"logLineNumber\" : 2, \"logText\" : \"01 Error: nullPointerException\"}";
+    private final String STACK_LOG_LINE = 
+    "cvr123 At com.stack.stacktrace.StackTraceExample.methodB";
+    private final String STACK_LOG_LINE_JSON = 
+    "{\"logLineNumber\" : 3, \"logText\" : \"cvr123 At com.stack.stacktrace.StackTraceExample.methodB\"}";
     // private final 
     SearchHit errorHit;
     SearchHit repeatedErrorHit;
@@ -76,8 +80,7 @@ public class FilterErrorsTest {
 
         Document errorDocument = new Document ("1", ERROR_LOG_LINE_JSON);
         ImmutableList < Document > expected = ImmutableList.<Document>builder() 
-                                          .add(errorDocument) 
-                                          .build();
+            .add(errorDocument).build();
         Assert.assertTrue(Document.compareDocumentList(expected, actual));
     }
 
@@ -90,8 +93,7 @@ public class FilterErrorsTest {
 
         Document errorDocument = new Document ("1", ERROR_LOG_LINE_JSON);
         ImmutableList < Document > expected = ImmutableList.<Document>builder() 
-                                          .add(errorDocument) 
-                                          .build();
+            .add(errorDocument).build();
         Assert.assertTrue(Document.compareDocumentList(expected, actual));
     }
     
