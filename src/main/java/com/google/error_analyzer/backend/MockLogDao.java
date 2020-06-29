@@ -19,6 +19,7 @@ import com.google.error_analyzer.data.Index;
 import java.io.IOException;
 import java.lang.*;
 import java.util.*;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -135,6 +136,13 @@ public class MockLogDao implements DaoInterface {
         return result;
     }
 
+    //fetch documents from index according to searchRequest
+    @Override
+    public ImmutableList < SearchHit > getHitsFromIndex(SearchRequest searchRequest) {
+        Builder < SearchHit > searchResultBuilder = ImmutableList.< SearchHit > builder();
+        return searchResultBuilder.build();
+    }
+
     //Stores the documents into the database by performing multiple indexing operations
     @Override
     public void bulkStoreLog(String fileName,
@@ -146,5 +154,4 @@ public class MockLogDao implements DaoInterface {
         }
         logDatabase.add(index);
     }
-    
 }

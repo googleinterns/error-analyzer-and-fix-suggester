@@ -135,6 +135,20 @@ public class LogDao implements DaoInterface {
         return getResponse.getSourceAsString();
     }
 
+    //fetch documents from index according to searchRequest
+    @Override
+    public ImmutableList < SearchHit > getHitsFromIndex(SearchRequest searchRequest)
+    throws IOException {
+        Builder < SearchHit > searchResultBuilder = ImmutableList.< SearchHit > builder();
+        SearchResponse searchResponse = client
+            .search(searchRequest, RequestOptions.DEFAULT);
+        SearchHits hits = searchResponse.getHits();
+        for (SearchHit hit : hits){
+            searchResultBuilder.add(hit);
+        }
+        return searchResultBuilder.build();
+    }
+    
     //Stores the documents into the database by performing multiple indexing operations
     //in a single API call
     @Override
