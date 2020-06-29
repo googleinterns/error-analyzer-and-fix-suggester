@@ -9,24 +9,6 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
 
-// prepare DOM element for log/error to be shown on resultPage
-prepareLogDomElement = (logError, fileType) => {
-    const liElement = document.createElement('li');
-    const logLineNo = document.createElement('span');
-    logLineNo.innerText = logError.logLineNumber + "  ";
-    const logText = document.createElement('span');
-    logText.innerHTML = logError.logText;
-    liElement.appendChild(logLineNo);
-    liElement.appendChild(logText);
-    
-    // if fileType is error then we need to add 
-    // btn to show stackTrace 
-    if(fileType == ERRORS){
-      addStackTraceBtn(liElement, logError);
-    }
-    return liElement;
-}
-
 // add button for stack trace
 addStackTraceBtn = (liElement, logError) => {
     const stackTraceButton = document.createElement('button');
