@@ -9,21 +9,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
 
-// file contains all the constants used by all the js files
-
-// DOM elements
-const PIE_CHART= "piechart";
-const FILE_NAME = "fileName";
-
-// attributes for dom status
-const HIDDEN = "hidden";
-const VISIBLE = "visible";
-
-// common constants for various js files
-const LOGS = "logs" ;
-const ERRORS = "errors";
-const FILE_TYPE = "fileType";
-
-// servlet constants
-const POST = "POST";
-const GET_COUNT = "/getCount";
+// call docCount servlet for no of documents in a index
+async function getCount(index, fileType) {
+    const params = new URLSearchParams();
+    params.append(FILE_NAME, index);
+    params.append(FILE_TYPE, fileType);
+    const response = await fetch(GET_COUNT, {
+        method: POST,
+        body: params
+    });
+    const count = await response.json();
+    return count;
+}
