@@ -50,6 +50,8 @@ public final class FileAndUrlLogTest {
     private static final String SESSIONID_VALUE = "abcd";
     private static final String FILE_CONTENT =
         "error1\nerror2\nerror3\nerror4\nerror5\nerror6\n";
+    private static final String URL_CONTENT =
+        "<html>error1\nerror2\nerror3\nerror4\nerror5\n<html>";
 
     @Mock
     HttpServletRequest request;
@@ -80,9 +82,9 @@ public final class FileAndUrlLogTest {
         Assert.assertEquals(expected, actual);
     }
 
-    /*storing maximum 5 lines in a single API call*/
+    /*store the url logs maximum 5 lines in a single API call*/
     @Test
-    public void storeFileLogsTest() throws IOException {
+    public void toreFileAndUrlLogsForFile() throws IOException {
         String fileName = "file1";
         InputStream inputStream =
             new ByteArrayInputStream(FILE_CONTENT.getBytes());
@@ -101,6 +103,29 @@ public final class FileAndUrlLogTest {
             .getJsonStringById(fileName, "7");
         String expected = null;
         assertEquals(expected, actual);
+    }
+
+    /*store the url logs maximum 5 lines in a single API call*/
+    @Test
+    public void storeFileAndUrlLogsForUrl() throws  IOException {
+        String fileName = "file1";
+        InputStream inputStream =
+            new ByteArrayInputStream(URL_CONTENT.getBytes());
+        when(request.getCookies()).thenReturn(new Cookie[] {cookie});
+        boolean isUrl = true;
+        fileAndUrlLogs.storeFileAndUrlLogs(
+            request, fileName, inputStream, isUrl);
+        for (int id = 1; id < 6; id++) {
+            String actual = fileAndUrlLogs.storeLogs.logDao
+                .getJsonStringById(fileName, Integer.toString(id));
+            String expected = String.format(
+                "{\"logLineNumber\":%1$s,\"logText\":\"error%1$s\"}", id);
+            assertEquals(expected, actual);
+        }
+        String actual = fileAndUrlLogs.storeLogs.logDao
+            .getJsonStringById(fileName, "6");
+        String expected = null;
+        assertEquals(expected, actual);   
     }
 
 }

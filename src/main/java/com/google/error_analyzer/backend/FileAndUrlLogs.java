@@ -65,24 +65,29 @@ public class FileAndUrlLogs {
             log = log + logLine + "\n";
             lineCount++;
             if (lineCount >= MaxLogLines) {
-                if(isUrl) {
-                    log = UrlLogs.removeHtmlTags(log);
-                }
                 response =
-                    storeLogs.storeLog(request, fileName, log, offset);
+                    storeLog(request, fileName, log, offset, isUrl);
                 log = "";
                 lineCount = 0;
                 offset = offset + MaxLogLines;
             }
         }
         if (!log.isEmpty()) {
-            if(isUrl) {
-                log = UrlLogs.removeHtmlTags(log);
-            }
             response =
-                storeLogs.storeLog(request, fileName, log, offset);
+               storeLog(request, fileName, log, offset, isUrl);
         }
         return response;
     }
+
+    /*remove html tags if the logs are from url and then stores the log 
+    into the database*/
+    private String storeLog(HttpServletRequest request,  String fileName,
+     String log, int offset, boolean isUrl) throws IOException {
+        if(isUrl) {
+            log = UrlLogs.removeHtmlTags(log);
+        }
+        String response = storeLogs.storeLog(request, fileName, log, offset);
+        return response;
+     }
 
 }

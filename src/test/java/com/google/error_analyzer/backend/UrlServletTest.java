@@ -57,8 +57,6 @@ public class UrlServletTest {
     private Cookie cookie;
     private FileAndUrlLogs fileAndUrlLogs;
     private static final String SESSIONID_VALUE = "abcd";
-    private static final String URL_CONTENT =
-        "<html>error1\nerror2\nerror3\nerror4\nerror5\n<html>";
 
     @Mock
     HttpServletRequest request;
@@ -83,32 +81,10 @@ public class UrlServletTest {
         servlet.fileAndUrlLogs.storeLogs.logDao = new MockLogDao();
     }
 
-    /*store the url content using storeFileLogs method*/
-    @Test
-    public void urlServletTest() throws ServletException, IOException {
-        String fileName = "file1";
-        InputStream inputStream =
-            new ByteArrayInputStream(URL_CONTENT.getBytes());
-        when(request.getCookies()).thenReturn(new Cookie[] {cookie});
-        boolean isUrl = true;
-        fileAndUrlLogs.storeFileAndUrlLogs(
-            request, fileName, inputStream, isUrl);
-        for (int id = 1; id < 6; id++) {
-            String actual = fileAndUrlLogs.storeLogs.logDao
-                .getJsonStringById(fileName, Integer.toString(id));
-            String expected = String.format(
-                "{\"logLineNumber\":%1$s,\"logText\":\"error%1$s\"}", id);
-            assertEquals(expected, actual);
-        }
-        String actual = fileAndUrlLogs.storeLogs.logDao
-            .getJsonStringById(fileName, "6");
-        String expected = null;
-        assertEquals(expected, actual);   
-    }
-
     //unit test for catch block of UrlServlet 
     @Test
-    public void urlServletTestExceptionCase() throws ServletException, IOException {
+    public void urlServletTestExceptionCase() throws ServletException,
+     IOException {
         when(request.getParameter(LogFields.URL))
             .thenThrow(NullPointerException.class);
         StringWriter stringWriter = new StringWriter();
@@ -121,10 +97,9 @@ public class UrlServletTest {
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
-        System.out.println(actual);
         String nullPointerExceptionString = "java.lang.NullPointerException";
-        String expected = String.format(fileAndUrlLogs.storeLogs.ERROR_TEMPLATE_RESPONSE, 
-            nullPointerExceptionString);
+        String expected = String.format(fileAndUrlLogs.storeLogs
+        .ERROR_TEMPLATE_RESPONSE, nullPointerExceptionString);
         assertTrue(actual.contains(expected));
     }
 
