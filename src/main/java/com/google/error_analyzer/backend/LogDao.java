@@ -106,9 +106,8 @@ public class LogDao implements DaoInterface {
     public String findAndStoreErrors(String fileName) throws IOException {
         ImmutableList < Document > errorHits = findErrors(fileName);
         String errorFileName = LogDaoHelper.getErrorIndexName(fileName);
-        Integer size = errorHits.size();
-        logger.info("storing ".concat(size.toString())
-        .concat(" in index ").concat(errorFileName));
+        logger.info(String.format("storing %d errors in %s", 
+        errorHits.size(), errorFileName));
         bulkStoreLog(errorFileName, errorHits);
         return errorFileName;
     }

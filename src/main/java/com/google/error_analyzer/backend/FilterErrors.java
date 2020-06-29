@@ -33,7 +33,7 @@ public class FilterErrors {
         Builder < Document > documentList = ImmutableList.< Document > builder(); 
         for (SearchHit hit : hits) {
             String logText = (String) hit.getSourceAsMap().get(LogFields.LOG_TEXT);
-            if (filterForError(logText)) {
+            if (shouldIncludeError(logText)) {
                 Document document = new Document(hit.getId(), hit.getSourceAsString());
                 documentList.add(document);
             }
@@ -41,7 +41,8 @@ public class FilterErrors {
         return documentList.build();
     }
 
-    private Boolean filterForError(String logText) {
+    //return false if error is repeated or part of stack
+    private Boolean shouldIncludeError(String logText) {
         if (StackTraceFormat.matchesFormat(logText)) {
             return false;
         }
