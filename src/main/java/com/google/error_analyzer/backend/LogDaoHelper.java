@@ -23,7 +23,7 @@ import org.elasticsearch.search.SearchHits;
 public class LogDaoHelper {
 
     // return ImmutableList of hit ids corresponding to given searchhit list
-    public ImmutableList < String > hitId(SearchHit[] searchHits) {
+    public ImmutableList < String > hitId(ImmutableList < SearchHit > searchHits) {
         Builder<String> ids = ImmutableList.<String>builder();
         for (SearchHit hit: searchHits) {
             String id = hit.getId();
@@ -35,7 +35,7 @@ public class LogDaoHelper {
     // return ImmutableList of content of specified field  corresponding to 
     // given searchhit list
     public ImmutableList < String > hitFieldContent(
-    SearchHit[] searchHits, String field) {
+    ImmutableList < SearchHit > searchHits, String field) {
         Builder<String> fieldContent = ImmutableList.<String>builder();
         for (SearchHit hit: searchHits) {
             String resultString = 
@@ -45,24 +45,24 @@ public class LogDaoHelper {
         return fieldContent.build();
     }
 
-    //returns hashmap of hit ids and highlighted content 
-    public HashMap < String, String > getHighLightedText(
+    //returns list of highlighted content 
+    public ImmutableList < String > getHighLightedText(
     ImmutableList < SearchHit > searchHits, String field) {
-        HashMap < String, String > searchResult = new HashMap();
+       Builder<String> searchResult = ImmutableList.<String>builder();
         for (SearchHit hit: searchHits) {
             Map < String, HighlightField > highlightFields 
                 = hit.getHighlightFields();
             HighlightField highlight = highlightFields.get(field);
             if(highlight.fragments().length != 0) {
                 String fragmentString = (highlight.fragments())[0].string();
-                searchResult.put(hit.getId(), fragmentString);
+                searchResult.add(fragmentString);
             }
         }
-        return searchResult;
+        return searchResult.build();
     }
 
     //returns index name which stores the error logs
     public static String getErrorIndexName (String fileName) {
         return fileName.concat("error");
-    } 
+    }
 }

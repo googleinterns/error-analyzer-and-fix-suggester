@@ -1,0 +1,27 @@
+2020-06-29 18:00:46,698 INFO c.g.e.b.StoreLogs File samplefile1 stored
+2020-06-29 18:00:46,719 ERROR c.g.e.b.StoreLogs File samplefile1 already exists
+2020-06-29 18:00:47,609 INFO c.g.e.b.StackTrace Finding stack for 1
+2020-06-29 18:00:47,625 INFO c.g.e.b.StackTrace Adding 0 messages to stack list
+2020-06-29 18:00:47,627 INFO c.g.e.b.StackTrace Adding line:2 to stack list
+2020-06-29 18:00:47,631 INFO c.g.e.b.StackTrace Adding line:3 to stack list
+2020-06-29 18:00:47,632 INFO c.g.e.b.StackTrace Exceeding batch size request
+2020-06-29 18:00:47,636 INFO c.g.e.b.StackTrace End of stack trace found
+2020-06-29 18:00:47,654 INFO c.g.e.b.StackTrace Finding stack for 1
+2020-06-29 18:00:47,657 INFO c.g.e.b.StackTrace No stack found
+2020-06-29 18:00:47,661 INFO c.g.e.b.StackTrace Finding stack for 1
+2020-06-29 18:00:47,667 INFO c.g.e.b.StackTrace Adding 1 messages to stack list
+2020-06-29 18:00:47,669 INFO c.g.e.b.StackTrace Adding line:3 to stack list
+2020-06-29 18:00:47,672 INFO c.g.e.b.StackTrace Exceeding batch size request
+2020-06-29 18:00:47,674 INFO c.g.e.b.StackTrace End of stack trace found
+2020-06-29 18:00:47,734 INFO c.g.e.b.StackTrace Finding stack for 1
+2020-06-29 18:00:47,735 INFO c.g.e.b.StackTrace No stack found
+2020-06-29 18:00:47,738 INFO c.g.e.b.StackTrace Finding stack for 1
+2020-06-29 18:00:47,742 INFO c.g.e.b.StackTrace No stack found
+2020-06-29 18:00:48,721 INFO c.g.e.b.StackTrace Finding stack for 1
+2020-06-29 18:00:48,723 INFO c.g.e.b.StackTrace No stack found
+2020-06-29 18:00:48,732 ERROR c.g.e.s.StackTraceServlet Could not complete requestjava.lang.NullPointerException: index must not be null
+2020-06-29 18:00:48,747 ERROR c.g.e.s.StackTraceServlet Could not parse logLineNumber java.lang.NumberFormatException: For input string: "a"
+2020-06-29 18:00:48,836 INFO c.g.e.b.StoreLogs File file1 stored
+2020-06-29 18:00:48,841 INFO c.g.e.b.StoreLogs File file2 stored
+2020-06-29 18:00:48,854 INFO c.g.e.b.StoreLogs File file1 stored
+2020-06-29 18:00:48,857 ERROR c.g.e.b.StoreLogs File file1 already exists

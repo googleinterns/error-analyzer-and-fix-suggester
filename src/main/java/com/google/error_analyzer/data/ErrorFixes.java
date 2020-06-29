@@ -31,7 +31,7 @@ import org.apache.logging.log4j.LogManager;
 public class ErrorFixes{
     
     private static final Logger logger = LogManager.getLogger(ErrorFixes.class);
-    public static String findFixes(String searchQuery) {
+    public String findFixes(String searchQuery) {
     
         try{
             String searchEngine = "cx"; //Your search engine
@@ -39,7 +39,7 @@ public class ErrorFixes{
             //Instance Customsearch
             Customsearch customeSearch = 
                 new Customsearch.Builder(GoogleNetHttpTransport.newTrustedTransport(),
-                JacksonFactory.getDefaultInstance(), null) 
+                JacksonFactory.getDefaultInstance(), null).
                 setApplicationName("errorFixes").setGoogleClientRequestInitializer(
                 new CustomsearchRequestInitializer("your_api_key")).build();
 
