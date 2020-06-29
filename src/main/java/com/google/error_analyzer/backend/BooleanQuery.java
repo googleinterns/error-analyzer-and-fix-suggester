@@ -11,13 +11,9 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.data.constant.Keywords;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.constant.RegexStrings;
-import com.google.error_analyzer.data.constant.StackTraceFormat;
-import com.google.error_analyzer.data.Document;
 import java.util.*;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -37,7 +33,6 @@ import org.elasticsearch.search.SearchHits;
 public class BooleanQuery {
     private final static Integer requestSize = 10000; //limited by ElasticSearch settings
     private final static Integer minimumMatch = 1;
-    private Set<String> hash_Set = new HashSet<String>();
 
     //create searchRequest to seach index file for errors
     public SearchRequest createSearchRequest(String fileName) {
@@ -51,39 +46,6 @@ public class BooleanQuery {
         SearchRequest searchRequest = new SearchRequest(fileName);
         searchRequest.source(searchSourceBuilder);
         return searchRequest;
-    }
-
-    public ImmutableList < Document > filterBoolQuerySearchHits (SearchHits hits) {
-        Builder < Document > documentList = ImmutableList.< Document > builder(); 
-        for (SearchHit hit : hits) {
-            String logText = (String) hit.getSourceAsMap().get(LogFields.LOG_TEXT);
-            if (filterForError(logText)) {
-                Document document = new Document(hit.getId(), hit.getSourceAsString());
-                documentList.add(document);
-            }
-        }
-        return documentList.build();
-    }
-
-    private Boolean filterForError(String logText) {
-        if(StackTraceFormat.matchesFormat(logText)){
-            return false;
-        }
-        logText = logText.replaceAll("[^a-zA-Z]", " ");
-        if(hash_Set.contains(logText)) {
-            return false;
-        }
-        hash_Set.add(logText);
-        return true;
-    }
-    
-    public ImmutableList < Document > creatIndexRequestForErrors (SearchHits hits) {
-        Builder < Document > documentList = ImmutableList.< Document > builder();
-        for (SearchHit hit : hits) {
-            Document document = new Document(hit.getId(), hit.getSourceAsString());
-            documentList.add(document);
-        }
-        return documentList.build();
     }
 
     //Combine matchquery and regex query and return a bool query

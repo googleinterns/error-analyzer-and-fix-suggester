@@ -14,6 +14,7 @@ package com.google.error_analyzer.backend;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.backend.BooleanQuery;
+import com.google.error_analyzer.backend.FilterErrors;
 import com.google.error_analyzer.backend.LogDaoHelper;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.Document;
@@ -173,7 +174,8 @@ public class LogDao implements DaoInterface {
         SearchResponse searchResponse = client
             .search(searchRequest, RequestOptions.DEFAULT);
         SearchHits hits = searchResponse.getHits();
-        ImmutableList < Document > documentList = booleanQuery.filterBoolQuerySearchHits(hits);
+        FilterErrors filterErrors = new FilterErrors();
+        ImmutableList < Document > documentList = filterErrors.filterErrorSearchHits(hits);
         return documentList;
     }
 }
