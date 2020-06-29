@@ -25,7 +25,7 @@ import org.junit.Test;
 public final class StackFormatTest {
 
     @Test
-    public void startsWithAtWithSpace() {
+    public void matchesFormat_startsWithAtWithSpace() {
         String logText = " at com.stack.stacktrace.StackTraceExample.methodB";
         boolean actual = StackTraceFormat.matchesFormat(logText);
         boolean expected = true;
@@ -33,7 +33,7 @@ public final class StackFormatTest {
     }
 
     @Test
-    public void atPreceededBy20Characters() {
+    public void matchesFormat_atPreceededBy20Characters() {
         String logText = "01234567890123456789 at com.stack.stacktrace.StackTraceExample.methodB";
         boolean actual = StackTraceFormat.matchesFormat(logText);
         boolean expected = true;
@@ -41,7 +41,7 @@ public final class StackFormatTest {
     }
 
     @Test
-    public void atInUpperCase() {
+    public void matchesFormat_atInUpperCase() {
         String logText = "cvr123 At com.stack.stacktrace.StackTraceExample.methodB";
         boolean actual = StackTraceFormat.matchesFormat(logText);
         boolean expected = true;
@@ -49,7 +49,7 @@ public final class StackFormatTest {
     }
 
     @Test
-    public void atAppearsLaterInString() {
+    public void matchesFormat_atAppearsLaterInString() {
         String logText = "Running com.google.error_analyzer at maven";
         boolean actual = StackTraceFormat.matchesFormat(logText);
         boolean expected = false;
@@ -57,7 +57,7 @@ public final class StackFormatTest {
     }
 
     @Test
-    public void atPreceededBy21Characters() {
+    public void matchesFormat_atPreceededBy21Characters() {
         String logText = "012345678901234567890 at com.stack.stacktrace.StackTraceExample.methodB";
         boolean actual = StackTraceFormat.matchesFormat(logText);
         boolean expected = false;
@@ -65,7 +65,7 @@ public final class StackFormatTest {
     }
 
     @Test
-    public void whenAtIsNotFollowedByAnything() {
+    public void matchesFormat_whenAtIsNotFollowedByAnything() {
         String logText = "01234567891234 at ";
         boolean actual = StackTraceFormat.matchesFormat(logText);
         boolean expected = false;
@@ -73,7 +73,7 @@ public final class StackFormatTest {
     }
 
     @Test
-    public void startsWithAtWithoutSpace() {
+    public void matchesFormat_startsWithAtWithoutSpace() {
         String logText = "at com.stack.stacktrace.StackTraceExample.methodB";
         boolean actual = StackTraceFormat.matchesFormat(logText);
         boolean expected = false;

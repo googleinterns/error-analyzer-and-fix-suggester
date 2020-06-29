@@ -58,7 +58,7 @@ public class StackTraceServletTest {
     }
 
     @Test
-    public void servletTest() throws IOException {
+    public void doPost_servletTest() throws IOException {
         when(request.getParameter(LogFields.FILE_NAME)).thenReturn("file1");
         when(request.getParameter(LogFields.LOG_LINE_NUMBER)).thenReturn("1");
         StringWriter stringWriter = new StringWriter();
@@ -71,7 +71,7 @@ public class StackTraceServletTest {
     }
 
     @Test
-    public void numberParseError() throws IOException {
+    public void doPost_numberParseError() throws IOException {
         when(request.getParameter(LogFields.LOG_LINE_NUMBER)).thenReturn("a");
         StringWriter stringWriter = new StringWriter();
         PrintWriter writer = new PrintWriter(stringWriter);
@@ -83,7 +83,7 @@ public class StackTraceServletTest {
     }
 
     @Test
-    public void fileNameisNull() throws IOException {
+    public void doPost_fileNameisNull() throws IOException {
         when(request.getParameter(LogFields.LOG_LINE_NUMBER)).thenReturn("1");
         when(request.getParameter(LogFields.FILE_NAME)).thenReturn(null);
         StringWriter stringWriter = new StringWriter();
