@@ -48,12 +48,9 @@ import java.util.*;
         return id;
     }
 
-    private boolean equals(Document a, Document b) {
-        return (a.getID().equals(b.id) && a.getJsonString().equals(b.jsonString));
-    }
-
-    @Override
     public boolean equals(Object other) {
-        return other instanceof Document && equals(this, (Document) other);
+    return other instanceof Document && 
+        this.id.equals(((Document) other).getID()) && 
+        this.jsonString.equals(((Document) other).getJsonString());
     }
 }
