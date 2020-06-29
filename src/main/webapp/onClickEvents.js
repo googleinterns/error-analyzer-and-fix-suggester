@@ -1,18 +1,20 @@
-// if on 2nd slide of carousel 
-addclass = () => {
-    const slide1 = document.getElementById(SLIDE_1_CONTAINER);
-    const slide2 = document.getElementById(SLIDE_2_CONTAINER);
-    slide1.classList.add(ACTIVE);
-    slide2.classList.remove(ACTIVE);
-
-}
+/**Copyright 2019 Google LLC
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    https://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.*/
 
 // add choosen filter to search
-addToSearch = (searchString) => {
+addFilterToSearch = (searchString) => {
     const searchBar = document.getElementById(SEARCH_BAR);
     searchBar.value += " " + searchString;
     search();
-    addclass();
+    moveToFirstSlide();
 }
 
 // hide stackTraces 
@@ -32,24 +34,9 @@ search = () => {
     changePage(1);
 }
 
-
-// decrement by 1 on pressing previous button
-prevPage = () => {
-    currentPage--;
-    next = false;
-    changePage(currentPage);
-}
-
-// increment by 1 on pressing next button
-nextPage = () => {
-    currentPage++;
-    next = true;
-    changePage(currentPage);
-}
-
 // change no of records on a page 
 changeNoOfRecordsOnPage = () => {
     const records = document.getElementById(RECORDS);
-    recordsPerPage = records.value;
+    updateRecordsPerPage(records.value);
     changePage(1);
 }

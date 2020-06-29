@@ -45,7 +45,7 @@
 				<input type="text" id="searchBar" 
 				class="shadow inputDimension font"  name="searchBar" 
 				placeholder="Search">
-				<button onclick="search(); addclass();" 
+				<button onclick="search(); moveToFirstSlide();" 
 				class="themeButton">
 				    <i class="fas fa-search"></i>
 				</button>
@@ -56,9 +56,9 @@
 					Filters
 				    </button>
 				    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-					<a class="dropdown-item" href="#" onclick="addToSearch('ERROR');">ERROR</a>
-					<a class="dropdown-item" href="#" onclick="addToSearch('INFO');">INFO</a>
-					<a class="dropdown-item" href="#" onclick="addToSearch('WARNING');">WARNING</a>
+					<a class="dropdown-item" href="#" onclick="addFilterToSearch('ERROR');">ERROR</a>
+					<a class="dropdown-item" href="#" onclick="addFilterToSearch('INFO');">INFO</a>
+					<a class="dropdown-item" href="#" onclick="addFilterToSearch('WARNING');">WARNING</a>
 				    </div>
                 		</span>
             		</span>
@@ -70,8 +70,8 @@
 				name="fileName" placeholder="File Name">
 				<!-- if user is changing file then show results 
 				starting from 1st page -->
-				<button onclick="drawChart(); changePage(1); 
-				addclass();" class="themeButton">submit</button>
+				<button onclick="checkAndDrawChart(); changePage(1); 
+				moveToFirstSlide();" class="themeButton">submit</button>
             		</span>
 
 		</div>
@@ -81,7 +81,7 @@
 			<span>
 				<input type="number" min="1" max="14" class="shadow" 
 				id="records" name="records" placeholder="Lines per page">
-				<button onclick="changeNoOfRecordsOnPage(); addclass();" 
+				<button onclick="changeNoOfRecordsOnPage(); moveToFirstSlide();" 
 				class="themeButton"> 
 				    apply 
 				</button>
@@ -95,7 +95,7 @@
 		<li class="nav-item " role="presentation">
 			<a class="nav-link active" id="logs" data-toggle="tab" 
 			   href="#slide1" role="tab" aria-controls="home"
-			   aria-selected="true" onclick="changePage(1); addclass();">
+			   aria-selected="true" onclick="changePage(1); moveToFirstSlide();">
 				Logs
 			</a>
 		</li>
@@ -103,7 +103,7 @@
 			<a class="nav-link" id="errors" data-toggle="tab" 
 			   href="#slide1" role="tab" aria-controls="profile"
 			   aria-selected="false" 
-			   onclick="changePage(1); addclass();">
+			   onclick="changePage(1); moveToFirstSlide();">
 				Errors
 			</a>
 		</li>
@@ -185,10 +185,13 @@
 
 	<!-- pagination JS  -->
 	<script src="pagination.js"></script>
-    <script src="createDOM.js"></script>
     <script src="constants.js"></script>
     <script src="onClickEvents.js"></script>
     <script src="servlet.js"></script>
+    <script src="globalVariables.js"></script>
+    <script src="stackTrace.js"></script>
+    <script src="dataWindow.js"></script>
+    <script src="carousel.js"></script>
 	<!-- chart JS -->
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 	<script src="charts.js"></script>

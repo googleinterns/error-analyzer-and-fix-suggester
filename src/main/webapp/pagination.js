@@ -1,16 +1,19 @@
-const noOfPages = 5;
-const extraPageInFrontAndBack = Math.floor(noOfPages/2);
-let currentPage = 1;
-let next = true;
-let recordsPerPage = 3;
+/**Copyright 2019 Google LLC++
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    https://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.*/
+
 let fileLength = Number.MAX_VALUE;
-let noOfRecordsOnLastPage = recordsPerPage;
-let lastPage = Number.MAX_VALUE;
-let data = new Array();
 
 // change content of page 
 async function changePage(page) {
-    currentPage = page;
+    updateCurrentPage(page);
     const logs = document.getElementById(LOGS).getAttribute("aria-selected");
     const searchString = document.getElementById(SEARCH_BAR).value;
     const fileType = logs == "true" ? LOGS : ERRORS ;
@@ -26,13 +29,15 @@ async function changePage(page) {
 
     if(fetchedPage != -1) {
         const pageSpecs = getPageStartAndSize(fileType, fetchedPage, searchString);
+        console.log(pageSpecs.START +" "+ pageSpecs.SIZE);
         fetchedData = await callPaginationServlet(fileName, fileType, searchString, pageSpecs);
-        updateLastPage(fetchedData.length, fetchedPage);
+        console.log(fetchedData);
+        updateLastPageBasedOnFetchedPageLength(fetchedData.length, fetchedPage);
         if(fetchedData.length == 0 && currentPage == 1) {
             fileNotFound();
             return;
         }
-        addToData(fetchedData, fetchedPage, fileType, fileName);    
+        addToData(fetchedData, fetchedPage, fileType);    
     }
 
     if(currentPage == 1 ) {
@@ -42,17 +47,17 @@ async function changePage(page) {
 
 // reset value of lastPage when on page 1 
 async function resetLastPage(fileName, fileType) {
-    lastPage = Number.MAX_VALUE;
-    noOfRecordsOnLastPage = recordsPerPage;
+    updateLastPage(Number.MAX_VALUE);
+    updateNoOfRecordsOnLastPage(recordsPerPage)
     if(fileType == ERRORS){
         fileLength = await getCount(fileName, fileType);
-        lastPage = Math.ceil(fileLength/recordsPerPage);
+        updateLastPage(Math.ceil(fileLength/recordsPerPage));
         if(fileLength % recordsPerPage != 0)
-            noOfRecordsOnLastPage = fileLength % recordsPerPage;
+            updateNoOfRecordsOnLastPage(fileLength % recordsPerPage);
     }
 }
 
-// calculating starting index and size of block to be fetched from databasefor given page
+// calculating starting index and size of block to be fetched from database for given page
 getPageStartAndSize = (fileType, page, searchString) => {
     if(fileType == LOGS || searchString != "") {
         return getPageStartAndSizeForLogFile(page);
@@ -85,25 +90,6 @@ getPageStartAndSizeForErrorFile = (page) => {
     return {START: start, SIZE: size};
 }
 
-// add returned records to data
-addToData = (fetchedData, page, fileType, fileName) => {
-    let idx = recordsPerPage * ((page - 1) % noOfPages);
-    for (let i = 0; i < fetchedData.length; i++) {
-        data[idx] = prepareLogDomElement(fetchedData[i], fileType, fileName);
-        idx++;
-    }
-}
-
-// return start and end indices for the section of data to be shown 
-getOffset = (page) => {
-    const start = recordsPerPage * ((page - 1) % noOfPages);
-    let end = start + (recordsPerPage - 1);
-    if(page == lastPage) {
-        end = start + (noOfRecordsOnLastPage - 1);
-    } 
-    return {START: start, END: end};
-}
-
 // return page no to be fetched from database
 getPageToBeFetched = () => {
     if (currentPage == 1) {
@@ -118,58 +104,23 @@ getPageToBeFetched = () => {
 }
 
 // calculate last page and no of records on last page
-updateLastPage = (fetchedPageLength, page) => {
+updateLastPageBasedOnFetchedPageLength = (fetchedPageLength, page) => {
     if (page == 1 && fetchedPageLength < recordsPerPage * noOfPages) {
-        lastPage =  Math.ceil(fetchedPageLength / recordsPerPage);
+        updateLastPage( Math.ceil(fetchedPageLength / recordsPerPage) );
         if(fetchedPageLength % recordsPerPage != 0){
-             noOfRecordsOnLastPage = fetchedPageLength % recordsPerPage;
+            updateNoOfRecordsOnLastPage(fetchedPageLength % recordsPerPage);
         }
         else{
-            noOfRecordsOnLastPage = recordsPerPage;
+            updateNoOfRecordsOnLastPage(recordsPerPage);
         }
     } else if (page != 1 && fetchedPageLength == 0) {
-        lastPage = page - 1;
-        noOfRecordsOnLastPage = recordsPerPage;
+        updateLastPage(page - 1);
+        updateNoOfRecordsOnLastPage(recordsPerPage);
     } else if (page != 1 && fetchedPageLength < recordsPerPage) {
-        lastPage = page;
-        noOfRecordsOnLastPage = fetchedPageLength;
+        updateLastPage(page);
+        updateNoOfRecordsOnLastPage(fetchedPageLength);
     } 
 }
 
-// add logs or errors to result page
-display = () => {
-    
-    const offset = getOffset(currentPage);
-    let listing_table;
-    if(currentPage % 2 == 0)
-        listing_table  = document.getElementById(SLIDE_2);
-    else
-        listing_table =  document.getElementById(SLIDE_1);
-    const page_span = document.getElementById(PAGE);
-    listing_table.innerHTML = "";
-    // dynamically add element to result page
-    for(let i = offset.START ; i <= offset.END && data.length!=0 ; i++ ) {
-         listing_table.appendChild(data[i]);
-    }
-    page_span.innerHTML = currentPage;
-    showAndHideBtn();
-}
 
-// display next and previous button 
-showAndHideBtn = () => {
-    const btnPrev = document.getElementById(PREVIOUS_BUTTON);
-    const btnNext = document.getElementById(NEXT_BUTTON);
-    // hide previous button when on page 1
-    if (currentPage == 1) {
-        btnPrev.style.visibility = HIDDEN;
-    } else {
-        btnPrev.style.visibility = VISIBLE;
-    }
-    // hide next button when 
-    if (lastPage == currentPage || data.length == 0) {
-        btnNext.style.visibility = HIDDEN;
-    } else if (lastPage != currentPage){
-        btnNext.style.visibility = VISIBLE;
-    }
-}
 
