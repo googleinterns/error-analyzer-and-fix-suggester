@@ -12,6 +12,7 @@ limitations under the License.*/
 // file contains all the constants used by all the js files
 
 // DOM elements
+const STACK_TRACE_CONTAINER = "stackTraceContainer";
 const PIE_CHART= "piechart";
 const FILE_NAME = "fileName";
 

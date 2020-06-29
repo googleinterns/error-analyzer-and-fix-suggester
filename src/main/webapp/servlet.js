@@ -21,3 +21,16 @@ async function getCount(index, fileType) {
     const count = await response.json();
     return count;
 }
+
+// call stackTrace servlet for stack trace of a error
+async function callStackTraceServlet(logLineNo, fileName) {
+    const params = new URLSearchParams();
+    params.append(LOG_LINE_NUMBER, logLineNo);
+    params.append(FILE_NAME, fileName);
+    const response = await fetch(STACK_TRACE, {
+        method: POST,
+        body: params
+    });
+    const stackTrace = await response.json();
+    return stackTrace;
+}
