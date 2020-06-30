@@ -88,7 +88,7 @@ public class DeleteServletTest {
         }
 
     @Test
-    public void doPost_noExceptionCase() throws ServletException,
+    public void doPost_exceptionCase() throws ServletException,
         IOException {
             StringWriter stringWriter = new StringWriter();
             PrintWriter writer = new PrintWriter(stringWriter);
