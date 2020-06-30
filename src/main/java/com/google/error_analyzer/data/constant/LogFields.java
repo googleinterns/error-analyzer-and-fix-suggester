@@ -19,4 +19,10 @@ public class LogFields {
     public static final String LOG = "Log";
     public static final String FILE_NAME = "filename";
     public static final String FILE = "file";
+    public static final String START = "start";
+    public static final String SIZE = "size";
+    public static final String FILE_TYPE = "fileType";
+    public static final String SEARCH_STRING = "searchString";
+    public static final String ERROR = "errors";
+
 }
