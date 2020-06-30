@@ -25,8 +25,10 @@ const VISIBLE = "visible";
 const LOGS = "logs" ;
 const ERRORS = "errors";
 const FILE_TYPE = "fileType";
-const CLICK = "click";
 
 // servlet constants
 const POST = "POST";
 const GET_COUNT = "/getCount";
+
+// js eventListeners
+const CLICK = "click";
