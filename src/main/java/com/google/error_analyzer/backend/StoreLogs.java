@@ -21,7 +21,7 @@ import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.StoreLogHelper;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.Document;
-import java.io.*;
+import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -30,10 +30,11 @@ import org.json.simple.JSONObject;
 //This class contains the methods used for storing logs
 //to the database.
 public class StoreLogs {
-    private static final Logger logger = LogManager.getLogger(StoreLogs.class);
+    private static final Logger logger = LogManager.getLogger(StoreLogs.class); 
     private static final String LINE_BREAK = "\\r?\\n";
+    private static final int OFFSET_FOR_PLAIN_TEXT = 0;
     private StoreLogHelper storeLogHelper = new StoreLogHelper();
-    private String ERROR_TEMPLATE_RESPONSE =
+    public String ERROR_TEMPLATE_RESPONSE =
         "\t\t\t<h2> Could not store file %1$s</h2>";
     public static final String FILE_STORED_TEMPLATE_RESPONSE =
         "\t\t\t<h2> File %1$s Stored</h2>";
@@ -47,7 +48,8 @@ public class StoreLogs {
         try {
             String indexName = IndexName.getIndexName(request, fileName);
             indexName = getUniqueIndexName(indexName);
-            final String response = storeLog(request, indexName, log);
+            final String response = storeLog(
+                request, indexName, log, OFFSET_FOR_PLAIN_TEXT );
             return response;
         } catch (Exception e) {
             final String errorResponse =
@@ -59,11 +61,11 @@ public class StoreLogs {
     }
 
     //Stores the log in an index with name fileName
-    private String storeLog(HttpServletRequest request, String fileName, 
-     String log) throws IOException, NullPointerException  {
+    public String storeLog(HttpServletRequest request, String fileName, 
+     String log, int offset) throws IOException, NullPointerException  {
         Builder < Document > documentList = ImmutableList
             . < Document > builder();
-        int logLineNumber = 1;
+        int logLineNumber = offset + 1;
         String logLines[] = log.split(LINE_BREAK);
         for (String logLine: logLines) {
             String cleanedLogLine = storeLogHelper.cleanLogText(logLine);
@@ -90,7 +92,7 @@ public class StoreLogs {
     }
 
     //find the name of the index in which the logs can be stored
-    private String getUniqueIndexName(String indexName) throws IOException {
+    public String getUniqueIndexName(String indexName) throws IOException {
         String nextIndexName = indexName;
         int indexSuffix = 1;
         while (logDao.fileExists(nextIndexName)) {
@@ -100,4 +102,5 @@ public class StoreLogs {
         }
         return nextIndexName;
     }
+
 }
