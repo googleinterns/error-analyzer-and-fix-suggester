@@ -84,7 +84,7 @@ public final class FileAndUrlLogTest {
 
     /*store the file logs maximum 5 lines in a single API call*/
     @Test
-    public void storeFileLog_max5LinesInOneApiCall() throws IOException {
+    public void storeFileAndUrlLog_forFiles() throws IOException {
         String fileName = "file1";
         InputStream inputStream =
             new ByteArrayInputStream(FILE_CONTENT.getBytes());
@@ -107,7 +107,7 @@ public final class FileAndUrlLogTest {
 
     /*store the url logs maximum 5 lines in a single API call*/
     @Test
-    public void storeFileAndUrlLogsForUrl() throws  IOException {
+    public void storeFileAndUrlLog_forUrl() throws  IOException {
         String fileName = "file1";
         InputStream inputStream =
             new ByteArrayInputStream(URL_CONTENT.getBytes());

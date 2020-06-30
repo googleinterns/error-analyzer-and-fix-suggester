@@ -83,7 +83,7 @@ public class UrlServletTest {
 
     //unit test for catch block of UrlServlet 
     @Test
-    public void urlServletTestExceptionCase() throws ServletException,
+    public void doPost_logExceptionCase() throws ServletException,
      IOException {
         when(request.getParameter(LogFields.URL))
             .thenThrow(NullPointerException.class);
