@@ -14,15 +14,7 @@ addFilterToSearch = (searchString) => {
     const searchBar = document.getElementById(SEARCH_BAR);
     searchBar.value += " " + searchString;
     search();
-    moveToFirstSlide();
-}
-
-// hide stackTraces 
-addHideClass = () => {
-    let stackTraceContainer = document.getElementById(STACK_TRACE_CONTAINER);
-    stackTraceContainer.className = HIDE;
-    let crossButton = document.getElementById(CROSS);
-    crossButton.className = HIDE;
+    moveCarouselToFirstSlide();
 }
 
 // search dataBase for the requested string

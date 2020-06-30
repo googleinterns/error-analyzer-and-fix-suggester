@@ -21,7 +21,7 @@ fileNotFound = () => {
 }
 
 // if on 2nd slide of carousel move to 1st slide
-moveToFirstSlide = () => {
+moveCarouselToFirstSlide = () => {
     const slide1 = document.getElementById(SLIDE_1_CONTAINER);
     const slide2 = document.getElementById(SLIDE_2_CONTAINER);
     slide1.classList.add(ACTIVE);
