@@ -52,6 +52,7 @@ public class StoreLogs {
             indexName = getUniqueIndexName(indexName);
             final String response = storeLog(
                 request, indexName, log, OFFSET_FOR_PLAIN_TEXT );
+            findErrorsInIndex(indexName);
             return response;
         } catch (Exception e) {
             final String errorResponse =
@@ -108,4 +109,11 @@ public class StoreLogs {
         return nextIndexName;
     }
 
+    public void findErrorsInIndex(String indexName) {
+        try {
+            logDao.findAndStoreErrors(indexName);
+        } catch (Exception e) {
+            logger.error("Error while running findAndStoreErrors function ".concat(e.toString()));
+        }
+    }
 }

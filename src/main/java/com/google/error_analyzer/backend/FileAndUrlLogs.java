@@ -41,6 +41,7 @@ public class FileAndUrlLogs {
             indexName = storeLogs.getUniqueIndexName(indexName);
             final String response = storeFileAndUrlLogs(
                 request, indexName, fileContent, isUrl);
+            storeLogs.findErrorsInIndex(indexName);
             return response;
         } catch (Exception e) {
             final String errorResponse =
