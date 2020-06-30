@@ -57,9 +57,6 @@
     	<script src="stackTrace.js"></script>
     	<script src="dataWindow.js"></script>
     	<script src="carousel.js"></script>
-	<!-- chart JS -->
-	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-	<script src="charts.js"></script>
 
 	<!-- bootstrap JS -->
 	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
