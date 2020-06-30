@@ -39,7 +39,8 @@ public class TextServlet extends HttpServlet {
         response.setContentType(FileConstants.TEXT_HTML_CONTENT_TYPE);
         String log = request.getParameter(LogFields.LOG);
         String fileName = request.getParameter(LogFields.FILE_NAME);
-        String status = storeLog.checkAndStoreLog(fileName, log);
+        request.getSession();
+        String status = storeLog.checkAndStoreLog(request, fileName, log);
         response.getWriter().println(status);
         RequestDispatcher requestDispatcher =
             request.getRequestDispatcher(PageConstants.LANDING_PAGE);

@@ -14,21 +14,23 @@ limitations under the License.*/
 
 package com.google.error_analyzer;
 
+import com.google.error_analyzer.backend.IndexName;
 import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.MockLogDao;
 import com.google.error_analyzer.backend.StoreLogs;
 import java.io.IOException;
 import java.util.ArrayList;
+import javax.servlet.http.*;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.runners.MockitoJUnitRunner;
 import static org.junit.Assert.assertEquals;
@@ -40,26 +42,80 @@ import static org.mockito.Mockito.when;
 storing logs to the database*/
 public final class StoreLogTest {
     private StoreLogs storeLogs;
+    private Cookie cookie;
+    private static final String SESSIONID_VALUE = "abcd";
+
+    @Mock
+    HttpServletRequest request;
 
     @Before
     public void setUp() {
         storeLogs = new StoreLogs();
         storeLogs.logDao = new MockLogDao();
+        request = Mockito.mock(HttpServletRequest.class);
+        cookie = new Cookie(IndexName.SESSIONID, SESSIONID_VALUE);
     }
 
     //store the log into the database when index with name same as the
     //file name does not exist in the database and then trying to
     //store another file with same fileName
     @Test
-    public void checkAndStoreLogInAlreadyExistingFileTest()
+    public void checkAndStoreLog_alreadyExistingFile()
     throws IOException {
         String log = "error2";
         String fileName = "samplefile1";
-        String expected = storeLogs.FILE_STORED_RESPONSE;
-        String actual = storeLogs.checkAndStoreLog(fileName, log);
+        when(request.getCookies()).thenReturn(new Cookie[] {cookie});
+        String expected = String.format(
+            storeLogs.FILE_STORED_TEMPLATE_RESPONSE, fileName);
+        String actual = storeLogs.checkAndStoreLog(request, fileName, log);
         assertEquals(expected, actual);
-        expected = storeLogs.FILE_ALREADY_EXISTS_RESPONSE;
-        actual = storeLogs.checkAndStoreLog(fileName, log);
+        expected = String.format(
+            storeLogs.FILE_STORED_TEMPLATE_RESPONSE, fileName + "(1)");
+        actual = storeLogs.checkAndStoreLog(request, fileName, log);
+        assertEquals(expected, actual);
+    }
+
+    /*unit test for storeLog method when offset is 0*/
+    @Test
+    public void storeLog_zeroOffset () throws IOException {
+        String log = "error1\nerror2\nerror3";
+        String fileName = "file1";
+        int offset = 0;
+        when(request.getCookies()).thenReturn(new Cookie[] {cookie});
+        storeLogs.storeLog(request, fileName, log, offset);
+        String actual = storeLogs.logDao.getJsonStringById(fileName, "1");
+        String expected = "{\"logLineNumber\":1,\"logText\":\"error1\"}";
+        assertEquals(expected, actual);
+        actual = storeLogs.logDao.getJsonStringById(fileName, "2");
+        expected = "{\"logLineNumber\":2,\"logText\":\"error2\"}";
+        assertEquals(expected, actual);
+        actual = storeLogs.logDao.getJsonStringById(fileName, "3");
+        expected = "{\"logLineNumber\":3,\"logText\":\"error3\"}";
+        assertEquals(expected, actual);
+        actual = storeLogs.logDao.getJsonStringById(fileName, "4");
+        expected = null;
+        assertEquals(expected, actual);
+    }
+
+    /*unit test for storeLog method when offset is 3*/
+    @Test
+    public void storeLog_nonZeroOffset () throws IOException {
+        String log = "error1\nerror2\nerror3";
+        String fileName = "file1";
+        int offset = 3;
+        when(request.getCookies()).thenReturn(new Cookie[] {cookie});
+        storeLogs.storeLog(request, fileName, log, offset);
+        String actual = storeLogs.logDao.getJsonStringById(fileName, "4");
+        String expected = "{\"logLineNumber\":4,\"logText\":\"error1\"}";
+        assertEquals(expected, actual);
+        actual = storeLogs.logDao.getJsonStringById(fileName, "5");
+        expected = "{\"logLineNumber\":5,\"logText\":\"error2\"}";
+        assertEquals(expected, actual);
+        actual = storeLogs.logDao.getJsonStringById(fileName, "6");
+        expected = "{\"logLineNumber\":6,\"logText\":\"error3\"}";
+        assertEquals(expected, actual);
+        actual = storeLogs.logDao.getJsonStringById(fileName, "1");
+        expected = null;
         assertEquals(expected, actual);
     }
 
