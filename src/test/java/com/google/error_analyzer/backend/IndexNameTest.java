@@ -13,8 +13,10 @@ package com.google.error_analyzer;
 
 import com.google.error_analyzer.backend.IndexName;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.codec.DecoderException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,21 +52,33 @@ public class IndexNameTest {
 
     //append sessionID to fileName to get indexName
     @Test
-    public void getIndexNameTest() {   
+    public void getIndexName_appendFilenameAndEncodeToHexadecimalString() 
+     throws UnsupportedEncodingException  {   
         when(request.getCookies()).thenReturn(new Cookie[]{cookie});
         String fileName = "file1";
-        String expected = "abcdfile1";
+        String expected = "6162636466696c6531";
         String actual = IndexName.getIndexName(request,fileName);
         Assert.assertEquals(expected, actual);
     }
 
     //remove sessionID from indexName to get fileName
     @Test
-    public void getFileNameTest() { 
+    public void getFileName_decodeAndRemoveSessionId() throws
+     DecoderException, UnsupportedEncodingException { 
         when(request.getCookies()).thenReturn(new Cookie[]{cookie});
-        String indexName = "abcdfile1";
+        String indexName = "6162636466696c6531";
         String expected = "file1";
         String actual = IndexName.getFileName(request,indexName);
+        Assert.assertEquals(expected, actual);
+    } 
+
+    //remove sessionID from indexName to get fileName
+    @Test
+    public void encodeFromStringToHex_convertToHexadecimalString() 
+    throws UnsupportedEncodingException  { 
+        String fileName = "file1";
+        String expected = "66696c6531";
+        String actual = IndexName.encodeFromStringToHex(fileName);
         Assert.assertEquals(expected, actual);
     } 
 }

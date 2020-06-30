@@ -11,8 +11,11 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
+import java.io.UnsupportedEncodingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.DecoderException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -24,15 +27,18 @@ public class IndexName {
 
     //returns index name for a given file name
     public static String getIndexName(HttpServletRequest request,
-        String fileName) throws NullPointerException {
+        String fileName) throws NullPointerException, UnsupportedEncodingException {
         String sessionId = getSessionId(request);
         String indexName = sessionId.concat(fileName);
+        indexName = encodeFromStringToHex(indexName);
         return indexName;
     }
 
     //returns file name for a given index name
     public static String getFileName(HttpServletRequest request,
-        String indexName) throws NullPointerException {
+        String indexName) throws NullPointerException, DecoderException,
+        UnsupportedEncodingException {
+        indexName = decodeFromHexToString (indexName);
         String sessionId = getSessionId(request);
         int indexOfFileName = indexName.indexOf(sessionId) +
             sessionId.length();
@@ -41,9 +47,16 @@ public class IndexName {
         return fileName;
     }
 
+    /*returns encoded index name*/
+    public static String encodeFromStringToHex(String indexName) 
+    throws  UnsupportedEncodingException {
+        String hexString = Hex.encodeHexString(indexName.getBytes());
+        return hexString;
+    }
+
     //get sessionID of the user
-    private static String getSessionId(HttpServletRequest request) throws NullPointerException {
-        String sessionID = null;
+    public static String getSessionId(HttpServletRequest request) throws NullPointerException {
+        String sessionID = "invalidSession";
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie: cookies) {
@@ -52,10 +65,17 @@ public class IndexName {
                 }
             }
         } 
-        if(sessionID == null) {
-            logger.fatal("Session ID is null");
+        if(sessionID == "invalidSession") {
+            logger.fatal("Invalid Session");
         }
-        return sessionID.toLowerCase();
+        return sessionID;
     }
 
+    /*returns decoded index name*/
+    private static String decodeFromHexToString (String indexName) 
+     throws NumberFormatException, DecoderException, UnsupportedEncodingException {
+        byte[] bytes = Hex.decodeHex(indexName .toCharArray());
+        String decodedString = new String(bytes, "UTF-8");
+        return decodedString;
+    }
 }
