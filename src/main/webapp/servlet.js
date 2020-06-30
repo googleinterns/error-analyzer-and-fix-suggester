@@ -9,10 +9,15 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
 
-package com.google.error_analyzer.data.constant;
-
-/** This class contains all the constants related to files*/
-public class FileConstants {
-    public static final String TEXT_HTML_CONTENT_TYPE = "text/html";
-    public static final String APPLICATION_JSON_CONTENT_TYPE = "application/json";
+// call docCount servlet for no of documents in a index
+async function getCount(index, fileType) {
+    const params = new URLSearchParams();
+    params.append(FILE_NAME, index);
+    params.append(FILE_TYPE, fileType);
+    const response = await fetch(GET_COUNT, {
+        method: POST,
+        body: params
+    });
+    const count = await response.json();
+    return count;
 }
