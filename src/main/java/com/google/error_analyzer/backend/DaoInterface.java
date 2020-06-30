@@ -15,18 +15,22 @@ import com.google.error_analyzer.data.Document;
 import java.io.IOException;
 import java.lang.*;
 import java.util.*;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.search.SearchHit;
 
 public interface DaoInterface {
 
     //search db using keywords and return SearchHit object containing highlight field
-    public ImmutableList < SearchHit > fullTextSearch (String fileName, 
-        String searchString, String field)throws IOException;
+    public ImmutableList < SearchHit > fullTextSearch (String fileName, String searchString,
+    String field, int start, int size)throws IOException;
 
     //return a section of given index starting from start and length equal to 
     // given size
-    public SearchHit[] getAll (String fileName, int start, int size) 
-    throws IOException;
+    public ImmutableList < SearchHit > getAll (String fileName, int start, 
+    int size) throws IOException;
+
+    // returns no of documents in an index
+    public long getDocumentCount (String index) throws IOException;
 
     //search an index for errors using regex and keywords and store back in db
     //Returns name of the new index 
@@ -45,4 +49,7 @@ public interface DaoInterface {
     public void bulkStoreLog(String fileName, 
         ImmutableList < Document > documentList) throws IOException;
 
+    //fetch documents from index according to searchRequest
+    public ImmutableList < SearchHit > getHitsFromIndex(SearchRequest searchRequest)
+    throws IOException;
 }

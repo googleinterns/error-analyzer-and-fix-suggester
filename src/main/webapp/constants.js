@@ -9,10 +9,21 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
 
-package com.google.error_analyzer.data.constant;
+// file contains all the constants used by all the js files
 
-/** This class contains all the constants related to files*/
-public class FileConstants {
-    public static final String TEXT_HTML_CONTENT_TYPE = "text/html";
-    public static final String APPLICATION_JSON_CONTENT_TYPE = "application/json";
-}
+// DOM elements
+const PIE_CHART= "piechart";
+const FILE_NAME = "fileName";
+
+// attributes for dom status
+const HIDDEN = "hidden";
+const VISIBLE = "visible";
+
+// common constants for various js files
+const LOGS = "logs" ;
+const ERRORS = "errors";
+const FILE_TYPE = "fileType";
+
+// servlet constants
+const POST = "POST";
+const GET_COUNT = "/getCount";
