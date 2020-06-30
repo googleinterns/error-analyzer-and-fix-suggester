@@ -18,7 +18,7 @@ let currentPage = 1;
 let next = true;
 
 
-currentPage = () => {
+getCurrentPage = () => {
     return currentPage;
 }
 updateCurrentPage = (page) => {
