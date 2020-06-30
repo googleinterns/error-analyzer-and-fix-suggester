@@ -38,14 +38,14 @@ showAndHideNavigationBtn = () => {
 
 // decrement by 1 on pressing previous button
 prevPage = () => {
-    decrementCurrentPageBy1();
+    updateCurrentPage(currentPage()-1);
     updateNextVariable(false);
     changePage(currentPage);
 }
 
 // increment by 1 on pressing next button
 nextPage = () => {
-    incrementCurrentPageBy1();
+    updateCurrentPage(currentPage()+1);
     updateNextVariable(true);
     changePage(currentPage);
 }

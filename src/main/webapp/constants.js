@@ -44,7 +44,6 @@ const SIZE = "size";
 const LOG_LINE_NUMBER = "logLineNumber";
 const RECORDS = "records";
 const END = "end";
-const FILE_NOT_FOUND = "File Not Found";
 const SEARCH_STRING = "searchString";
 
 // servlet constants
@@ -55,3 +54,6 @@ const PAGINATION= "/pagination";
 
 // JS eventListeners
 const CLICK = "click";
+
+// html content
+const FILE_NOT_FOUND = "File Not Found";

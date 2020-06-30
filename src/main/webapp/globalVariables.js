@@ -17,16 +17,12 @@ let lastPage = Number.MAX_VALUE;
 let currentPage = 1;
 let next = true;
 
+
+currentPage = () => {
+    return currentPage;
+}
 updateCurrentPage = (page) => {
     currentPage = page;
-}
-
-decrementCurrentPageBy1 = () => {
-    currentPage--;
-}
-
-incrementCurrentPageBy1 = () => {
-    currentPage++;
 }
 
 updateLastPage = (page) => {
