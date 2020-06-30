@@ -18,18 +18,18 @@ hideStackTrace = () => {
 }
 
 // return stack trace button
-StackTraceButton = (logError) => {
+stackTraceButton = (logError) => {
     const stackTraceButton = document.createElement(BUTTON);
     stackTraceButton.innerText="Stack Trace";
     stackTraceButton.className = "stackTraceButton";
     stackTraceButton.addEventListener(CLICK, () => {
-        showStackTrace(logError);
+        buildAndshowStackTrace(logError);
     });
     return stackTraceButton;
 }
 
 // call stackTrace servlet and fetch stackTrace corresponding to error
-async function showStackTrace(logError) {
+async function buildAndshowStackTrace(logError) {
     let fileName = document.getElementById(FILE_NAME).value;
     fileName =  fileName.trim();
     let stackTraceContainer = document.getElementById(STACK_TRACE_CONTAINER);
@@ -38,11 +38,11 @@ async function showStackTrace(logError) {
     crossBtn.className = SHOW;
     stackTraceContainer.innerHTML = logError.logText;
     const stackTrace = await callStackTraceServlet(logError.logLineNumber, fileName);
-    addStackTracesDynamicallyToFrontEnd(stackTrace);
+    buildStackTrace(stackTrace);
 }
 
 // add fetched stackTrace dynamically to frontEnd
-addStackTracesDynamicallyToFrontEnd = (stackTrace) => {
+buildStackTrace = (stackTrace) => {
     let stackTraceContainer = document.getElementById(STACK_TRACE_CONTAINER);
     for(let i=0; i<stackTrace.length; i++) {
         let stackTraceElement = document.createElement('li');
