@@ -85,22 +85,22 @@ public final class FileAndUrlLogTest {
     /*store the file logs maximum 5 lines in a single API call*/
     @Test
     public void storeFileAndUrlLogsForFile() throws IOException {
-        String fileName = "i66i69i6ci65i31";
+        String indexName = "i66i69i6ci65i31";
         InputStream inputStream =
             new ByteArrayInputStream(FILE_CONTENT.getBytes());
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         boolean isUrl = false;
         fileAndUrlLogs.storeFileAndUrlLogs(
-            request, fileName, inputStream, isUrl);
+            request, indexName, inputStream, isUrl);
         for (int id = 1; id < 7; id++) {
             String actual = fileAndUrlLogs.storeLogs.logDao
-                .getJsonStringById(fileName, Integer.toString(id));
+                .getJsonStringById(indexName, Integer.toString(id));
             String expected = String.format(
                 "{\"logLineNumber\":%1$s,\"logText\":\"error%1$s\"}", id);
             assertEquals(expected, actual);
         }
         String actual = fileAndUrlLogs.storeLogs.logDao
-            .getJsonStringById(fileName, "7");
+            .getJsonStringById(indexName, "7");
         String expected = null;
         assertEquals(expected, actual);
     }
@@ -108,22 +108,22 @@ public final class FileAndUrlLogTest {
     /*store the url logs maximum 5 lines in a single API call*/
     @Test
     public void storeFileAndUrlLogsForUrl() throws  IOException {
-        String fileName = "i66i69i6ci65i31";
+        String indexName = "i66i69i6ci65i31";
         InputStream inputStream =
             new ByteArrayInputStream(URL_CONTENT.getBytes());
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         boolean isUrl = true;
         fileAndUrlLogs.storeFileAndUrlLogs(
-            request, fileName, inputStream, isUrl);
+            request, indexName, inputStream, isUrl);
         for (int id = 1; id < 6; id++) {
             String actual = fileAndUrlLogs.storeLogs.logDao
-                .getJsonStringById(fileName, Integer.toString(id));
+                .getJsonStringById(indexName, Integer.toString(id));
             String expected = String.format(
                 "{\"logLineNumber\":%1$s,\"logText\":\"error%1$s\"}", id);
             assertEquals(expected, actual);
         }
         String actual = fileAndUrlLogs.storeLogs.logDao
-            .getJsonStringById(fileName, "6");
+            .getJsonStringById(indexName, "6");
         String expected = null;
         assertEquals(expected, actual);   
     }

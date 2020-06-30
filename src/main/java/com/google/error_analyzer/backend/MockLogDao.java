@@ -175,11 +175,11 @@ public class MockLogDao implements DaoInterface {
 
     //delete indices
     @Override
-    public String deleteIndices(String sessionId) throws IOException {
+    public String deleteIndices(String indexRegex) throws IOException {
         Iterator < Index > indexListIterator = logDatabase.iterator();
         while (indexListIterator.hasNext()) {
             Index searchIndex = indexListIterator.next();
-            if ((searchIndex.getIndexName()).contains(sessionId)) {
+            if ((searchIndex.getIndexName()).contains(indexRegex)) {
                 indexListIterator.remove();
             }
         }

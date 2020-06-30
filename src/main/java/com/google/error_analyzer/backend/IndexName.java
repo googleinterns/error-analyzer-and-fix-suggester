@@ -58,7 +58,7 @@ public class IndexName {
 
     //get sessionID of the user
     public static String getSessionId(HttpServletRequest request) throws NullPointerException {
-        String sessionID = "";
+        String sessionID = "invalidSession";
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie: cookies) {
@@ -67,24 +67,24 @@ public class IndexName {
                 }
             }
         } 
-        if(sessionID == "") {
+        if(sessionID == "invalidSession") {
             logger.fatal("Invalid Session");
         }
         return sessionID;
     }
 
     /*returns decoded index name*/
-    private static String decodeIndexName(String indexName) throws NumberFormatException {
+    private static String decodeIndexName(String indexName) 
+     throws NumberFormatException {
         String decodedIndexName = "";
         String decimalStrings[] = indexName.split(STUFF_STRING);
         for (String decimalString: decimalStrings) {
-            if(!decimalString.isEmpty()){
-            int decimalValue = Integer.parseInt(decimalString,16);
-            char character = (char)decimalValue;
-            String characterString = Character.toString(character);
-            decodedIndexName = decodedIndexName.concat(characterString);
+            if (!decimalString.isEmpty()) {
+                int decimalValue = Integer.parseInt(decimalString, 16);
+                char character = (char) decimalValue;
+                decodedIndexName = decodedIndexName + character;
             }
         }
-        return decodedIndexName;    
+        return decodedIndexName;
     }
 }

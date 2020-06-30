@@ -50,6 +50,6 @@ public interface DaoInterface {
      throws IOException;
 
     //delete indices
-    public String deleteIndices(String sessionId) throws IOException ;
+    public String deleteIndices(String indexRegex) throws IOException ;
 
 }

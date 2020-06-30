@@ -170,8 +170,8 @@ public class LogDao implements DaoInterface {
 
     //delete indices
     @Override
-    public String deleteIndices(String sessionId) throws IOException {
-        String indexName = sessionId.concat("*");
+    public String deleteIndices(String indexRegex) throws IOException {
+        String indexName = indexRegex.concat("*");
         DeleteIndexRequest request = new DeleteIndexRequest(indexName);
         client.indices().delete(request, RequestOptions.DEFAULT);
         return DELETE_RESPONSE;
