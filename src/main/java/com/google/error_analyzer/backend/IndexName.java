@@ -11,8 +11,11 @@ limitations under the License.*/
 
 package com.google.error_analyzer.backend;
 
+import java.io.UnsupportedEncodingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.codec.binary.Hex;
+import org.apache.commons.codec.DecoderException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -20,22 +23,22 @@ import org.apache.logging.log4j.LogManager;
 indexName to fileName*/
 public class IndexName {
     public static final String SESSIONID = "JSESSIONID";
-    private static final String STUFF_STRING = "i";
     private static final Logger logger = LogManager.getLogger(IndexName.class);
 
     //returns index name for a given file name
     public static String getIndexName(HttpServletRequest request,
-        String fileName) throws NullPointerException {
+        String fileName) throws NullPointerException, UnsupportedEncodingException {
         String sessionId = getSessionId(request);
         String indexName = sessionId.concat(fileName);
-        indexName = encodeIndexName(indexName);
+        indexName = encodeFromStringToHex(indexName);
         return indexName;
     }
 
     //returns file name for a given index name
     public static String getFileName(HttpServletRequest request,
-        String indexName) throws NullPointerException {
-        indexName = decodeIndexName (indexName);
+        String indexName) throws NullPointerException, DecoderException,
+        UnsupportedEncodingException {
+        indexName = decodeFromHexToString (indexName);
         String sessionId = getSessionId(request);
         int indexOfFileName = indexName.indexOf(sessionId) +
             sessionId.length();
@@ -45,15 +48,10 @@ public class IndexName {
     }
 
     /*returns encoded index name*/
-    public static String encodeIndexName(String indexName) {
-        String encodedIndexName = "";
-        for(int stringIndex = 0; stringIndex < indexName.length(); stringIndex++){ 
-            int asciiValue = (int) indexName.charAt(stringIndex);
-            String hex = Integer.toHexString(asciiValue);
-            encodedIndexName = encodedIndexName.concat(STUFF_STRING);
-            encodedIndexName = encodedIndexName.concat(hex);
-        }
-        return encodedIndexName;
+    public static String encodeFromStringToHex(String indexName) 
+    throws  UnsupportedEncodingException {
+        String hexString = Hex.encodeHexString(indexName.getBytes());
+        return hexString;
     }
 
     //get sessionID of the user
@@ -74,17 +72,10 @@ public class IndexName {
     }
 
     /*returns decoded index name*/
-    private static String decodeIndexName(String indexName) 
-     throws NumberFormatException {
-        String decodedIndexName = "";
-        String decimalStrings[] = indexName.split(STUFF_STRING);
-        for (String decimalString: decimalStrings) {
-            if (!decimalString.isEmpty()) {
-                int decimalValue = Integer.parseInt(decimalString, 16);
-                char character = (char) decimalValue;
-                decodedIndexName = decodedIndexName + character;
-            }
-        }
-        return decodedIndexName;
+    private static String decodeFromHexToString (String indexName) 
+     throws NumberFormatException, DecoderException, UnsupportedEncodingException {
+        byte[] bytes = Hex.decodeHex(indexName .toCharArray());
+        String decodedString = new String(bytes, "UTF-8");
+        return decodedString;
     }
 }

@@ -75,7 +75,7 @@ public class DeleteServletTest {
     }
 
     @Test
-    public void deleteServletTest() throws ServletException,
+    public void doPost_noExceptionCase() throws ServletException,
         IOException {
             StringWriter stringWriter = new StringWriter();
             PrintWriter writer = new PrintWriter(stringWriter);
@@ -88,7 +88,7 @@ public class DeleteServletTest {
         }
 
     @Test
-    public void deleteServletTestExceptionCase() throws ServletException,
+    public void doPost_noExceptionCase() throws ServletException,
         IOException {
             StringWriter stringWriter = new StringWriter();
             PrintWriter writer = new PrintWriter(stringWriter);

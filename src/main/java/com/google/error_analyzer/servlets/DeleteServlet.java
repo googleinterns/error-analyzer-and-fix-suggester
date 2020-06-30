@@ -48,7 +48,8 @@ public class DeleteServlet extends HttpServlet {
         response.setContentType(FileConstants.APPLICATION_JSON_CONTENT_TYPE);
         try {
             String sessionId = IndexName.getSessionId(request);
-            String encodedSessionId = IndexName.encodeIndexName(sessionId);
+            String encodedSessionId = IndexName
+                .encodeFromStringToHex(sessionId);
             String status = logDao.deleteIndices(encodedSessionId);
             String json = new Gson().toJson(status);
             response.getWriter().println(json);

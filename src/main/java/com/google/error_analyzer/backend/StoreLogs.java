@@ -14,6 +14,7 @@
 
 package com.google.error_analyzer.backend;
 
+import org.apache.commons.codec.DecoderException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.backend.IndexName;
@@ -22,6 +23,7 @@ import com.google.error_analyzer.backend.StoreLogHelper;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.Document;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -62,7 +64,8 @@ public class StoreLogs {
 
     //Stores the log in an index with name fileName
     public String storeLog(HttpServletRequest request, String fileName, 
-     String log, int offset) throws IOException, NullPointerException  {
+     String log, int offset) throws IOException, NullPointerException, 
+      DecoderException, UnsupportedEncodingException{
         Builder < Document > documentList = ImmutableList
             . < Document > builder();
         int logLineNumber = offset + 1;
@@ -97,7 +100,7 @@ public class StoreLogs {
         int indexSuffix = 1;
         while (logDao.fileExists(nextIndexName)) {
             String encodedSuffix = IndexName
-                .encodeIndexName(String.format("(%s)",indexSuffix));
+                .encodeFromStringToHex(String.format("(%s)",indexSuffix));
             nextIndexName = String.format(
                 "%1$s%2$s", indexName, encodedSuffix);
             indexSuffix++;

@@ -23,9 +23,11 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.codec.DecoderException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -84,8 +86,9 @@ public final class FileAndUrlLogTest {
 
     /*store the file logs maximum 5 lines in a single API call*/
     @Test
-    public void storeFileAndUrlLog_forFiles() throws IOException {
-        String indexName = "i66i69i6ci65i31";
+    public void storeFileAndUrlLog_forFiles() throws IOException,
+    DecoderException, UnsupportedEncodingException  {
+        String indexName = "66696c6531";
         InputStream inputStream =
             new ByteArrayInputStream(FILE_CONTENT.getBytes());
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
@@ -107,8 +110,9 @@ public final class FileAndUrlLogTest {
 
     /*store the url logs maximum 5 lines in a single API call*/
     @Test
-    public void storeFileAndUrlLog_forUrl() throws  IOException {
-        String indexName = "i66i69i6ci65i31";
+    public void storeFileAndUrlLog_forUrl() throws  IOException,
+    DecoderException, UnsupportedEncodingException  {
+        String indexName = "66696c6531";
         InputStream inputStream =
             new ByteArrayInputStream(URL_CONTENT.getBytes());
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});

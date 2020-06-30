@@ -13,8 +13,10 @@ package com.google.error_analyzer;
 
 import com.google.error_analyzer.backend.IndexName;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.codec.DecoderException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,19 +52,20 @@ public class IndexNameTest {
 
     //append sessionID to fileName to get indexName
     @Test
-    public void getIndexNameTest() {   
+    public void getIndexNameTest()  throws UnsupportedEncodingException  {   
         when(request.getCookies()).thenReturn(new Cookie[]{cookie});
         String fileName = "file1";
-        String expected = "i61i62i63i64i66i69i6ci65i31";
+        String expected = "6162636466696c6531";
         String actual = IndexName.getIndexName(request,fileName);
         Assert.assertEquals(expected, actual);
     }
 
     //remove sessionID from indexName to get fileName
     @Test
-    public void getFileNameTest() { 
+    public void getFileNameTest() throws
+     DecoderException, UnsupportedEncodingException { 
         when(request.getCookies()).thenReturn(new Cookie[]{cookie});
-        String indexName = "i61i62i63i64i66i69i6ci65i31";
+        String indexName = "6162636466696c6531";
         String expected = "file1";
         String actual = IndexName.getFileName(request,indexName);
         Assert.assertEquals(expected, actual);
@@ -70,10 +73,11 @@ public class IndexNameTest {
 
     //remove sessionID from indexName to get fileName
     @Test
-    public void encodeIndexNameTest() { 
-        String indexName = "file1";
-        String expected = "i66i69i6ci65i31";
-        String actual = IndexName.encodeIndexName(indexName);
+    public void encodeFromStringToHexTest() 
+    throws UnsupportedEncodingException  { 
+        String fileName = "file1";
+        String expected = "66696c6531";
+        String actual = IndexName.encodeFromStringToHex(fileName);
         Assert.assertEquals(expected, actual);
     } 
 }

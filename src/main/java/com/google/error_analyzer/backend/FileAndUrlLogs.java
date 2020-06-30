@@ -20,7 +20,9 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.codec.DecoderException;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
@@ -52,7 +54,7 @@ public class FileAndUrlLogs {
     // stores maximum 10000 log lines in a single API  call
     public String storeFileAndUrlLogs(HttpServletRequest request, 
         String fileName, InputStream fileContent, boolean isUrl) 
-        throws IOException {
+        throws IOException, DecoderException, UnsupportedEncodingException  {
         InputStreamReader isReader = new InputStreamReader(fileContent);
         BufferedReader reader = new BufferedReader(isReader);
         String logLine;
@@ -82,7 +84,8 @@ public class FileAndUrlLogs {
     /*remove html tags if the logs are from url and then stores the log 
     into the database*/
     private String storeLog(HttpServletRequest request,  String fileName,
-     String log, int offset, boolean isUrl) throws IOException {
+     String log, int offset, boolean isUrl) throws IOException ,
+     DecoderException, UnsupportedEncodingException  {
         if(isUrl) {
             log = UrlLogs.removeHtmlTags(log);
         }
