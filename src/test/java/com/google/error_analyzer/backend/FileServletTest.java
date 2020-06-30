@@ -89,7 +89,7 @@ public class FileServletTest {
     //file name does not exist in the database and then trying to
     //store another file with same fileName
     @Test
-    public void fileServlet_alreadyExistingFiles() 
+    public void doPost_alreadyExistingFiles() 
     throws ServletException, IOException {
         String fileName1 = "file1";
         when(request.getParameter(LogFields.FILE_NAME)).thenReturn(fileName1);
@@ -122,7 +122,7 @@ public class FileServletTest {
 
     /*Storing empty file to the database*/
     @Test
-    public void fileServlet_EmptyFileCase()
+    public void doPost_EmptyFileCase()
     throws ServletException, IOException {
         String fileName1 = "file1";
         when(request.getParameter(LogFields.FILE_NAME)).thenReturn(fileName1);
