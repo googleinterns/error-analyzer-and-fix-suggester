@@ -12,6 +12,7 @@ limitations under the License.*/
 // file contains all the constants used by all the js files
 
 // DOM elements
+const STACK_TRACE_CONTAINER = "stackTraceContainer";
 const PIE_CHART= "piechart";
 const FILE_NAME = "fileName";
 const SLIDE_1_CONTAINER = "slide1Container";
@@ -26,6 +27,7 @@ const CROSS = "crossBtn";
 
 // classes for dom status
 const HIDE = "hide";
+const BUTTON = "button";
 
 // attributes for dom status
 const ACTIVE = "active";
@@ -44,3 +46,6 @@ const GET_COUNT = "/getCount";
 
 // html content
 const FILE_NOT_FOUND = "File Not Found";
+
+// js eventListeners
+const CLICK = "click";
