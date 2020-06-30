@@ -22,14 +22,14 @@ prepareLogDomElement = (logError, fileType) => {
     // if fileType is error then we need to add 
     // btn to show stackTrace 
     if(fileType == ERRORS) {
-        stackTraceButton = addStackTraceButton(logError);
+        stackTraceButton = StackTraceButton(logError);
         liElement.appendChild(stackTraceButton);
     }
     return liElement;
 }
 
-// add button for stack trace
-addStackTraceButton = (logError) => {
+// return stack trace button
+StackTraceButton = (logError) => {
     const stackTraceButton = document.createElement(BUTTON);
     stackTraceButton.innerText="Stack Trace";
     stackTraceButton.className = "stackTraceButton";

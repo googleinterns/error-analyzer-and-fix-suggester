@@ -46,10 +46,12 @@ const RECORDS = "records";
 const END = "end";
 const FILE_NOT_FOUND = "File Not Found";
 const SEARCH_STRING = "searchString";
-const CLICK = "click";
 
 // servlet constants
 const POST = "POST";
 const GET_COUNT = "/getCount";
 const STACK_TRACE = "/stackTrace";
 const PAGINATION= "/pagination";
+
+// JS eventListeners
+const CLICK = "click";
