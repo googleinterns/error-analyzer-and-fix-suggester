@@ -117,7 +117,8 @@ public class StoreLogs {
             TimeUnit.SECONDS.sleep(1);
             logDao.findAndStoreErrors(indexName);
         } catch (Exception e) {
-            logger.error("Error while running findAndStoreErrors function ".concat(e.toString()));
+            logger.error("Error while running findAndStoreErrors function "
+            .concat(e.toString()));
         }
     }
 }
