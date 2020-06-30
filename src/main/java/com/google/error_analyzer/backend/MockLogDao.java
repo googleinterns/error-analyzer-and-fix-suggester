@@ -154,4 +154,4 @@ public class MockLogDao implements DaoInterface {
         }
         logDatabase.add(index);
     }
-}
+} 

@@ -16,7 +16,8 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.constant.StackTraceFormat;
 import com.google.error_analyzer.data.Document;
-import java.util.*;
+import java.util.Set;
+import java.util.HashSet;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
@@ -26,14 +27,14 @@ import org.elasticsearch.search.SearchHits;
 * Remove error Searchit that have occured previously.
 */
 public class FilterErrors {
-    private final Set < String > errorSet = new HashSet < String >();
 
     //Filter SeacrchHits and return Document List for storing.
     public ImmutableList < Document > filterErrorSearchHits (SearchHits hits) {
+        Set < String > errorSet = new HashSet < String >();
         Builder < Document > documentList = ImmutableList.< Document > builder(); 
         for (SearchHit hit : hits) {
             String logText = (String) hit.getSourceAsMap().get(LogFields.LOG_TEXT);
-            if (shouldIncludeError(logText)) {
+            if (shouldIncludeError(logText, errorSet)) {
                 Document document = new Document(hit.getId(), hit.getSourceAsString());
                 documentList.add(document);
             }
@@ -42,12 +43,13 @@ public class FilterErrors {
     }
 
     //return false if error is repeated or part of stack
-    private Boolean shouldIncludeError(String logText) {
+    private Boolean shouldIncludeError(String logText, Set < String > errorSet) {
         if (StackTraceFormat.matchesFormat(logText)) {
             return false;
         }
         logText = logText.replaceAll("[^a-zA-Z]", " ");
         if (errorSet.contains(logText)) {
+            System.out.println("Repeated error");
             return false;
         }
         errorSet.add(logText);
