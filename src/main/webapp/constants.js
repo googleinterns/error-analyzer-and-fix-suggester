@@ -14,8 +14,16 @@ limitations under the License.*/
 // DOM elements
 const PIE_CHART= "piechart";
 const FILE_NAME = "fileName";
+const SLIDE_1_CONTAINER = "slide1Container";
+const SLIDE_2_CONTAINER = "slide2Container";
+const SLIDE_1 = "slide1";
+const SLIDE_2 = "slide2";
+const FILE_NOT_FOUND = "File Not Found";
+const PREVIOUS_BUTTON = "btnPrev";
+const NEXT_BUTTON = "btnNext";
 
 // attributes for dom status
+const ACTIVE = "active";
 const HIDDEN = "hidden";
 const VISIBLE = "visible";
 
