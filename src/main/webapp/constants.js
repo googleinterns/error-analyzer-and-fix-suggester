@@ -18,7 +18,6 @@ const SLIDE_1_CONTAINER = "slide1Container";
 const SLIDE_2_CONTAINER = "slide2Container";
 const SLIDE_1 = "slide1";
 const SLIDE_2 = "slide2";
-const FILE_NOT_FOUND = "File Not Found";
 const PREVIOUS_BUTTON = "btnPrev";
 const NEXT_BUTTON = "btnNext";
 
@@ -35,3 +34,6 @@ const FILE_TYPE = "fileType";
 // servlet constants
 const POST = "POST";
 const GET_COUNT = "/getCount";
+
+// html content
+const FILE_NOT_FOUND = "File Not Found";
