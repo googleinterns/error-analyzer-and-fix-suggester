@@ -14,6 +14,7 @@
 package com.google.error_analyzer.backend;
 
 import com.google.error_analyzer.backend.StoreLogs;
+import com.google.error_analyzer.backend.UrlLogs;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -24,18 +25,20 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 
 //this class contains all the file related methods
-public class FileLogs {
-    private static final Logger logger = LogManager.getLogger(FileLogs.class);
+public class FileAndUrlLogs {
+    private static final Logger logger = 
+        LogManager.getLogger(FileAndUrlLogs.class);
     public static int MaxLogLines = 10000;
     public StoreLogs storeLogs = new StoreLogs();
 
     //stores the logs into database with appropriate filename
-    public String checkAndStoreFileLog(HttpServletRequest request,
-        String fileName, InputStream fileContent) {
+    public String checkAndStoreFileAndUrlLog(HttpServletRequest request,
+        String fileName, InputStream fileContent, boolean isUrl) {
         try {
             String indexName = IndexName.getIndexName(request, fileName);
             indexName = storeLogs.getUniqueIndexName(indexName);
-            final String response = storeFileLogs(request, indexName, fileContent);
+            final String response = storeFileAndUrlLogs(
+                request, indexName, fileContent, isUrl);
             return response;
         } catch (Exception e) {
             final String errorResponse =
@@ -47,8 +50,9 @@ public class FileLogs {
     }
 
     // stores maximum 10000 log lines in a single API  call
-    public String storeFileLogs(HttpServletRequest request, String fileName,
-        InputStream fileContent) throws IOException {
+    public String storeFileAndUrlLogs(HttpServletRequest request, 
+        String fileName, InputStream fileContent, boolean isUrl) 
+        throws IOException {
         InputStreamReader isReader = new InputStreamReader(fileContent);
         BufferedReader reader = new BufferedReader(isReader);
         String logLine;
@@ -62,7 +66,7 @@ public class FileLogs {
             lineCount++;
             if (lineCount >= MaxLogLines) {
                 response =
-                    storeLogs.storeLog(request, fileName, log, offset);
+                    storeLog(request, fileName, log, offset, isUrl);
                 log = "";
                 lineCount = 0;
                 offset = offset + MaxLogLines;
@@ -70,9 +74,20 @@ public class FileLogs {
         }
         if (!log.isEmpty()) {
             response =
-                storeLogs.storeLog(request, fileName, log, offset);
+               storeLog(request, fileName, log, offset, isUrl);
         }
         return response;
     }
+
+    /*remove html tags if the logs are from url and then stores the log 
+    into the database*/
+    private String storeLog(HttpServletRequest request,  String fileName,
+     String log, int offset, boolean isUrl) throws IOException {
+        if(isUrl) {
+            log = UrlLogs.removeHtmlTags(log);
+        }
+        String response = storeLogs.storeLog(request, fileName, log, offset);
+        return response;
+     }
 
 }
