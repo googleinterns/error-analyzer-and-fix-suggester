@@ -54,7 +54,7 @@ public interface DaoInterface {
      throws IOException;
 
     //delete indices
-    public String deleteIndices(String indexRegex) throws IOException ;
+    public String deleteIndices(String indexPrefix) throws IOException ;
 
     //fetch documents from index according to searchRequest
     public ImmutableList < SearchHit > getHitsFromIndex(SearchRequest searchRequest)

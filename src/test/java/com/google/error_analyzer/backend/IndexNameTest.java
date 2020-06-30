@@ -52,7 +52,8 @@ public class IndexNameTest {
 
     //append sessionID to fileName to get indexName
     @Test
-    public void getIndexNameTest()  throws UnsupportedEncodingException  {   
+    public void getIndexName_appendFilenameAndEncodeToHexadecimalString() 
+     throws UnsupportedEncodingException  {   
         when(request.getCookies()).thenReturn(new Cookie[]{cookie});
         String fileName = "file1";
         String expected = "6162636466696c6531";
@@ -62,7 +63,7 @@ public class IndexNameTest {
 
     //remove sessionID from indexName to get fileName
     @Test
-    public void getFileNameTest() throws
+    public void getFileName_decodeAndRemoveSessionId() throws
      DecoderException, UnsupportedEncodingException { 
         when(request.getCookies()).thenReturn(new Cookie[]{cookie});
         String indexName = "6162636466696c6531";
@@ -73,7 +74,7 @@ public class IndexNameTest {
 
     //remove sessionID from indexName to get fileName
     @Test
-    public void encodeFromStringToHexTest() 
+    public void encodeFromStringToHex_convertToHexadecimalString() 
     throws UnsupportedEncodingException  { 
         String fileName = "file1";
         String expected = "66696c6531";
