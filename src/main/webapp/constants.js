@@ -12,6 +12,7 @@ limitations under the License.*/
 // file contains all the constants used by all the js files
 
 // DOM elements
+const STACK_TRACE_CONTAINER = "stackTraceContainer";
 const PIE_CHART= "piechart";
 const FILE_NAME = "fileName";
 const SLIDE_1_CONTAINER = "slide1Container";
@@ -20,6 +21,13 @@ const SLIDE_1 = "slide1";
 const SLIDE_2 = "slide2";
 const PREVIOUS_BUTTON = "btnPrev";
 const NEXT_BUTTON = "btnNext";
+const SEARCH_BAR ="searchBar";
+const STACK_TRACE_CONTAINER = "stackTraceContainer";
+const CROSS = "crossBtn";
+
+// classes for dom status
+const HIDE = "hide";
+const BUTTON = "button";
 
 // attributes for dom status
 const ACTIVE = "active";
@@ -30,6 +38,7 @@ const VISIBLE = "visible";
 const LOGS = "logs" ;
 const ERRORS = "errors";
 const FILE_TYPE = "fileType";
+const RECORDS = "records";
 
 // servlet constants
 const POST = "POST";
@@ -37,3 +46,6 @@ const GET_COUNT = "/getCount";
 
 // html content
 const FILE_NOT_FOUND = "File Not Found";
+
+// js eventListeners
+const CLICK = "click";
