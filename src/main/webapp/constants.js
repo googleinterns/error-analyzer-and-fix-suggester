@@ -24,6 +24,7 @@ const NEXT_BUTTON = "btnNext";
 const SLIDE_1 = "slide1";
 const SLIDE_2 = "slide2";
 const PAGE = "page";
+const BUTTON = "button";
 
 // classes for dom status
 const ACTIVE = "active";
@@ -45,6 +46,7 @@ const RECORDS = "records";
 const END = "end";
 const FILE_NOT_FOUND = "File Not Found";
 const SEARCH_STRING = "searchString";
+const CLICK = "click";
 
 // servlet constants
 const POST = "POST";
