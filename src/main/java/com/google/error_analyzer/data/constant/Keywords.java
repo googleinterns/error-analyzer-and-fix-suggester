@@ -26,6 +26,7 @@ public class Keywords {
             add("severe");
             add("exit");
             add("exception");
+            add("failed");
         }
     };
 

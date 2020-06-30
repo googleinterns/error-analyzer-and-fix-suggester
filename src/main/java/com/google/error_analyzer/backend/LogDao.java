@@ -14,6 +14,7 @@ package com.google.error_analyzer.backend;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.backend.BooleanQuery;
+import com.google.error_analyzer.backend.FilterErrors;
 import com.google.error_analyzer.backend.LogDaoHelper;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.Document;
@@ -105,10 +106,11 @@ public class LogDao implements DaoInterface {
     //Returns name of the new index 
     @Override 
     public String findAndStoreErrors(String fileName) throws IOException {
-        SearchHits hits = findErrors(fileName);
+        ImmutableList < Document > errorHits = findErrors(fileName);
         String errorFileName = LogDaoHelper.getErrorIndexName(fileName);
-        storeErrors(errorFileName, hits);
-        logger.info("Errors stored in index ".concat(errorFileName));
+        logger.info(String.format("storing %d errors in %s", 
+        errorHits.size(), errorFileName));
+        bulkStoreLog(errorFileName, errorHits);
         return errorFileName;
     }
 
@@ -198,25 +200,16 @@ public class LogDao implements DaoInterface {
     }
 
     //find errors in a given index
-    private SearchHits findErrors(String fileName) 
+    private ImmutableList < Document > findErrors(String fileName) 
     throws IOException {
         logger.info("Finding errors in ".concat(fileName));
         BooleanQuery booleanQuery = new BooleanQuery();
         SearchRequest searchRequest = booleanQuery.createSearchRequest(fileName);
         SearchResponse searchResponse = client
             .search(searchRequest, RequestOptions.DEFAULT);
-        return searchResponse.getHits();
-    }
-
-    //store errors found in the log file
-    private void storeErrors(String errorFileName, SearchHits hits)
-    throws IOException {
-        Integer numberOfErrorsFound = hits.getHits().length;
-        logger.info("Storing ".concat(numberOfErrorsFound.toString()).concat(" into database"));
-        for (SearchHit hit : hits) {
-            String jsonSource =  hit.getSourceAsString();
-            String id = hit.getId();
-            storeLogLine(errorFileName, jsonSource, id);
-        }
+        SearchHits hits = searchResponse.getHits();
+        FilterErrors filterErrors = new FilterErrors();
+        ImmutableList < Document > documentList = filterErrors.filterErrorSearchHits(hits);
+        return documentList;
     }
 }
