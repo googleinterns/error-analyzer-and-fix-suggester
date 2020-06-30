@@ -154,7 +154,6 @@ public class MockLogDao implements DaoInterface {
         }
         logDatabase.add(index);
     }
- 
 
     //returns the jsonString stored in the document
     @Override
