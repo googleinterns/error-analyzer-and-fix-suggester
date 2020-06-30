@@ -16,11 +16,13 @@ package com.google.error_analyzer.backend;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.error_analyzer.backend.IndexName;
 import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.StoreLogHelper;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.Document;
 import java.io.*;
+import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.json.simple.JSONObject;
@@ -31,36 +33,34 @@ public class StoreLogs {
     private static final Logger logger = LogManager.getLogger(StoreLogs.class);
     private static final String LINE_BREAK = "\\r?\\n";
     private StoreLogHelper storeLogHelper = new StoreLogHelper();
-    private String ERROR_TEMPLATE_RESPONSE = "\t\t\t<h2> Could not store file %1$s</h2>";
-    public static final String FILE_STORED_RESPONSE =
-        "\t\t\t<h2> File Stored</h2>";
-    public static final String FILE_ALREADY_EXISTS_RESPONSE =
-        "\t\t\t<h2> Sorry! the file already exists. " +
-        "Please try with a different file name</h2>";
+    private String ERROR_TEMPLATE_RESPONSE =
+        "\t\t\t<h2> Could not store file %1$s</h2>";
+    public static final String FILE_STORED_TEMPLATE_RESPONSE =
+        "\t\t\t<h2> File %1$s Stored</h2>";
+    public static final String FILE_EMPTY_TEMPLATE_RESPONSE =
+        "\t\t\t<h2> Sorry! the file %1$s is empty</h2>";
     public DaoInterface logDao = new LogDao();
 
-    //Calls the method StoreLog if an index with name fileName does not 
-    //exist in db
-    public String checkAndStoreLog(String fileName, String log) {
+    //stores the logs into database with appropriate filename
+    public String checkAndStoreLog(HttpServletRequest request, String fileName,
+        String log) {
         try {
-            if (logDao.fileExists(fileName)) {
-                logger.error(String.format("File %s already exists", fileName));
-                return FILE_ALREADY_EXISTS_RESPONSE;
-            } else {
-                final String response = storeLog(fileName, log);
-                logger.info(String.format("File %s stored", fileName));
-                return response;
-            }
+            String indexName = IndexName.getIndexName(request, fileName);
+            indexName = getUniqueIndexName(indexName);
+            final String response = storeLog(request, indexName, log);
+            return response;
         } catch (Exception e) {
-            final String ERROR_RESPONSE =
+            final String errorResponse =
                 String.format(ERROR_TEMPLATE_RESPONSE, e);
-            logger.error(String.format("Could not store file %1$s %2$s", fileName, e));
-            return ERROR_RESPONSE;
+            logger.error(String.format("Could not store file %1$s %2$s",
+                fileName, e));
+            return errorResponse;
         }
     }
 
     //Stores the log in an index with name fileName
-    private String storeLog(String fileName, String log) throws IOException {
+    private String storeLog(HttpServletRequest request, String fileName, 
+     String log) throws IOException, NullPointerException  {
         Builder < Document > documentList = ImmutableList
             . < Document > builder();
         int logLineNumber = 1;
@@ -75,9 +75,29 @@ public class StoreLogs {
                 logLineNumber++;
             }
         }
+
+        if ((documentList.build()).isEmpty()) {
+            fileName = IndexName.getFileName(request, fileName);
+            String response = String.format(FILE_EMPTY_TEMPLATE_RESPONSE, fileName);
+            logger.info(String.format("File %s is empty", fileName));
+            return response;
+        }
         logDao.bulkStoreLog(fileName, documentList.build());
-        return FILE_STORED_RESPONSE;
+        fileName = IndexName.getFileName(request, fileName);
+        String response = String.format(FILE_STORED_TEMPLATE_RESPONSE, fileName);
+        logger.info(String.format("File %s stored", fileName));
+        return response;
     }
 
-
+    //find the name of the index in which the logs can be stored
+    private String getUniqueIndexName(String indexName) throws IOException {
+        String nextIndexName = indexName;
+        int indexSuffix = 1;
+        while (logDao.fileExists(nextIndexName)) {
+            nextIndexName = String.format(
+                "%1$s(%2$s)", indexName, indexSuffix);
+            indexSuffix++;
+        }
+        return nextIndexName;
+    }
 }
