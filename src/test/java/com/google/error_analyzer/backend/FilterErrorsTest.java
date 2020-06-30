@@ -27,13 +27,7 @@ import org.junit.Test;
 import org.mockito.*;
 import org.mockito.Mockito.*;
 import org.mockito.MockitoAnnotations;
-import org.mockito.runners.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
-import org.springframework.test.util.ReflectionTestUtils;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
-import static org.mockito.Mockito.doAnswer;
 
 
 public class FilterErrorsTest {
