@@ -20,6 +20,12 @@ const SLIDE_1 = "slide1";
 const SLIDE_2 = "slide2";
 const PREVIOUS_BUTTON = "btnPrev";
 const NEXT_BUTTON = "btnNext";
+const SEARCH_BAR ="searchBar";
+const STACK_TRACE_CONTAINER = "stackTraceContainer";
+const CROSS = "crossBtn";
+
+// classes for dom status
+const HIDE = "hide";
 
 // attributes for dom status
 const ACTIVE = "active";
@@ -30,6 +36,7 @@ const VISIBLE = "visible";
 const LOGS = "logs" ;
 const ERRORS = "errors";
 const FILE_TYPE = "fileType";
+const RECORDS = "records";
 
 // servlet constants
 const POST = "POST";

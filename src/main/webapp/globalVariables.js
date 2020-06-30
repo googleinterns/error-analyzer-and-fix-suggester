@@ -16,6 +16,8 @@ let currentPage = 1;
 // next true means user have asked for next 
 // page false means user is asking for previous page 
 let next = true;
+// no of records to be shown on each page 
+let recordsPerPage = 3;
 
 getCurrentPage = () => {
     return currentPage;
@@ -31,4 +33,8 @@ updateLastPage = (page) => {
 
 updateNextVariable = (value) => {
     next = value;
+}
+
+updateRecordsPerPage = (recordLength) => {
+    recordsPerPage = recordLength;
 }
