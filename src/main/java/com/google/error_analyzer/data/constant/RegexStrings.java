@@ -22,9 +22,11 @@ import java.util.ArrayList;
 */
 public class RegexStrings{
     private final static String PIPE_OPERATOR = "|";
-    private static final ArrayList < String > REGEX_LIST = new ArrayList < String > () {
+    private static final ArrayList < String > REGEX_LIST = 
+    new ArrayList < String > () {
         {
             add(".*exception");
+            add(".*error");
         }
     };
 
