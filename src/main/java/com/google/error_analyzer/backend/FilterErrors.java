@@ -29,7 +29,7 @@ import org.elasticsearch.search.SearchHits;
 * Remove error Searchit that have occured previously.
 */
 public class FilterErrors {
-    private static final Logger logger = LogManager.getLogger(StoreLogs.class);
+    private static final Logger logger = LogManager.getLogger(FilterErrors.class);
     
     //Filter SeacrchHits and return Document List for storing.
     public ImmutableList < Document > filterErrorSearchHits (SearchHits hits) {
