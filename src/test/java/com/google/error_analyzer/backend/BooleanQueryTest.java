@@ -32,8 +32,8 @@ public final class BooleanQueryTest {
     @Test
     public void createSearchRequestWithBoolQuery() {
         String fileName = "file"; 
-        String expectedMatchQueryString = "error OR fatal OR severe OR exit OR exception";
-        String expectedRegexQueryString = ".*exception";
+        String expectedMatchQueryString = "error OR fatal OR severe OR exit OR exception OR failed";
+        String expectedRegexQueryString = ".*exception|.*error";
         Integer expectedRequestSize = 10000;
         BoolQueryBuilder boolQuery = buildBoolQuery(expectedMatchQueryString, expectedRegexQueryString);
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
