@@ -18,6 +18,8 @@ import com.google.error_analyzer.data.constant.StackTraceFormat;
 import com.google.error_analyzer.data.Document;
 import java.util.Set;
 import java.util.HashSet;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 
@@ -27,7 +29,8 @@ import org.elasticsearch.search.SearchHits;
 * Remove error Searchit that have occured previously.
 */
 public class FilterErrors {
-
+    private static final Logger logger = LogManager.getLogger(StoreLogs.class);
+    
     //Filter SeacrchHits and return Document List for storing.
     public ImmutableList < Document > filterErrorSearchHits (SearchHits hits) {
         Set < String > errorSet = new HashSet < String >();
@@ -49,7 +52,7 @@ public class FilterErrors {
         }
         logText = logText.replaceAll("[^a-zA-Z]", " ");
         if (errorSet.contains(logText)) {
-            System.out.println("Repeated error");
+            logger.info("Repeated error");
             return false;
         }
         errorSet.add(logText);
