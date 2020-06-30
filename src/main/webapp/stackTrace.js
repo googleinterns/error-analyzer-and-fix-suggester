@@ -10,14 +10,14 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 
 // add button for stack trace
-addStackTraceBtn = (liElement, logError) => {
-    const stackTraceButton = document.createElement('button');
+addStackTraceButton = (logError) => {
+    const stackTraceButton = document.createElement(BUTTON);
     stackTraceButton.innerText="Stack Trace";
     stackTraceButton.className = "stackTraceButton";
-    stackTraceButton.addEventListener('click', () => {
+    stackTraceButton.addEventListener(CLICK, () => {
         showStackTrace(logError);
     });
-    liElement.appendChild(stackTraceButton);
+    return stackTraceButton;
 }
 
 // call stackTrace servlet and fetch stackTrace corresponding to error
@@ -28,8 +28,7 @@ async function showStackTrace(logError) {
     stackTraceContainer.className = SHOW;
     let crossBtn = document.getElementById(CROSS);
     crossBtn.className = SHOW;
-    stackTraceContainer.innerHTML = "";
-    stackTraceContainer.innerHTML += logError.logText;
+    stackTraceContainer.innerHTML = logError.logText;
     const stackTrace = await callStackTraceServlet(logError.logLineNumber, fileName);
     addStackTracesDynamicallyToFrontEnd(stackTrace);
 }

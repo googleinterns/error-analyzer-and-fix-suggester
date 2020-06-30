@@ -15,6 +15,7 @@ limitations under the License.*/
 const STACK_TRACE_CONTAINER = "stackTraceContainer";
 const PIE_CHART= "piechart";
 const FILE_NAME = "fileName";
+const BUTTON = "button";
 
 // attributes for dom status
 const HIDDEN = "hidden";
@@ -24,6 +25,7 @@ const VISIBLE = "visible";
 const LOGS = "logs" ;
 const ERRORS = "errors";
 const FILE_TYPE = "fileType";
+const CLICK = "click";
 
 // servlet constants
 const POST = "POST";
