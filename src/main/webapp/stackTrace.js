@@ -28,6 +28,14 @@ prepareLogDomElement = (logError, fileType) => {
     return liElement;
 }
 
+// hide stackTraces 
+hideStackTrace = () => {
+    let stackTraceContainer = document.getElementById(STACK_TRACE_CONTAINER);
+    stackTraceContainer.className = HIDE;
+    let crossBtn = document.getElementById(CROSS);
+    crossBtn.className = HIDE;
+}
+
 // return stack trace button
 StackTraceButton = (logError) => {
     const stackTraceButton = document.createElement(BUTTON);
