@@ -41,7 +41,8 @@ import static org.mockito.Mockito.when;
 public final class LogDaoHelperTest {
     private final String field = "name";
     private LogDaoHelper logDaoHelper;
-    private SearchHit[] searchHits;
+    private ImmutableList<SearchHit> searchHits ;
+
     @Mock 
     SearchHit hit1;
 
@@ -54,7 +55,9 @@ public final class LogDaoHelperTest {
     @Before
     public void setUp() {
         logDaoHelper = new LogDaoHelper();
-        searchHits=new SearchHit[]{hit1, hit2};
+        searchHits = ImmutableList.<SearchHit>builder() 
+                                          .add(hit1, hit2) 
+                                          .build(); 
     }
 
     // hitId
@@ -86,16 +89,15 @@ public final class LogDaoHelperTest {
     public void getHighLightedText() throws Exception {
         when(hit1.getHighlightFields()).thenReturn(highlight("error1"));
         when(hit2.getHighlightFields()).thenReturn(highlight("error2"));
-        getHitId();
         ImmutableList<SearchHit> searchHits = ImmutableList
                                           .<SearchHit>builder() 
                                           .add(hit1, hit2) 
                                           .build(); 
-        HashMap < String, String >actual = 
+        ImmutableList< String >actual = 
             logDaoHelper.getHighLightedText(searchHits, field);
-        HashMap < String, String > expected =new HashMap(); 
-        expected.put("1","error1");
-        expected.put("2","error2");
+        ImmutableList<String> expected = ImmutableList.<String>builder() 
+                                          .add("error1", "error2" ) 
+                                          .build();
         Assert.assertTrue(expected.equals(actual));
     }
 

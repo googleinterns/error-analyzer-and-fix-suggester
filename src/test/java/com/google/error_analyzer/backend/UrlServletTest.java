@@ -83,7 +83,7 @@ public class UrlServletTest {
 
     //unit test for catch block of UrlServlet 
     @Test
-    public void urlServletTestExceptionCase() throws ServletException,
+    public void doPost_logExceptionCase() throws ServletException,
      IOException {
         when(request.getParameter(LogFields.URL))
             .thenThrow(NullPointerException.class);
@@ -97,8 +97,7 @@ public class UrlServletTest {
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
         String nullPointerExceptionString = "java.lang.NullPointerException";
-        String expected = String.format(fileAndUrlLogs.storeLogs
-        .ERROR_TEMPLATE_RESPONSE, nullPointerExceptionString);
+        String expected = String.format(fileAndUrlLogs.storeLogs.ERROR_TEMPLATE_RESPONSE, nullPointerExceptionString);
         assertTrue(actual.contains(expected));
     }
 

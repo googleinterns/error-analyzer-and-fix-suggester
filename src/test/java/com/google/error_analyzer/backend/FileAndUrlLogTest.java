@@ -67,7 +67,7 @@ public final class FileAndUrlLogTest {
 
     /*unit test for the catch block of checkAndStoreFileLogs */
     @Test
-    public void checkAndStoreFileLogExceptionCase() {
+    public void checkAndStoreFileLog_logExceptionCase() {
         String fileName = "file1";
         when(request.getCookies()).thenThrow(NullPointerException.class);
         InputStream inputStream =
@@ -84,7 +84,7 @@ public final class FileAndUrlLogTest {
 
     /*store the file logs maximum 5 lines in a single API call*/
     @Test
-    public void storeFileAndUrlLogsForFile() throws IOException {
+    public void storeFileAndUrlLog_forFiles() throws IOException {
         String indexName = "i66i69i6ci65i31";
         InputStream inputStream =
             new ByteArrayInputStream(FILE_CONTENT.getBytes());
@@ -107,7 +107,7 @@ public final class FileAndUrlLogTest {
 
     /*store the url logs maximum 5 lines in a single API call*/
     @Test
-    public void storeFileAndUrlLogsForUrl() throws  IOException {
+    public void storeFileAndUrlLog_forUrl() throws  IOException {
         String indexName = "i66i69i6ci65i31";
         InputStream inputStream =
             new ByteArrayInputStream(URL_CONTENT.getBytes());

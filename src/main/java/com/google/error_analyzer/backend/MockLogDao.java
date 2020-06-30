@@ -19,6 +19,7 @@ import com.google.error_analyzer.data.Index;
 import java.io.IOException;
 import java.lang.*;
 import java.util.*;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -37,8 +38,8 @@ public class MockLogDao implements DaoInterface {
 
     //search db using keywords and return searchHits having highlight field added 
     @Override 
-    public ImmutableList < SearchHit > fullTextSearch(
-    String fileName, String searchString, String field) throws IOException {
+    public ImmutableList < SearchHit > fullTextSearch(String fileName, 
+    String searchString, String field, int start, int size) throws IOException {
         Builder < SearchHit > searchResultBuilder = ImmutableList.< SearchHit >builder();
         String[] keyWords = searchString.split(" ");
         for (int i = 0; i < database.length; i++) {
@@ -66,27 +67,22 @@ public class MockLogDao implements DaoInterface {
     //return a section of given index starting from start and of length equal
     //  to given size
     @Override 
-    public SearchHit[] getAll(String fileName, int start, int size) 
-    throws IOException {
+    public ImmutableList < SearchHit > getAll( String fileName,
+    int start, int size) throws IOException {
         if (start >= database.length) {
-            return new SearchHit[0];
+            return ImmutableList.< SearchHit >builder().build();
         }
-        if (start < 0) {
-            start = 0;
+        Builder < SearchHit > resultBuilder = 
+            ImmutableList.< SearchHit >builder();
+        for (int idx = start; idx < start+size ; idx++) {
+            resultBuilder.add(new SearchHit(idx));
         }
-        int len = 0;
-        int databaseLength = database.length;
-        if (start + size - 1 < databaseLength) {
-            len = size;
-        }
-        else {
-            len = databaseLength - start;
-        }
-        SearchHit[] searchHits = new SearchHit[len];
-        for (int idx = start; idx < len; idx++) {
-            searchHits[idx] = new SearchHit(idx);
-        }
-        return searchHits;
+        return resultBuilder.build();
+    }
+  
+    // returns no of documents in an index
+    public long getDocumentCount (String index) throws IOException {
+        return 0l;
     }
 
     //search an index for errors using regex and keywords and store back in db
@@ -140,6 +136,13 @@ public class MockLogDao implements DaoInterface {
         return result;
     }
 
+    //fetch documents from index according to searchRequest
+    @Override
+    public ImmutableList < SearchHit > getHitsFromIndex(SearchRequest searchRequest) {
+        Builder < SearchHit > searchResultBuilder = ImmutableList.< SearchHit > builder();
+        return searchResultBuilder.build();
+    }
+
     //Stores the documents into the database by performing multiple indexing operations
     @Override
     public void bulkStoreLog(String fileName,
@@ -185,4 +188,5 @@ public class MockLogDao implements DaoInterface {
         }
         return LogDao.DELETE_RESPONSE;
     }
+
 }

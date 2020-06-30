@@ -21,7 +21,7 @@ public class UrlLogTest {
 
     //remove html tags from HTML string
     @Test
-    public void removeHtmlTagsTest() {
+    public void removeHtmlTags_removeTags() {
         String HtmlString = String.format("<!DOCTYPE html><html><head>" +
             "</head><body><h1>This is a Heading</h1></body></html>");
         String actual = urlLogs.removeHtmlTags(HtmlString);
@@ -31,7 +31,7 @@ public class UrlLogTest {
 
     //preserve line breaks
     @Test
-    public void removeHtmlTagsTestPreserveLinebreaks() {
+    public void removeHtmlTags_preserveLinebreaks() {
         String HtmlString = String.format("<!DOCTYPE html><html><head>" +
             "</head><body><h1>This is first line.\n" +
             "This is second line.<br/></h1></body></html>");
@@ -42,7 +42,7 @@ public class UrlLogTest {
 
     //preserve links in HTML string
     @Test
-    public void removeHtmlTagsTestPreserveLinksInHTMLString() {
+    public void removeHtmlTags_preserveLinksInHTMLString() {
         String HtmlString = String.format("<!DOCTYPE html><html><head>" +
             "</head><body><h1>This is first line.\nThis is second line.</h1>" +
             "<a href=\"www.google.com\">link text</a></body></html>");

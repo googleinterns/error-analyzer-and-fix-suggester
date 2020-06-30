@@ -60,7 +60,7 @@ public final class StoreLogTest {
     //file name does not exist in the database and then trying to
     //store another file with same fileName
     @Test
-    public void checkAndStoreLogInAlreadyExistingFileTest()
+    public void checkAndStoreLog_alreadyExistingFile()
     throws IOException {
         String log = "error2";
         String fileName = "samplefile1";
@@ -77,7 +77,7 @@ public final class StoreLogTest {
 
     /*unit test for storeLog method when offset is 0*/
     @Test
-    public void storeLogTestWithZeroOffset () throws IOException {
+    public void storeLog_zeroOffset () throws IOException {
         String log = "error1\nerror2\nerror3";
         String fileName = "i66i69i6ci65i31";
         int offset = 0;
@@ -99,7 +99,7 @@ public final class StoreLogTest {
 
     /*unit test for storeLog method when offset is 3*/
     @Test
-    public void storeLogTestWithNonZeroOffset () throws IOException {
+    public void storeLog_nonZeroOffset () throws IOException {
         String log = "error1\nerror2\nerror3";
         String fileName = "i66i69i6ci65i31";
         int offset = 3;

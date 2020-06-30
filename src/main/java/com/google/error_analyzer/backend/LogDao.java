@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.backend.BooleanQuery;
 import com.google.error_analyzer.backend.LogDaoHelper;
+import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.Document;
 import java.io.IOException;
 import java.util.*;
@@ -30,6 +31,8 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.client.core.CountRequest;
+import org.elasticsearch.client.core.CountResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -50,49 +53,31 @@ public class LogDao implements DaoInterface {
         (RestClient.builder(new HttpHost("localhost", 9200, "http")));
     private static final SearchSourceBuilder searchSourceBuilder 
         = new SearchSourceBuilder();
-    private static final int windowSize = 10;
     private static final Logger logger = LogManager.getLogger(LogDao.class);
     public static final String DELETE_RESPONSE = "Files Successfully Deleted";
 
     //search db using keywords and return searchHits having highlight field added  
     @Override 
-    public ImmutableList < SearchHit > fullTextSearch(
-    String fileName, String searchString, String field)throws IOException {
-        int offset = 0;
-        SearchHit[] searchHits = null;
-        Builder < SearchHit > searchResultBuilder = ImmutableList.< SearchHit > builder();
-
-        // we check for matching keywords in a specific windowsize in each 
-        // iteration and do this until the the end of index .this way we 
-        // have traverse whole index 
-        while (true) {
-            SearchRequest searchRequest = new SearchRequest(fileName);
-            SimpleQueryStringBuilder simpleQueryBuilder = 
-                QueryBuilders.simpleQueryStringQuery(searchString);
-            searchSourceBuilder.query(simpleQueryBuilder)
-                .size(windowSize).from(offset);
-            searchSourceBuilder.highlighter(addHighLighter(field));
-            searchRequest.source(searchSourceBuilder);
-            SearchResponse searchResponse = 
-                client.search(searchRequest, RequestOptions.DEFAULT);
-            SearchHits hits = searchResponse.getHits();
-            searchHits = hits.getHits();
-
-            if( searchHits.length == 0) {
-                break;
-            }
-            for (SearchHit hit: searchHits) {
-                searchResultBuilder.add(hit);
-            }
-            offset += windowSize;
-        }
-        return searchResultBuilder.build();
+    public ImmutableList < SearchHit > fullTextSearch(String fileName, 
+    String searchString, String field, int start, int size)throws IOException {
+        SearchRequest searchRequest = new SearchRequest(fileName);
+        SimpleQueryStringBuilder simpleQueryBuilder = 
+            QueryBuilders.simpleQueryStringQuery(searchString);
+        searchSourceBuilder.query(simpleQueryBuilder)
+            .size(size).from(start).sort(LogFields.LOG_LINE_NUMBER);
+        searchSourceBuilder.highlighter(addHighLighter(field));
+        searchRequest.source(searchSourceBuilder);
+        SearchResponse searchResponse = 
+            client.search(searchRequest, RequestOptions.DEFAULT);
+        SearchHits hits= searchResponse.getHits();
+        SearchHit[] searchHits= hits.getHits();
+        return ImmutableList.copyOf(Arrays.asList(searchHits)); 
     }
 
     //return a section of given index starting from start and of 
     // length equal to given size
     @Override 
-    public SearchHit[] getAll(String fileName, int start, int size) 
+    public ImmutableList<SearchHit> getAll(String fileName, int start, int size) 
     throws IOException {
         SearchRequest searchRequest = new SearchRequest(fileName);
         searchSourceBuilder.query(QueryBuilders.matchAllQuery())
@@ -102,7 +87,18 @@ public class LogDao implements DaoInterface {
             client.search(searchRequest, RequestOptions.DEFAULT);
         SearchHits hits = searchResponse.getHits();
         SearchHit[] searchHits = hits.getHits();
-        return searchHits;
+        return ImmutableList.copyOf(Arrays.asList(searchHits));
+    }
+
+    // returns no of documents in an index
+    @Override 
+    public long getDocumentCount (String index) throws IOException {
+        CountRequest countRequest = new CountRequest(index);
+        searchSourceBuilder.query(QueryBuilders.matchAllQuery());
+        countRequest.source(searchSourceBuilder);
+        CountResponse countResponse = 
+            client.count(countRequest, RequestOptions.DEFAULT);
+        return countResponse.getCount();
     }
 
     //search an index for errors using regex and keywords and store back in db
@@ -141,6 +137,20 @@ public class LogDao implements DaoInterface {
         return getResponse.getSourceAsString();
     }
 
+    //fetch documents from index according to searchRequest
+    @Override
+    public ImmutableList < SearchHit > getHitsFromIndex(SearchRequest searchRequest)
+    throws IOException {
+        Builder < SearchHit > searchResultBuilder = ImmutableList.< SearchHit > builder();
+        SearchResponse searchResponse = client
+            .search(searchRequest, RequestOptions.DEFAULT);
+        SearchHits hits = searchResponse.getHits();
+        for (SearchHit hit : hits){
+            searchResultBuilder.add(hit);
+        }
+        return searchResultBuilder.build();
+    }
+    
     //Stores the documents into the database by performing multiple indexing operations
     //in a single API call
     @Override

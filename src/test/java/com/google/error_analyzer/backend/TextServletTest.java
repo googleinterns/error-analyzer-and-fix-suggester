@@ -61,7 +61,8 @@ public class TextServletTest {
     //file name does not exist in the db and then trying to store another 
     //file with different file name
     @Test
-    public void servletTest() throws ServletException, IOException {
+    public void doPost_filesWithDifferentNames() 
+    throws ServletException, IOException {
         String fileName1 = "file1";
         String fileName2 = "file2";
         String log = "error";
@@ -93,7 +94,7 @@ public class TextServletTest {
     //file name does not exist in the database and then trying to
     //store another file with same fileName
     @Test
-    public void servletTestWhenFileAlreadyExists()
+    public void doPost_whenFileAlreadyExists()
     throws ServletException, IOException {
         String fileName1 = "file1";
         String log = "error";
