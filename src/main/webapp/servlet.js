@@ -34,3 +34,19 @@ async function callStackTraceServlet(logLineNo, fileName) {
     const stackTrace = await response.json();
     return stackTrace;
 }
+
+// fetch logs/errors/search results from pagination servlet
+async function callPaginationServlet(fileName, fileType, searchString, pageSpecs) {
+    const params = new URLSearchParams();
+    params.append(START, pageSpecs.START);
+    params.append(SIZE,  pageSpecs.SIZE);
+    params.append(SEARCH_STRING, searchString);
+    params.append(FILE_TYPE, fileType);
+    params.append(FILE_NAME, fileName);
+    const response = await fetch(PAGINATION, {
+        method: POST,
+        body: params
+    });
+    const fetchedData = await response.json();
+    return fetchedData;
+}

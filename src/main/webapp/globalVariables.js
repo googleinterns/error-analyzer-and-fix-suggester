@@ -9,6 +9,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
 
+// noOfPages contains page length of window that we are maintaining
+const noOfPages = 5;
+const extraPageInFrontAndBack = Math.floor(noOfPages/2);
 // lastPage contains last page no of the file user is viewing 
 let lastPage = Number.MAX_VALUE;
 // cuttent page user is at
@@ -18,6 +21,10 @@ let currentPage = 1;
 let next = true;
 // no of records to be shown on each page 
 let recordsPerPage = 3;
+// its not necessary that the no of records in a file will be a
+//  multiple of records per page so no of records on last page
+//  may vary from 0 to recordsPerPage
+let noOfRecordsOnLastPage = recordsPerPage;
 
 getCurrentPage = () => {
     return currentPage;
@@ -37,4 +44,8 @@ updateNextVariable = (value) => {
 
 updateRecordsPerPage = (recordLength) => {
     recordsPerPage = recordLength;
+}
+
+updateNoOfRecordsOnLastPage = (recordLength) => {
+    noOfRecordsOnLastPage = recordLength;
 }
