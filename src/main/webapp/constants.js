@@ -22,7 +22,6 @@ const SLIDE_2 = "slide2";
 const PREVIOUS_BUTTON = "btnPrev";
 const NEXT_BUTTON = "btnNext";
 const SEARCH_BAR ="searchBar";
-const STACK_TRACE_CONTAINER = "stackTraceContainer";
 const CROSS = "crossBtn";
 const PAGE = "page";
 const BUTTON = "button";

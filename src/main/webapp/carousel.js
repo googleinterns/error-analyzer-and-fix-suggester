@@ -17,7 +17,7 @@ fileNotFound = () => {
     listing_table2.innerHTML = FILE_NOT_FOUND;
     updateCurrentPage(1);
     updateLastPage(1);
-    showAndHideNavigationBtn();
+    updateNavigationButton();
 }
 
 // if on 2nd slide of carousel move to 1st slide
@@ -30,7 +30,7 @@ moveCarouselToFirstSlide = () => {
 }
 
 // display next and previous button 
-showAndHideNavigationBtn = () => {
+updateNavigationButton = () => {
     const btnPrev = document.getElementById(PREVIOUS_BUTTON);
     const btnNext = document.getElementById(NEXT_BUTTON);
     // hide previous button when on page 1
@@ -49,14 +49,10 @@ showAndHideNavigationBtn = () => {
 
 // decrement by 1 on pressing previous button
 prevPage = () => {
-    updateCurrentPage(currentPage()-1);
-    updateNextVariable(false);
-    changePage(currentPage);
+    changePage(getCurrentPage()-1, false);
 }
 
 // increment by 1 on pressing next button
 nextPage = () => {
-    updateCurrentPage(currentPage()+1);
-    updateNextVariable(true);
-    changePage(currentPage);
+    changePage(getCurrentPage()+1, true);
 }

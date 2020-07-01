@@ -18,7 +18,7 @@ hideStackTrace = () => {
 }
 
 // return stack trace button
-stackTraceButton = (logError) => {
+getStackTraceButton = (logError) => {
     const stackTraceButton = document.createElement(BUTTON);
     stackTraceButton.innerText="Stack Trace";
     stackTraceButton.className = "stackTraceButton";
