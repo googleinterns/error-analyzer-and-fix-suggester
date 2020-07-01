@@ -61,8 +61,6 @@ public class StoreLogs {
             logger.error(String.format("Could not store file %1$s %2$s",
                 fileName, e));
             return errorResponse;
-        } finally {
-            
         }
     }
 

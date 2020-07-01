@@ -39,7 +39,7 @@ public class StackTraceServlet extends HttpServlet {
     private static final Logger logger = LogManager.getLogger(StackTraceServlet.class);
     public StackTrace stackTrace = new StackTrace();
     @Override
-    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType(FileConstants.APPLICATION_JSON_CONTENT_TYPE);
         try {
             Integer errorLineNumber = Integer.parseInt(request.getParameter(LogFields.LOG_LINE_NUMBER));
