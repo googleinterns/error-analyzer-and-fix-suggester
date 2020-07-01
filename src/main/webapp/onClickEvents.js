@@ -32,3 +32,4 @@ changeNoOfRecordsOnPage = () => {
     updateRecordsPerPage(records.value);
     changePage(1);
 }
+

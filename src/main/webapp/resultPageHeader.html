@@ -1,0 +1,81 @@
+<!-- Copyright 2020 Google LLC
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+        https://www.apache.org/licenses/LICENSE-2.0
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+-->
+<!-- header -->
+<header id="body-header" class="backgroundColor">	
+	<div>
+		<span>
+			<!-- search bar -->
+			<input type="text" id="searchBar" 
+			class="shadow inputDimension font"  name="searchBar" 
+			placeholder="Search">
+			<!-- search button -->
+			<button onclick="search(); moveCarouselToFirstSlide();" 
+			class="themeButton">
+				<i class="fas fa-search"></i>
+			</button>
+			<!--dropdown button for filters-->
+                	<span class="dropdown">
+				<button class="btn btn-light dropdown-toggle" 
+				type="button" id="dropdownMenuButton" 
+				data-toggle="dropdown"aria-haspopup="true" 
+				aria-expanded="false">
+					Filters
+				</button>
+				<div class="dropdown-menu" 
+				aria-labelledby="dropdownMenuButton">
+					<a class="dropdown-item" href="#" 
+					onclick="addFilterToSearch('ERROR');">
+						ERROR
+					</a>
+					<a class="dropdown-item" href="#" 
+					onclick="addFilterToSearch('INFO');">
+						INFO
+					</a>
+					<a class="dropdown-item" href="#" 
+					onclick="addFilterToSearch('WARNING');">
+						WARNING
+					</a>
+				</div>
+                	</span>
+            	</span>
+	</div>
+	<!-- choose file  -->
+	<div>
+		<span>
+			<input type="text"  id="fileName" 
+			class="shadow inputDimension font" 
+			name="fileName" placeholder="File Name">
+			<!-- if user is changing file then show results 
+			starting from 1st page -->
+			<button onclick="checkAndDrawChart(); changePage(1); 
+			moveCarouselToFirstSlide();" class="themeButton">submit</button>
+
+            	</span>
+
+	</div>
+
+	<!-- choose no of lines per page -->
+	<div>
+		<span>
+			<input type="number" min="1" max="14" class="shadow" 
+			id="records" name="records" placeholder="Lines per page">
+			<button onclick="changeNoOfRecordsOnPage(); moveCarouselToFirstSlide();" 
+			class="themeButton"> 
+				apply 
+			</button>
+           	</span>
+	</div>
+</header>
+
+<!-- chart JS -->
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script src="charts.js"></script>
