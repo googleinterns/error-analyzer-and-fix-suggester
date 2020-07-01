@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
 import org.json.simple.JSONObject;
+import java.util.concurrent.TimeUnit;
 
 //This class contains the methods used for storing logs
 //to the database.
@@ -52,6 +53,7 @@ public class StoreLogs {
             indexName = getUniqueIndexName(indexName);
             final String response = storeLog(
                 request, indexName, log, OFFSET_FOR_PLAIN_TEXT );
+            findAndStoreErrorsInIndex(indexName);
             return response;
         } catch (Exception e) {
             final String errorResponse =
@@ -108,4 +110,13 @@ public class StoreLogs {
         return nextIndexName;
     }
 
+    public void findAndStoreErrorsInIndex(String indexName) {
+        try {
+            TimeUnit.SECONDS.sleep(1);
+            logDao.findAndStoreErrors(indexName);
+        } catch (Exception e) {
+            logger.error("Error while running findAndStoreErrors function "
+            .concat(e.toString()));
+        }
+    }
 }

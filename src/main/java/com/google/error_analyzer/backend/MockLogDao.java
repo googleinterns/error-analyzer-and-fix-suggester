@@ -33,8 +33,6 @@ public class MockLogDao implements DaoInterface {
     "Severe: Could not find index file", "warning: NullPointerException"};
     //logDatabase is the list of all indices stored in the database
     private ArrayList < Index > logDatabase = new ArrayList < Index >();
-    //errorFile is for storing error logs after findAndStoreErrors is executed
-    public ArrayList < String > errorFile = new ArrayList < String >();
 
     //search db using keywords and return searchHits having highlight field added 
     @Override 
@@ -88,11 +86,12 @@ public class MockLogDao implements DaoInterface {
     //search an index for errors using regex and keywords and store back in db
     //Returns name of the new index 
     @Override 
-    public String findAndStoreErrors(String fileName) {
+    public String findAndStoreErrors(String fileName) throws IOException {
         String errorFileName = LogDaoHelper.getErrorIndexName(fileName);
-        errorFile.add("Error: nullPointerException");
-        errorFile.add("Severe: Could not find index file");
-        errorFile.add("warning: NullPointerException");
+        Builder < Document > documentList = ImmutableList.< Document > builder(); 
+        Document document = new Document("1", 1, "Error: nullPointerException");
+        documentList.add(document);
+        bulkStoreLog(errorFileName, documentList.build());
         return errorFileName;
     }
 
