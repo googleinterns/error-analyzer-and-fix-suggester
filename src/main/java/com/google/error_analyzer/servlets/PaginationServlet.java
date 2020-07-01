@@ -11,6 +11,7 @@ limitations under the License.*/
 package com.google.error_analyzer.servlets;
 
 import com.google.common.collect.ImmutableList;
+import com.google.error_analyzer.backend.IndexName;
 import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.LogDaoHelper;
 import com.google.error_analyzer.data.constant.FileConstants;
@@ -50,6 +51,9 @@ public class PaginationServlet extends HttpServlet {
         fileName = request.getParameter(LogFields.FILE_NAME);
         String fileType = request.getParameter(LogFields.FILE_TYPE);
         String searchString = request.getParameter(LogFields.SEARCH_STRING);
+
+        fileName = IndexName.getIndexName(request, fileName);
+
         if(fileType.equals(LogFields.ERROR))
             fileName = logDaoHelper.getErrorIndexName(fileName);
         response.setContentType(FileConstants.APPLICATION_JSON_CONTENT_TYPE);

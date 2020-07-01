@@ -31,22 +31,23 @@ import org.apache.logging.log4j.LogManager;
 public class ErrorFixes{
     
     private static final Logger logger = LogManager.getLogger(ErrorFixes.class);
+    private Customsearch.Cse.List list;
     public String findFixes(String searchQuery) {
     
         try{
-            String searchEngine = "cx"; //Your search engine
+            String searchEngine = "search_engine_id"; //Your search engine
 
             //Instance Customsearch
-            Customsearch customeSearch = 
+            Customsearch customSearch = 
                 new Customsearch.Builder(GoogleNetHttpTransport.newTrustedTransport(),
                 JacksonFactory.getDefaultInstance(), null).
                 setApplicationName("errorFixes").setGoogleClientRequestInitializer(
                 new CustomsearchRequestInitializer("your_api_key")).build();
 
             //Set search parameter
-            Customsearch.Cse.List list = customeSearch.cse()
-                                                    .list(searchQuery)
-                                                    .setCx(searchEngine); 
+             list = customSearch.cse()
+                                .list(searchQuery)
+                                .setCx(searchEngine); 
             
             //Execute search
             Search result = list.execute();
@@ -55,8 +56,7 @@ public class ErrorFixes{
             if (result.getItems()!=null){
                 Result stackoverflowResult= result.getItems().get(0);
                 String fix= stackoverflowResult.getLink();
-                fix=" <a href="+fix+"> FIX </a>";
-                return fix;
+                return resultString(fix);
             } else {
                 return new String();
             }
@@ -68,4 +68,8 @@ public class ErrorFixes{
         }
         return new String();
     }
+
+    private String resultString(String fix) {
+        return String.format(" <a href = \"%s\" > FIX </a>",fix);
+    } 
 }

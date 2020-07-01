@@ -10,6 +10,7 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 package com.google.error_analyzer.servlets;
 
+import com.google.error_analyzer.backend.IndexName;
 import  com.google.error_analyzer.backend.LogDao;
 import  com.google.error_analyzer.backend.LogDaoHelper;
 import  com.google.error_analyzer.data.constant.FileConstants;
@@ -40,6 +41,9 @@ public class DocCountServlet extends HttpServlet {
         HttpServletResponse response) throws IOException {
         String index = request.getParameter(LogFields.FILE_NAME);
         String fileType = request.getParameter(LogFields.FILE_TYPE);
+
+        index = IndexName.getIndexName(request, index);
+
         if(fileType.equals(LogFields.ERROR))
             index = logDaoHelper.getErrorIndexName(index);
         long count = 0l;
