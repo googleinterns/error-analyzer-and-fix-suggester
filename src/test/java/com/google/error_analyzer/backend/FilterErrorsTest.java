@@ -34,6 +34,7 @@ import static org.mockito.Mockito.when;
 
 public class FilterErrorsTest {
     private final FilterErrors filterErrors = new FilterErrors();
+    private static final String NO_ERROR_FOUND_MSG = "No errors were found in this file";
     private final String ERROR_LOG_LINE = "01 Error: nullPointerException";
     private final String ERROR_LOG_LINE_JSON = 
     "{\"logLineNumber\" : 1, \"logText\" : \"01 Error: nullPointerException\"}";
@@ -104,7 +105,7 @@ public class FilterErrorsTest {
         ImmutableList < Document > actual = filterErrors.filterErrorSearchHits(hits);
 
         Document errorDocument = 
-        new Document ("1", 1, "No errors were found in this file");
+        new Document ("1", 1, NO_ERROR_FOUND_MSG);
         ImmutableList < Document > expected = ImmutableList.<Document>builder() 
             .add(errorDocument).build();
         Assert.assertEquals(expected, actual);

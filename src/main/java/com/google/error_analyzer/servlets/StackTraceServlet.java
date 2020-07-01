@@ -45,6 +45,7 @@ public class StackTraceServlet extends HttpServlet {
             String fileName = request.getParameter(LogFields.FILE_NAME);
             String indexName = IndexName.getIndexName(request, fileName);
             ImmutableList < String > stackList = stackTrace.findStack(errorLineNumber,indexName);
+            
             if (stackList.size() == 0) {
                 String json = convertMsgToJsonList("No stack found");
                 response.getWriter().println(json);
