@@ -10,7 +10,7 @@ See the License for the specific language governing permissions and
 limitations under the License.*/
 
 // call docCount servlet for no of documents in a index
-getCount = (index, fileType) => {
+const getCount = async (index, fileType) => {
     const params = new URLSearchParams();
     params.append(FILE_NAME, index);
     params.append(FILE_TYPE, fileType);
@@ -23,7 +23,7 @@ getCount = (index, fileType) => {
 }
 
 // call stackTrace servlet for stack trace of a error
-callStackTraceServlet = (logLineNo, fileName) => {
+const callStackTraceServlet = async (logLineNo, fileName) => {
     const params = new URLSearchParams();
     params.append(LOG_LINE_NUMBER, logLineNo);
     params.append(FILE_NAME, fileName);
@@ -36,7 +36,7 @@ callStackTraceServlet = (logLineNo, fileName) => {
 }
 
 // fetch logs/errors/search results from pagination servlet
-callPaginationServlet = async(fileName, fileType, searchString, pageSpecs) => {
+const callPaginationServlet = async(fileName, fileType, searchString, pageSpecs) => {
     const params = new URLSearchParams();
     params.append(START, pageSpecs.START);
     params.append(SIZE,  pageSpecs.SIZE);
