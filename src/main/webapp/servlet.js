@@ -57,4 +57,5 @@ const deleteIndices = async() => {
         method: POST
 });
     alert("Data Deleted");
+    
 }
