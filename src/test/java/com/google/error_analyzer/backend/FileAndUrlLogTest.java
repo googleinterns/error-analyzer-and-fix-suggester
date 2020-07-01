@@ -23,9 +23,11 @@ import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.codec.DecoderException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -84,46 +86,48 @@ public final class FileAndUrlLogTest {
 
     /*store the file logs maximum 5 lines in a single API call*/
     @Test
-    public void storeFileAndUrlLog_forFiles() throws IOException {
-        String fileName = "file1";
+    public void storeFileAndUrlLog_forFiles() throws IOException,
+    DecoderException, UnsupportedEncodingException  {
+        String indexName = "66696c6531";
         InputStream inputStream =
             new ByteArrayInputStream(FILE_CONTENT.getBytes());
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         boolean isUrl = false;
         fileAndUrlLogs.storeFileAndUrlLogs(
-            request, fileName, inputStream, isUrl);
+            request, indexName, inputStream, isUrl);
         for (int id = 1; id < 7; id++) {
             String actual = fileAndUrlLogs.storeLogs.logDao
-                .getJsonStringById(fileName, Integer.toString(id));
+                .getJsonStringById(indexName, Integer.toString(id));
             String expected = String.format(
                 "{\"logLineNumber\":%1$s,\"logText\":\"error%1$s\"}", id);
             assertEquals(expected, actual);
         }
         String actual = fileAndUrlLogs.storeLogs.logDao
-            .getJsonStringById(fileName, "7");
+            .getJsonStringById(indexName, "7");
         String expected = null;
         assertEquals(expected, actual);
     }
 
     /*store the url logs maximum 5 lines in a single API call*/
     @Test
-    public void storeFileAndUrlLog_forUrl() throws  IOException {
-        String fileName = "file1";
+    public void storeFileAndUrlLog_forUrl() throws  IOException,
+    DecoderException, UnsupportedEncodingException  {
+        String indexName = "66696c6531";
         InputStream inputStream =
             new ByteArrayInputStream(URL_CONTENT.getBytes());
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         boolean isUrl = true;
         fileAndUrlLogs.storeFileAndUrlLogs(
-            request, fileName, inputStream, isUrl);
+            request, indexName, inputStream, isUrl);
         for (int id = 1; id < 6; id++) {
             String actual = fileAndUrlLogs.storeLogs.logDao
-                .getJsonStringById(fileName, Integer.toString(id));
+                .getJsonStringById(indexName, Integer.toString(id));
             String expected = String.format(
                 "{\"logLineNumber\":%1$s,\"logText\":\"error%1$s\"}", id);
             assertEquals(expected, actual);
         }
         String actual = fileAndUrlLogs.storeLogs.logDao
-            .getJsonStringById(fileName, "6");
+            .getJsonStringById(indexName, "6");
         String expected = null;
         assertEquals(expected, actual);   
     }

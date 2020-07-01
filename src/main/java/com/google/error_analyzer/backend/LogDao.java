@@ -23,6 +23,7 @@ import java.util.*;
 import org.apache.http.HttpHost;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.get.GetRequest;
@@ -54,6 +55,7 @@ public class LogDao implements DaoInterface {
     private static final SearchSourceBuilder searchSourceBuilder 
         = new SearchSourceBuilder();
     private static final Logger logger = LogManager.getLogger(LogDao.class);
+    public static final String DELETE_RESPONSE = "Files Successfully Deleted";
 
     //search db using keywords and return searchHits having highlight field added  
     @Override 
@@ -176,6 +178,15 @@ public class LogDao implements DaoInterface {
         GetResponse getResponse =
             client.get(getRequest, RequestOptions.DEFAULT);
         return getResponse.getSourceAsString();  
+    }
+
+    //delete indices
+    @Override
+    public String deleteIndices(String indexPrefix) throws IOException {
+        String indexName = indexPrefix.concat("*");
+        DeleteIndexRequest request = new DeleteIndexRequest(indexName);
+        client.indices().delete(request, RequestOptions.DEFAULT);
+        return DELETE_RESPONSE;
     }
 
     // highlight searched text

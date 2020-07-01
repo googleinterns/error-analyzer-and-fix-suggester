@@ -175,6 +175,18 @@ public class MockLogDao implements DaoInterface {
         }
         return result;
     }
-    
+
+    //delete indices
+    @Override
+    public String deleteIndices(String indexPrefix) throws IOException {
+        Iterator < Index > indexListIterator = logDatabase.iterator();
+        while (indexListIterator.hasNext()) {
+            Index searchIndex = indexListIterator.next();
+            if ((searchIndex.getIndexName()).contains(indexPrefix)) {
+                indexListIterator.remove();
+            }
+        }
+        return LogDao.DELETE_RESPONSE;
+    }
 
 }

@@ -19,8 +19,10 @@ import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.MockLogDao;
 import com.google.error_analyzer.backend.StoreLogs;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import javax.servlet.http.*;
+import org.apache.commons.codec.DecoderException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -77,44 +79,46 @@ public final class StoreLogTest {
 
     /*unit test for storeLog method when offset is 0*/
     @Test
-    public void storeLog_zeroOffset () throws IOException {
+    public void storeLog_zeroOffset () throws IOException,
+    DecoderException, UnsupportedEncodingException {
         String log = "error1\nerror2\nerror3";
-        String fileName = "file1";
+        String indexName = "66696c6531";
         int offset = 0;
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
-        storeLogs.storeLog(request, fileName, log, offset);
-        String actual = storeLogs.logDao.getJsonStringById(fileName, "1");
+        storeLogs.storeLog(request, indexName, log, offset);
+        String actual = storeLogs.logDao.getJsonStringById(indexName, "1");
         String expected = "{\"logLineNumber\":1,\"logText\":\"error1\"}";
         assertEquals(expected, actual);
-        actual = storeLogs.logDao.getJsonStringById(fileName, "2");
+        actual = storeLogs.logDao.getJsonStringById(indexName, "2");
         expected = "{\"logLineNumber\":2,\"logText\":\"error2\"}";
         assertEquals(expected, actual);
-        actual = storeLogs.logDao.getJsonStringById(fileName, "3");
+        actual = storeLogs.logDao.getJsonStringById(indexName, "3");
         expected = "{\"logLineNumber\":3,\"logText\":\"error3\"}";
         assertEquals(expected, actual);
-        actual = storeLogs.logDao.getJsonStringById(fileName, "4");
+        actual = storeLogs.logDao.getJsonStringById(indexName, "4");
         expected = null;
         assertEquals(expected, actual);
     }
 
     /*unit test for storeLog method when offset is 3*/
     @Test
-    public void storeLog_nonZeroOffset () throws IOException {
+    public void storeLog_nonZeroOffset () throws IOException ,
+    DecoderException, UnsupportedEncodingException  {
         String log = "error1\nerror2\nerror3";
-        String fileName = "file1";
+        String indexName = "66696c6531";
         int offset = 3;
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
-        storeLogs.storeLog(request, fileName, log, offset);
-        String actual = storeLogs.logDao.getJsonStringById(fileName, "4");
+        storeLogs.storeLog(request, indexName, log, offset);
+        String actual = storeLogs.logDao.getJsonStringById(indexName, "4");
         String expected = "{\"logLineNumber\":4,\"logText\":\"error1\"}";
         assertEquals(expected, actual);
-        actual = storeLogs.logDao.getJsonStringById(fileName, "5");
+        actual = storeLogs.logDao.getJsonStringById(indexName, "5");
         expected = "{\"logLineNumber\":5,\"logText\":\"error2\"}";
         assertEquals(expected, actual);
-        actual = storeLogs.logDao.getJsonStringById(fileName, "6");
+        actual = storeLogs.logDao.getJsonStringById(indexName, "6");
         expected = "{\"logLineNumber\":6,\"logText\":\"error3\"}";
         assertEquals(expected, actual);
-        actual = storeLogs.logDao.getJsonStringById(fileName, "1");
+        actual = storeLogs.logDao.getJsonStringById(indexName, "1");
         expected = null;
         assertEquals(expected, actual);
     }
