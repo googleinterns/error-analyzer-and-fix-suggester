@@ -25,7 +25,7 @@ async function checkAndDrawChart() {
 }
 
 // fetch log and error count from database and draw piechart
-async function drawChart(fileName) {
+const drawChart = async(fileName) => {
     const log = await getCount(fileName, LOGS);
     const error= await getCount(fileName, ERRORS);
     let data = google.visualization.arrayToDataTable([
