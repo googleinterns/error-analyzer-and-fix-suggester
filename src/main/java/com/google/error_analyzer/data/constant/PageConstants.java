@@ -13,5 +13,5 @@ package com.google.error_analyzer.data.constant;
 
 /** This class contains all the page constants*/
 public class PageConstants {
-    public static final String LANDING_PAGE = "/index.html";
+    public static final String LANDING_PAGE = "/index.jsp";
 }
