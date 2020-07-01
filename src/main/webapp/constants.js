@@ -51,6 +51,7 @@ const POST = "POST";
 const GET_COUNT = "/getCount";
 const STACK_TRACE = "/stackTrace";
 const PAGINATION= "/pagination";
+const DELETE = "/deleteServlet";
 
 // html content
 const FILE_NOT_FOUND = "File Not Found";
