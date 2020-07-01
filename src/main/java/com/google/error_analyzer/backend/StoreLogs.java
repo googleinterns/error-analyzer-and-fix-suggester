@@ -53,7 +53,7 @@ public class StoreLogs {
             indexName = getUniqueIndexName(indexName);
             final String response = storeLog(
                 request, indexName, log, OFFSET_FOR_PLAIN_TEXT );
-            findAnsStoreErrorsInIndex(indexName);
+            findAndStoreErrorsInIndex(indexName);
             return response;
         } catch (Exception e) {
             final String errorResponse =
@@ -110,7 +110,7 @@ public class StoreLogs {
         return nextIndexName;
     }
 
-    public void findAnsStoreErrorsInIndex(String indexName) {
+    public void findAndStoreErrorsInIndex(String indexName) {
         try {
             TimeUnit.SECONDS.sleep(1);
             logDao.findAndStoreErrors(indexName);
