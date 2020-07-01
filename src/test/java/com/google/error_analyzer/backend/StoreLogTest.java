@@ -77,6 +77,20 @@ public final class StoreLogTest {
         assertEquals(expected, actual);
     }
 
+    //check the creation for errorindex
+    @Test
+    public void checkAndStoreLog_creationOfErrorIndex() throws IOException {
+        String fileName = "file1";
+        String log = "error2";
+        when(request.getCookies()).thenReturn(new Cookie[] {cookie});
+        boolean isUrl = false;
+        storeLogs.checkAndStoreLog(request, fileName, log);
+        String errorIndexName = "6162636466696c6531error";
+        boolean actual = storeLogs.logDao.fileExists(errorIndexName);
+        boolean expected = true;
+        Assert.assertEquals(expected, actual);
+    }
+
     /*unit test for storeLog method when offset is 0*/
     @Test
     public void storeLog_zeroOffset () throws IOException,

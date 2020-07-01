@@ -69,7 +69,7 @@ public final class FileAndUrlLogTest {
 
     /*unit test for the catch block of checkAndStoreFileLogs */
     @Test
-    public void checkAndStoreFileLog_logExceptionCase() {
+    public void checkAndStoreFileAndUrlLog_logExceptionCase() throws IOException{
         String fileName = "file1";
         when(request.getCookies()).thenThrow(NullPointerException.class);
         InputStream inputStream =
@@ -77,13 +77,30 @@ public final class FileAndUrlLogTest {
         boolean isUrl = false;
         String actual = fileAndUrlLogs
             .checkAndStoreFileAndUrlLog(request, fileName, inputStream, isUrl);
-        System.out.println(actual);
         String nullPointerExceptionString = "java.lang.NullPointerException";
         String expected = String.format(fileAndUrlLogs
             .storeLogs.ERROR_TEMPLATE_RESPONSE, nullPointerExceptionString);
         Assert.assertEquals(expected, actual);
     }
 
+   //check the creation for errorIndex
+    @Test
+    public void checkAndStoreFileAndUrlLog_creationOfErrorIndex() 
+    throws IOException {
+        String fileName = "file1";
+        when(request.getCookies()).thenReturn(new Cookie[] {cookie});
+        InputStream inputStream =
+            new ByteArrayInputStream(FILE_CONTENT.getBytes());
+        boolean isUrl = false;
+        fileAndUrlLogs.checkAndStoreFileAndUrlLog(
+            request, fileName, inputStream, isUrl);
+        String errorIndexName = "6162636466696c6531error";
+        boolean actual = fileAndUrlLogs.
+            storeLogs.logDao.fileExists(errorIndexName);
+        boolean expected = true;
+        Assert.assertEquals(expected, actual);
+    }
+        
     /*store the file logs maximum 5 lines in a single API call*/
     @Test
     public void storeFileAndUrlLog_forFiles() throws IOException,
