@@ -17,8 +17,10 @@ package com.google.error_analyzer.servlets;
 import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.data.constant.FileConstants;
 import com.google.error_analyzer.data.constant.LogFields;
+import com.google.error_analyzer.backend.IndexName;
 import com.google.error_analyzer.backend.StackTrace;
 import com.google.gson.Gson;
+import java.io.UnsupportedEncodingException;
 import java.lang.*;
 import java.util.*;
 import java.io.IOException;
@@ -37,13 +39,13 @@ public class StackTraceServlet extends HttpServlet {
     private static final Logger logger = LogManager.getLogger(StackTraceServlet.class);
     public StackTrace stackTrace = new StackTrace();
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType(FileConstants.APPLICATION_JSON_CONTENT_TYPE);
         try {
             Integer errorLineNumber = Integer.parseInt(request.getParameter(LogFields.LOG_LINE_NUMBER));
-            String indexName = request.getParameter(LogFields.FILE_NAME);
+            String fileName = request.getParameter(LogFields.FILE_NAME);
+            String indexName = IndexName.getIndexName(request, fileName);
             ImmutableList < String > stackList = stackTrace.findStack(errorLineNumber,indexName);
-            
             if (stackList.size() == 0) {
                 String json = convertMsgToJsonList("No stack found");
                 response.getWriter().println(json);
