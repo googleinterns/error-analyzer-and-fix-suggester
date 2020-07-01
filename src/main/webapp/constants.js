@@ -22,12 +22,13 @@ const SLIDE_2 = "slide2";
 const PREVIOUS_BUTTON = "btnPrev";
 const NEXT_BUTTON = "btnNext";
 const SEARCH_BAR ="searchBar";
-const STACK_TRACE_CONTAINER = "stackTraceContainer";
 const CROSS = "crossBtn";
+const PAGE = "page";
+const BUTTON = "button";
 
 // classes for dom status
 const HIDE = "hide";
-const BUTTON = "button";
+const SHOW = "show";
 
 // attributes for dom status
 const ACTIVE = "active";
@@ -39,10 +40,17 @@ const LOGS = "logs" ;
 const ERRORS = "errors";
 const FILE_TYPE = "fileType";
 const RECORDS = "records";
+const START = "start";
+const SIZE = "size";
+const LOG_LINE_NUMBER = "logLineNumber";
+const END = "end";
+const SEARCH_STRING = "searchString";
 
 // servlet constants
 const POST = "POST";
 const GET_COUNT = "/getCount";
+const STACK_TRACE = "/stackTrace";
+const PAGINATION= "/pagination";
 
 // html content
 const FILE_NOT_FOUND = "File Not Found";

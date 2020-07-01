@@ -9,15 +9,19 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
 
+// dataWindowSize contains page length of window that we are maintaining
+const dataWindowSize = 5;
+const extraPageInFrontAndBack = Math.floor(dataWindowSize/2);
 // lastPage contains last page no of the file user is viewing 
 let lastPage = Number.MAX_VALUE;
 // cuttent page user is at
 let currentPage = 1;
-// next true means user have asked for next 
-// page false means user is asking for previous page 
-let next = true;
 // no of records to be shown on each page 
 let recordsPerPage = 3;
+// its not necessary that the no of records in a file will be a
+//  multiple of records per page so no of records on last page
+//  may vary from 0 to recordsPerPage
+let noOfRecordsOnLastPage = recordsPerPage;
 
 getCurrentPage = () => {
     return currentPage;
@@ -31,10 +35,10 @@ updateLastPage = (page) => {
     lastPage = page;
 }
 
-updateNextVariable = (value) => {
-    next = value;
-}
-
 updateRecordsPerPage = (recordLength) => {
     recordsPerPage = recordLength;
+}
+
+updateNoOfRecordsOnLastPage = (recordLength) => {
+    noOfRecordsOnLastPage = recordLength;
 }
