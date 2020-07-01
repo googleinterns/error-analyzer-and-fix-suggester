@@ -50,3 +50,11 @@ const callPaginationServlet = async(fileName, fileType, searchString, pageSpecs)
     const fetchedData = await response.json();
     return fetchedData;
 }
+
+// delete all the 
+const deleteIndices = async() => {
+    await fetch(DELETE, {
+        method: POST
+});
+
+}
