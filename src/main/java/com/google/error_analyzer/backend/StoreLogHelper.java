@@ -26,7 +26,7 @@ import org.json.simple.JSONObject;
 //This includes removal of special characters, conversion into json string.
 
 public class StoreLogHelper {
-    private static final String SPECIAL_CHARACTERS = "[^a-zA-Z0-9:\"]";
+    private static final String SPECIAL_CHARACTERS = "[^a-zA-Z0-9:./\"]";
     private static final String SPACE = " ";
     private static final String WHITE_SPACE = "\\s+";
 

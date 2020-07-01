@@ -56,6 +56,5 @@ const deleteIndices = async() => {
     await fetch(DELETE, {
         method: POST
 });
-    alert("Data Deleted");
-    
+    alert("Data Deleted"); 
 }
