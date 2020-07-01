@@ -14,6 +14,7 @@ package com.google.error_analyzer.backend;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.backend.BooleanQuery;
+import com.google.error_analyzer.backend.FilterErrors;
 import com.google.error_analyzer.backend.LogDaoHelper;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.Document;
@@ -22,6 +23,7 @@ import java.util.*;
 import org.apache.http.HttpHost;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.get.GetRequest;
@@ -53,6 +55,7 @@ public class LogDao implements DaoInterface {
     private static final SearchSourceBuilder searchSourceBuilder 
         = new SearchSourceBuilder();
     private static final Logger logger = LogManager.getLogger(LogDao.class);
+    public static final String DELETE_RESPONSE = "Files Successfully Deleted";
 
     //search db using keywords and return searchHits having highlight field added  
     @Override 
@@ -103,10 +106,11 @@ public class LogDao implements DaoInterface {
     //Returns name of the new index 
     @Override 
     public String findAndStoreErrors(String fileName) throws IOException {
-        SearchHits hits = findErrors(fileName);
+        ImmutableList < Document > errorHits = findErrors(fileName);
         String errorFileName = LogDaoHelper.getErrorIndexName(fileName);
-        storeErrors(errorFileName, hits);
-        logger.info("Errors stored in index ".concat(errorFileName));
+        logger.info(String.format("storing %d errors in %s", 
+        errorHits.size(), errorFileName));
+        bulkStoreLog(errorFileName, errorHits);
         return errorFileName;
     }
 
@@ -165,6 +169,25 @@ public class LogDao implements DaoInterface {
         }
         client.bulk(request, RequestOptions.DEFAULT);;
     }
+    
+    //returns the jsonString stored in the document
+    @Override
+    public String getJsonStringById (String fileName, String id)
+     throws IOException {
+        GetRequest getRequest = new GetRequest(fileName, id);
+        GetResponse getResponse =
+            client.get(getRequest, RequestOptions.DEFAULT);
+        return getResponse.getSourceAsString();  
+    }
+
+    //delete indices
+    @Override
+    public String deleteIndices(String indexPrefix) throws IOException {
+        String indexName = indexPrefix.concat("*");
+        DeleteIndexRequest request = new DeleteIndexRequest(indexName);
+        client.indices().delete(request, RequestOptions.DEFAULT);
+        return DELETE_RESPONSE;
+    }
 
     // highlight searched text
     private HighlightBuilder addHighLighter(String field) {
@@ -177,25 +200,16 @@ public class LogDao implements DaoInterface {
     }
 
     //find errors in a given index
-    private SearchHits findErrors(String fileName) 
+    private ImmutableList < Document > findErrors(String fileName) 
     throws IOException {
         logger.info("Finding errors in ".concat(fileName));
         BooleanQuery booleanQuery = new BooleanQuery();
         SearchRequest searchRequest = booleanQuery.createSearchRequest(fileName);
         SearchResponse searchResponse = client
             .search(searchRequest, RequestOptions.DEFAULT);
-        return searchResponse.getHits();
-    }
-
-    //store errors found in the log file
-    private void storeErrors(String errorFileName, SearchHits hits)
-    throws IOException {
-        Integer numberOfErrorsFound = hits.getHits().length;
-        logger.info("Storing ".concat(numberOfErrorsFound.toString()).concat(" into database"));
-        for (SearchHit hit : hits) {
-            String jsonSource =  hit.getSourceAsString();
-            String id = hit.getId();
-            storeLogLine(errorFileName, jsonSource, id);
-        }
+        SearchHits hits = searchResponse.getHits();
+        FilterErrors filterErrors = new FilterErrors();
+        ImmutableList < Document > documentList = filterErrors.filterErrorSearchHits(hits);
+        return documentList;
     }
 }

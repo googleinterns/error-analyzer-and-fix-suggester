@@ -49,7 +49,15 @@ public interface DaoInterface {
     public void bulkStoreLog(String fileName, 
         ImmutableList < Document > documentList) throws IOException;
 
+    //returns the jsonString stored in the document
+    public String getJsonStringById (String fileName, String id)
+     throws IOException;
+
+    //delete indices
+    public String deleteIndices(String indexPrefix) throws IOException ;
+
     //fetch documents from index according to searchRequest
     public ImmutableList < SearchHit > getHitsFromIndex(SearchRequest searchRequest)
     throws IOException;
+
 }

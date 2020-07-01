@@ -13,7 +13,6 @@ package com.google.error_analyzer.data;
 
 import com.google.error_analyzer.backend.StoreLogHelper;
 import java.io.IOException;
-import java.util.ArrayList;
 
 /*The Document class has attributes id, logLineNumber, logText,
  and jsonString. Id represents the document id in the database.
@@ -47,4 +46,9 @@ import java.util.ArrayList;
         return id;
     }
 
+    public boolean equals(Object other) {
+    return other instanceof Document && 
+        this.id.equals(((Document) other).getID()) && 
+        this.jsonString.equals(((Document) other).getJsonString());
+    }
 }
