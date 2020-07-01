@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.backend.FilterErrors;
 import com.google.error_analyzer.data.Document;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.lucene.search.TotalHits;
@@ -67,7 +68,8 @@ public class FilterErrorsTest {
     }
 
     @Test
-    public void filterErrorSearchHits_errorsAreRepeated() {
+    public void filterErrorSearchHits_errorsAreRepeated()
+    throws IOException {
         TotalHits totalHits = new TotalHits(2, Relation.valueOf("EQUAL_TO"));
         SearchHit[] hitArray = new SearchHit[]{errorHit, repeatedErrorHit};
         SearchHits hits = new SearchHits(hitArray, totalHits, 1);
@@ -80,7 +82,8 @@ public class FilterErrorsTest {
     }
 
     @Test
-    public void filterErrorSearchHits_searchHitHasStackLogLine() {
+    public void filterErrorSearchHits_searchHitHasStackLogLine() 
+    throws IOException {
         TotalHits totalHits = new TotalHits(2, Relation.valueOf("EQUAL_TO"));
         SearchHit[] hitArray = new SearchHit[]{errorHit, partOfStackHit};
         SearchHits hits = new SearchHits(hitArray, totalHits, 1);
@@ -92,6 +95,21 @@ public class FilterErrorsTest {
         Assert.assertEquals(expected, actual);
     }
     
+    @Test
+    public void filterErrorSearchHits_noErrorsAreFound() 
+    throws IOException {
+        TotalHits totalHits = new TotalHits(2, Relation.valueOf("EQUAL_TO"));
+        SearchHit[] hitArray = new SearchHit[]{partOfStackHit, partOfStackHit};
+        SearchHits hits = new SearchHits(hitArray, totalHits, 1);
+        ImmutableList < Document > actual = filterErrors.filterErrorSearchHits(hits);
+
+        Document errorDocument = 
+        new Document ("1", 1, "No errors were found in this file");
+        ImmutableList < Document > expected = ImmutableList.<Document>builder() 
+            .add(errorDocument).build();
+        Assert.assertEquals(expected, actual);
+    }
+
     private Map <String, Object > createSourceMap(Integer logLineNumber, 
         String logText) {
         Map <String, Object> map = new HashMap();

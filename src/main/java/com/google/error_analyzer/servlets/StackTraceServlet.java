@@ -20,7 +20,6 @@ import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.backend.IndexName;
 import com.google.error_analyzer.backend.StackTrace;
 import com.google.gson.Gson;
-import java.io.UnsupportedEncodingException;
 import java.lang.*;
 import java.util.*;
 import java.io.IOException;
