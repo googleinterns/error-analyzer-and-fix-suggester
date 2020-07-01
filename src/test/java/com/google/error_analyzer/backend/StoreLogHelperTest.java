@@ -49,7 +49,7 @@ public final class StoreLogHelperTest {
 
     // remove special characters from logText
     @Test
-    public void RemoveSpecialCharactersTest() {
+    public void cleanLogText_removeSpecialCharacters() {
         String actual =
             storeLogHelper.cleanLogText("Error1:\"^&index not found?/,*\"");
         String expected = new String("Error1:\" index not found \"");

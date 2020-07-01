@@ -34,7 +34,7 @@ public class MockLogDao implements DaoInterface {
     //logDatabase is the list of all indices stored in the database
     private ArrayList < Index > logDatabase = new ArrayList < Index >();
     //errorFile is for storing error logs after findAndStoreErrors is executed
-    public ArrayList < String > errorFile;
+    public ArrayList < String > errorFile = new ArrayList < String >();
 
     //search db using keywords and return searchHits having highlight field added 
     @Override 
@@ -154,4 +154,39 @@ public class MockLogDao implements DaoInterface {
         }
         logDatabase.add(index);
     }
+
+    //returns the jsonString stored in the document
+    @Override
+    public String getJsonStringById (String fileName, String id) {
+        String result = null;
+        Iterator < Index > indexListIterator = logDatabase.iterator();
+        while (indexListIterator.hasNext()) {
+            Index searchIndex = indexListIterator.next();
+            if (fileName.equals(searchIndex.getIndexName())) {
+                ArrayList < Document > DocList = searchIndex.getDocumentList();
+                Iterator < Document > docListIterator = DocList.iterator();
+                while (docListIterator.hasNext()) {
+                    Document doc = docListIterator.next();
+                    if (id.equals(doc.getID())) {
+                        result = doc.getJsonString();
+                    }
+                }
+            }
+        }
+        return result;
+    }
+
+    //delete indices
+    @Override
+    public String deleteIndices(String indexPrefix) throws IOException {
+        Iterator < Index > indexListIterator = logDatabase.iterator();
+        while (indexListIterator.hasNext()) {
+            Index searchIndex = indexListIterator.next();
+            if ((searchIndex.getIndexName()).contains(indexPrefix)) {
+                indexListIterator.remove();
+            }
+        }
+        return LogDao.DELETE_RESPONSE;
+    }
+
 }
