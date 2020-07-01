@@ -29,7 +29,7 @@ getStackTraceButton = (logError) => {
 }
 
 // call stackTrace servlet and fetch stackTrace corresponding to error
-async function buildAndshowStackTrace(logError) {
+const buildAndshowStackTrace = async (logError) => {
     let fileName = document.getElementById(FILE_NAME).value;
     fileName =  fileName.trim();
     let stackTraceContainer = document.getElementById(STACK_TRACE_CONTAINER);

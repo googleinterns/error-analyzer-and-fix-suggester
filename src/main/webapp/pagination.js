@@ -14,7 +14,7 @@ let fileLength = Number.MAX_VALUE;
 
 // the function contains algo for fetching page 
 // and updating current page's content
-async function changePage(page, next) {
+changePage = async(page, next) => {
     // change current page (page user is viewing at present) to the 
     // value provided while calling the function 
     updateCurrentPage(page);
@@ -43,7 +43,7 @@ async function changePage(page, next) {
     }
 }
 
-async function updateOrCreateWindow(fileName, fileType, searchString, fetchPage) {
+updateOrCreateWindow = async(fileName, fileType, searchString, fetchPage) => {
     // get file offset for page to be fetched  
     const pageSpecs = getPageStartAndSize(fileType, fetchPage, searchString);
     // fetch data from database
@@ -67,7 +67,7 @@ async function updateOrCreateWindow(fileName, fileType, searchString, fetchPage)
 }
 
 // reset value of lastPage when on page 1
-async function resetLastPage(fileName, fileType) {
+resetLastPage = async(fileName, fileType) => {
     updateLastPage(Number.MAX_VALUE);
     updateNoOfRecordsOnLastPage(recordsPerPage)
 

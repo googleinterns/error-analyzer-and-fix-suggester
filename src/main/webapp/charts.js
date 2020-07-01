@@ -12,7 +12,7 @@ limitations under the License.*/
 google.charts.load('current', {'packages':['corechart']});
 google.charts.setOnLoadCallback(checkAndDrawChart);
 
-async function checkAndDrawChart() {
+checkAndDrawChart = async() => {
     const fileName = document.getElementById(FILE_NAME).value;
     const piechart=document.getElementById(PIE_CHART);
     if(fileName == ""){
@@ -25,7 +25,7 @@ async function checkAndDrawChart() {
 }
 
 // fetch log and error count from database and draw piechart
-async function drawChart(fileName) {
+drawChart = async(fileName) => {
     const log = await getCount(fileName, LOGS);
     const error= await getCount(fileName, ERRORS);
     let data = google.visualization.arrayToDataTable([
