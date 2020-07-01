@@ -12,8 +12,6 @@ limitations under the License.*/
 // code for maintaining data window
 let data = new Array();
 
-// return page no to be fetched from database
-
 // returning -1 would mean that the page which
 //  we need to fetch next is out of bound
 getPageToBeFetched = (next) => {

@@ -43,7 +43,6 @@ public class PaginationServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) 
     throws IOException {
-      
         start = Integer.parseInt(request.getParameter(LogFields.START));
         size = Integer.parseInt(request.getParameter(LogFields.SIZE));
         fileName = request.getParameter(LogFields.FILE_NAME);
