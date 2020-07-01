@@ -77,7 +77,7 @@ public final class StoreLogTest {
         assertEquals(expected, actual);
     }
 
-    //check the creation for errorindex
+    //check the creation of errorIndex
     @Test
     public void checkAndStoreLog_creationOfErrorIndex() throws IOException {
         String fileName = "file1";

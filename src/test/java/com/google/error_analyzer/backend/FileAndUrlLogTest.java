@@ -83,7 +83,7 @@ public final class FileAndUrlLogTest {
         Assert.assertEquals(expected, actual);
     }
 
-   //check the creation for errorIndex
+   //check the creation of errorIndex
     @Test
     public void checkAndStoreFileAndUrlLog_creationOfErrorIndex() 
     throws IOException {
