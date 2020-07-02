@@ -9,14 +9,32 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 -->
+
+ 
 <!-- header -->
 <header id="body-header" class="backgroundColor">	
+	
+	<!-- choose file  -->
 	<div>
+		<span>
+			<input type="text"  id="fileName" 
+			class="shadow inputDimension font" 
+			name="fileName" placeholder="File Name" data-toggle="tooltip" title="file name">
+			<!-- if user is changing file then show results 
+			starting from 1st page -->
+			<button onclick="checkAndDrawChart(); changePage(1); 
+			moveCarouselToFirstSlide();" class="themeButton">submit</button>
+
+            	</span>
+
+	</div>
+    <!-- search bar -->
+    <div>
 		<span>
 			<!-- search bar -->
 			<input type="text" id="searchBar" 
 			class="shadow inputDimension font"  name="searchBar" 
-			placeholder="Search">
+			placeholder="Search" data-toggle="tooltip" title="search">
 			<!-- search button -->
 			<button onclick="search(); moveCarouselToFirstSlide();" 
 			class="themeButton">
@@ -48,26 +66,11 @@
                 	</span>
             	</span>
 	</div>
-	<!-- choose file  -->
-	<div>
-		<span>
-			<input type="text"  id="fileName" 
-			class="shadow inputDimension font" 
-			name="fileName" placeholder="File Name">
-			<!-- if user is changing file then show results 
-			starting from 1st page -->
-			<button onclick="checkAndDrawChart(); changePage(1); 
-			moveCarouselToFirstSlide();" class="themeButton">submit</button>
-
-            	</span>
-
-	</div>
-
 	<!-- choose no of lines per page -->
 	<div>
 		<span>
 			<input type="number" min="1" max="14" class="shadow" 
-			id="records" name="records" placeholder="Lines per page">
+			id="records" name="records" placeholder="Lines per page" data-toggle="tooltip" title="choose no of lines">
 			<button onclick="changeNoOfRecordsOnPage(); moveCarouselToFirstSlide();" 
 			class="themeButton"> 
 				apply 
@@ -79,3 +82,4 @@
 <!-- chart JS -->
 	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 	<script src="charts.js"></script>
+    

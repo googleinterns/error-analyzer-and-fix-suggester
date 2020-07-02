@@ -30,11 +30,16 @@ const drawChart = async(fileName) => {
     const error= await getCount(fileName, ERRORS);
     let data = google.visualization.arrayToDataTable([
         ['logError',  '%'],
-        ['Other Logs', log-error],
-        ['Error', error]
+        ['Error', error],
+        ['Other Logs', log-error]
+       
     ]);
     const options = {
-          title: '% Error'
+          title: '% Error',
+           slices: {
+            0: { color: 'red' },
+            1: { color: 'blue' }
+          }
     };
     const chart = 
         new google.visualization.PieChart(document.getElementById(PIE_CHART));

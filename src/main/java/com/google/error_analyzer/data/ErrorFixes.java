@@ -35,13 +35,13 @@ public class ErrorFixes{
     public String findFixes(String searchQuery) {
     
         try{
-            String searchEngine = "search_engine_id"; //Your search engine
+            String searchEngine = ""; //Your search engine
 
             //Instance Customsearch
             Customsearch customSearch = 
                 new Customsearch.Builder(GoogleNetHttpTransport.newTrustedTransport(),
                 JacksonFactory.getDefaultInstance(), null).
-                setApplicationName("errorFixes").setGoogleClientRequestInitializer(
+                setApplicationName("search_engine_id").setGoogleClientRequestInitializer(
                 new CustomsearchRequestInitializer("your_api_key")).build();
 
             //Set search parameter
