@@ -92,7 +92,6 @@ public final class StoreLogTest {
         assertEquals(expected, actual);
     }
 
-
     /*unit test for the catch block of checkAndStoreLogs */
     @Test
     public void checkAndStoreLog_logExceptionCase() throws IOException{
