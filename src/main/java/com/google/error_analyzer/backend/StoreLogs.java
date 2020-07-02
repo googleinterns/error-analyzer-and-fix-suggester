@@ -22,8 +22,8 @@ import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.StoreLogHelper;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.Document;
-import java.io.ByteArrayInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -110,7 +110,7 @@ public class StoreLogs {
         }
         String response = storeLog(request, fileName, log, offset);
         return response;
-     }
+    }
 
     //Stores the log in an index with name fileName
     public String storeLog(HttpServletRequest request, String fileName, 

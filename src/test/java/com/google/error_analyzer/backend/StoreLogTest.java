@@ -64,8 +64,7 @@ public final class StoreLogTest {
         storeLogs = new StoreLogs();
         storeLogs.logDao = new MockLogDao();
         request = Mockito.mock(HttpServletRequest.class);
-        cookie = new Cookie(IndexName.SESSIONID, SESSIONID_VALUE);
-        
+        cookie = new Cookie(IndexName.SESSIONID, SESSIONID_VALUE);    
     }
 
     //store the log into the database when index with name same as the
@@ -124,9 +123,9 @@ public final class StoreLogTest {
         Assert.assertEquals(expected, actual);
     }
 
-    /*store the file logs maximum 5 lines in a single API call*/
+    /*store the file logs or plain text maximum 5 lines in a single API call*/
     @Test
-    public void storeFileAndUrlLog_forFilesAndPlainText() throws IOException,
+    public void storeLogsInBatches_forFilesAndPlainText() throws IOException,
     DecoderException, UnsupportedEncodingException  {
         String indexName = "66696c6531";
         InputStream inputStream =
@@ -150,7 +149,7 @@ public final class StoreLogTest {
 
     /*store the url logs maximum 5 lines in a single API call*/
     @Test
-    public void storeFileAndUrlLog_forUrl() throws  IOException,
+    public void storeLogsInBatches_forUrl() throws  IOException,
     DecoderException, UnsupportedEncodingException  {
         String indexName = "66696c6531";
         InputStream inputStream =
