@@ -8,13 +8,14 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.*/
-package com.google.error_analyzer;
+package com.google.error_analyzer.servlets;
 
 import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.LogDaoHelper;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.Document;
+import com.google.error_analyzer.data.ErrorFixes;
 import com.google.error_analyzer.servlets.PaginationServlet;
 import com.google.gson.Gson;
 import java.io.*;
@@ -67,6 +68,9 @@ public final class PaginationServletTest {
     @Mock
     LogDaoHelper logDaoHelper;
 
+    @Mock
+    ErrorFixes errorFixes;
+
     @InjectMocks
     PaginationServlet pagination;
 
@@ -79,6 +83,7 @@ public final class PaginationServletTest {
         ReflectionTestUtils.setField(pagination, "logDao", logDao);
         ReflectionTestUtils.setField(pagination, "logDaoHelper", 	
         logDaoHelper);
+        ReflectionTestUtils.setField(pagination, "errorFixes", errorFixes);
         MockitoAnnotations.initMocks(this);
     }
 
@@ -119,7 +124,8 @@ public final class PaginationServletTest {
                                                     .build();	
         ImmutableList<String> logLineNo = ImmutableList.<String>builder() 
                                                     .add("1","2")
-                                                    .build();	                                           
+                                                    .build();	
+        when(errorFixes.findFixes(any(String.class))).thenReturn("");                                         
         when(logDao.fileExists(any(String.class))).thenReturn(true);	
         when(logDaoHelper.hitFieldContent(any(),eq(LogFields.LOG_TEXT))).	
             thenReturn(logText);

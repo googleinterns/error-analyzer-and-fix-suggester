@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.constant.StackTraceFormat;
 import com.google.error_analyzer.data.Document;
+import java.io.IOException;
 import java.util.Set;
 import java.util.HashSet;
 import org.apache.logging.log4j.Logger;
@@ -29,10 +30,12 @@ import org.elasticsearch.search.SearchHits;
 * Remove error Searchit that have occured previously.
 */
 public class FilterErrors {
+    private static final String NO_ERROR_FOUND_MSG = "No errors were found in this file";
     private static final Logger logger = LogManager.getLogger(FilterErrors.class);
     
     //Filter SeacrchHits and return Document List for storing.
-    public ImmutableList < Document > filterErrorSearchHits (SearchHits hits) {
+    public ImmutableList < Document > filterErrorSearchHits (SearchHits hits)
+    throws IOException {
         Set < String > errorSet = new HashSet < String >();
         Builder < Document > documentList = ImmutableList.< Document > builder(); 
         for (SearchHit hit : hits) {
@@ -41,6 +44,10 @@ public class FilterErrors {
                 Document document = new Document(hit.getId(), hit.getSourceAsString());
                 documentList.add(document);
             }
+        }
+        if (documentList.build().size() == 0) {
+            Document document = new Document("1", 1, NO_ERROR_FOUND_MSG);
+            documentList.add(document);
         }
         return documentList.build();
     }

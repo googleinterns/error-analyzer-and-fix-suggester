@@ -17,6 +17,7 @@ package com.google.error_analyzer.servlets;
 import com.google.common.collect.ImmutableList;
 import com.google.error_analyzer.data.constant.FileConstants;
 import com.google.error_analyzer.data.constant.LogFields;
+import com.google.error_analyzer.backend.IndexName;
 import com.google.error_analyzer.backend.StackTrace;
 import com.google.gson.Gson;
 import java.lang.*;
@@ -41,7 +42,8 @@ public class StackTraceServlet extends HttpServlet {
         response.setContentType(FileConstants.APPLICATION_JSON_CONTENT_TYPE);
         try {
             Integer errorLineNumber = Integer.parseInt(request.getParameter(LogFields.LOG_LINE_NUMBER));
-            String indexName = request.getParameter(LogFields.FILE_NAME);
+            String fileName = request.getParameter(LogFields.FILE_NAME);
+            String indexName = IndexName.getIndexName(request, fileName);
             ImmutableList < String > stackList = stackTrace.findStack(errorLineNumber,indexName);
             
             if (stackList.size() == 0) {
