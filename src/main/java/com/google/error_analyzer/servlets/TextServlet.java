@@ -15,6 +15,8 @@ import com.google.error_analyzer.backend.StoreLogs;
 import com.google.error_analyzer.data.constant.FileConstants;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.constant.PageConstants;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -23,6 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import org.apache.http.HttpHost;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -31,19 +35,34 @@ import org.elasticsearch.common.xcontent.XContentType;
 plain text to the database*/
 @WebServlet("/StorePlainTextLogServlet")
 public class TextServlet extends HttpServlet {
+    private static final Logger logger =
+         LogManager.getLogger(TextServlet.class);
     public static final StoreLogs storeLog = new StoreLogs();
 
     @Override
     public void doPost(HttpServletRequest request,
         HttpServletResponse response) throws IOException, ServletException {
-        response.setContentType(FileConstants.TEXT_HTML_CONTENT_TYPE);
-        String log = request.getParameter(LogFields.LOG);
-        String fileName = request.getParameter(LogFields.FILE_NAME);
-        request.getSession();
-        String status = storeLog.checkAndStoreLog(request, fileName, log);
-        response.getWriter().println(status);
-        RequestDispatcher requestDispatcher =
-            request.getRequestDispatcher(PageConstants.LANDING_PAGE);
-        requestDispatcher.include(request, response);
+        try {
+            response.setContentType(FileConstants.TEXT_HTML_CONTENT_TYPE);
+            String log = request.getParameter(LogFields.LOG);
+            String fileName = request.getParameter(LogFields.FILE_NAME);
+            request.getSession();
+            InputStream inputStream =
+                new ByteArrayInputStream(log.getBytes());
+            boolean isUrl = false;
+            String status = storeLog.checkAndStoreLog(
+                request, fileName, inputStream, isUrl);
+            response.getWriter().println(status);
+            RequestDispatcher requestDispatcher =
+                request.getRequestDispatcher(PageConstants.LANDING_PAGE);
+            requestDispatcher.include(request, response);
+        } catch (Exception e) {
+            logger.error("Could not store file", e);
+            response.getWriter().println(String.format(
+                storeLog.ERROR_TEMPLATE_RESPONSE, e));
+            RequestDispatcher requestDispatcher =
+                request.getRequestDispatcher(PageConstants.LANDING_PAGE);
+            requestDispatcher.include(request, response);
+        }
     }
 }

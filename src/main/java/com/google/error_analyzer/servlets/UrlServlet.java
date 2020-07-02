@@ -11,7 +11,7 @@
 
 package com.google.error_analyzer.servlets;
 
-import com.google.error_analyzer.backend.FileAndUrlLogs;
+import com.google.error_analyzer.backend.StoreLogs;
 import com.google.error_analyzer.data.constant.FileConstants;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.constant.PageConstants;
@@ -39,7 +39,7 @@ import org.jsoup.nodes.Element;
 public class UrlServlet extends HttpServlet {
     private static final Logger logger =
         LogManager.getLogger(UrlServlet.class);
-    public static final FileAndUrlLogs fileAndUrlLogs = new FileAndUrlLogs();
+    public static final StoreLogs storeLogs = new StoreLogs();
 
     @Override
     public void doPost(HttpServletRequest request,
@@ -52,7 +52,7 @@ public class UrlServlet extends HttpServlet {
             URL urlObject = new URL(url);
             InputStream urlContent = urlObject.openStream();
             boolean isUrl = true;
-            String status = fileAndUrlLogs.checkAndStoreFileAndUrlLog(
+            String status = storeLogs.checkAndStoreLog(
                 request, fileName, urlContent, isUrl);
             response.getWriter().println(status);
             RequestDispatcher requestDispatcher =
@@ -61,7 +61,7 @@ public class UrlServlet extends HttpServlet {
         } catch (Exception e) {
             logger.error("Could not store file", e);
             response.getWriter().println(String.format(
-                fileAndUrlLogs.storeLogs.ERROR_TEMPLATE_RESPONSE, e));
+                storeLogs.ERROR_TEMPLATE_RESPONSE, e));
             RequestDispatcher requestDispatcher =
                 request.getRequestDispatcher(PageConstants.LANDING_PAGE);
             requestDispatcher.include(request, response);
