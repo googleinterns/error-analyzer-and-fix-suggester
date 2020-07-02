@@ -93,7 +93,8 @@ public class UrlServletTest {
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
         String nullPointerExceptionString = "java.lang.NullPointerException";
-        String expected = String.format(servlet.storeLogs.ERROR_TEMPLATE_RESPONSE, nullPointerExceptionString);
+        String expected = String.format(servlet.storeLogs.
+            ERROR_TEMPLATE_RESPONSE, nullPointerExceptionString);
         assertTrue(actual.contains(expected));
     }
 
