@@ -42,7 +42,7 @@ public class StoreLogs {
     private static final String LINE_BREAK = "\\r?\\n";
     private static final int OFFSET_FOR_PLAIN_TEXT = 0;
     private StoreLogHelper storeLogHelper = new StoreLogHelper();
-     public static int MaxLogLines = 10000;
+    public static int MaxLogLines = 10000;
     public String ERROR_TEMPLATE_RESPONSE =
         "\t\t\t<h2> Could not store file %1$s</h2>";
     public static final String FILE_STORED_TEMPLATE_RESPONSE =

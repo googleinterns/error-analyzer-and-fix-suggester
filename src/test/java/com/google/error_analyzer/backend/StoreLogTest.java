@@ -63,6 +63,7 @@ public final class StoreLogTest {
     public void setUp() {
         storeLogs = new StoreLogs();
         storeLogs.logDao = new MockLogDao();
+        storeLogs.MaxLogLines = 5;
         request = Mockito.mock(HttpServletRequest.class);
         cookie = new Cookie(IndexName.SESSIONID, SESSIONID_VALUE);    
     }
