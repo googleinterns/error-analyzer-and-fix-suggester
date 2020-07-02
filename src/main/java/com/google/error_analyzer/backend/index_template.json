@@ -10,6 +10,19 @@
           "name" : "ilm-log-management",
           "rollover_alias" : ""
         },
+        "analysis" : {
+          "analyzer" : {
+            "default" : {
+              "type" : "stop",
+              "stopwords" : [
+                ".",
+                "/",
+                ":",
+                "\""
+              ]
+            }
+          }
+        },
         "number_of_shards" : "1",
         "number_of_replicas" : "0"
       }
