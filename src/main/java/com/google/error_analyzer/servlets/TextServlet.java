@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import org.apache.http.HttpHost;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.common.xcontent.XContentType;
@@ -33,6 +35,8 @@ import org.elasticsearch.common.xcontent.XContentType;
 plain text to the database*/
 @WebServlet("/StorePlainTextLogServlet")
 public class TextServlet extends HttpServlet {
+    private static final Logger logger =
+         LogManager.getLogger(TextServlet.class);
     public static final StoreLogs storeLog = new StoreLogs();
 
     @Override
@@ -55,7 +59,7 @@ public class TextServlet extends HttpServlet {
         } catch (Exception e) {
             logger.error("Could not store file", e);
             response.getWriter().println(String.format(
-                storeLogs.ERROR_TEMPLATE_RESPONSE, e));
+                storeLog.ERROR_TEMPLATE_RESPONSE, e));
             RequestDispatcher requestDispatcher =
                 request.getRequestDispatcher(PageConstants.LANDING_PAGE);
             requestDispatcher.include(request, response);
