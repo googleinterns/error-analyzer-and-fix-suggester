@@ -38,18 +38,27 @@ public class TextServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request,
         HttpServletResponse response) throws IOException, ServletException {
-        response.setContentType(FileConstants.TEXT_HTML_CONTENT_TYPE);
-        String log = request.getParameter(LogFields.LOG);
-        String fileName = request.getParameter(LogFields.FILE_NAME);
-        request.getSession();
-        InputStream inputStream =
-            new ByteArrayInputStream(log.getBytes());
-        boolean isUrl = false;
-        String status =  storeLog.checkAndStoreLog(
+        try {
+            response.setContentType(FileConstants.TEXT_HTML_CONTENT_TYPE);
+            String log = request.getParameter(LogFields.LOG);
+            String fileName = request.getParameter(LogFields.FILE_NAME);
+            request.getSession();
+            InputStream inputStream =
+                new ByteArrayInputStream(log.getBytes());
+            boolean isUrl = false;
+            String status = storeLog.checkAndStoreLog(
                 request, fileName, inputStream, isUrl);
-        response.getWriter().println(status);
-        RequestDispatcher requestDispatcher =
-            request.getRequestDispatcher(PageConstants.LANDING_PAGE);
-        requestDispatcher.include(request, response);
+            response.getWriter().println(status);
+            RequestDispatcher requestDispatcher =
+                request.getRequestDispatcher(PageConstants.LANDING_PAGE);
+            requestDispatcher.include(request, response);
+        } catch (Exception e) {
+            logger.error("Could not store file", e);
+            response.getWriter().println(String.format(
+                storeLogs.ERROR_TEMPLATE_RESPONSE, e));
+            RequestDispatcher requestDispatcher =
+                request.getRequestDispatcher(PageConstants.LANDING_PAGE);
+            requestDispatcher.include(request, response);
+        }
     }
 }
