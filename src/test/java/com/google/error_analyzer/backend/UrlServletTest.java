@@ -10,7 +10,6 @@
 // limitations under the License.
 package com.google.error_analyzer;
 
-import com.google.error_analyzer.backend.FileAndUrlLogs;
 import com.google.error_analyzer.backend.IndexName;
 import com.google.error_analyzer.backend.MockLogDao;
 import com.google.error_analyzer.data.constant.LogFields;
@@ -55,7 +54,6 @@ import static org.mockito.Mockito.when;
 UrlServlet*/
 public class UrlServletTest {
     private Cookie cookie;
-    private FileAndUrlLogs fileAndUrlLogs;
     private static final String SESSIONID_VALUE = "abcd";
 
     @Mock
@@ -72,13 +70,11 @@ public class UrlServletTest {
 
     @Before
     public void setUp() {
-        fileAndUrlLogs = new FileAndUrlLogs();
         request = Mockito.mock(HttpServletRequest.class);
         response = Mockito.mock(HttpServletResponse.class);
         cookie = new Cookie(IndexName.SESSIONID, SESSIONID_VALUE);
         MockitoAnnotations.initMocks(this);
-        fileAndUrlLogs.storeLogs.logDao = new MockLogDao();
-        servlet.fileAndUrlLogs.storeLogs.logDao = new MockLogDao();
+        servlet.storeLogs.logDao = new MockLogDao();
     }
 
     //unit test for catch block of UrlServlet 
@@ -97,7 +93,7 @@ public class UrlServletTest {
         servlet.doPost(request, response);
         String actual = stringWriter.toString();
         String nullPointerExceptionString = "java.lang.NullPointerException";
-        String expected = String.format(fileAndUrlLogs.storeLogs.ERROR_TEMPLATE_RESPONSE, nullPointerExceptionString);
+        String expected = String.format(servlet.storeLogs.ERROR_TEMPLATE_RESPONSE, nullPointerExceptionString);
         assertTrue(actual.contains(expected));
     }
 

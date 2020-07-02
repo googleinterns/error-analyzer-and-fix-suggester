@@ -15,6 +15,8 @@ import com.google.error_analyzer.backend.StoreLogs;
 import com.google.error_analyzer.data.constant.FileConstants;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.constant.PageConstants;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.IOException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -40,7 +42,11 @@ public class TextServlet extends HttpServlet {
         String log = request.getParameter(LogFields.LOG);
         String fileName = request.getParameter(LogFields.FILE_NAME);
         request.getSession();
-        String status = storeLog.checkAndStoreLog(request, fileName, log);
+        InputStream inputStream =
+            new ByteArrayInputStream(log.getBytes());
+        boolean isUrl = false;
+        String status =  storeLog.checkAndStoreLog(
+                request, fileName, inputStream, isUrl);
         response.getWriter().println(status);
         RequestDispatcher requestDispatcher =
             request.getRequestDispatcher(PageConstants.LANDING_PAGE);

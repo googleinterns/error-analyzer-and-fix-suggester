@@ -22,6 +22,11 @@ import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.StoreLogHelper;
 import com.google.error_analyzer.data.constant.LogFields;
 import com.google.error_analyzer.data.Document;
+import java.io.ByteArrayInputStream;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import javax.servlet.http.HttpServletRequest;
@@ -37,6 +42,7 @@ public class StoreLogs {
     private static final String LINE_BREAK = "\\r?\\n";
     private static final int OFFSET_FOR_PLAIN_TEXT = 0;
     private StoreLogHelper storeLogHelper = new StoreLogHelper();
+     public static int MaxLogLines = 10000;
     public String ERROR_TEMPLATE_RESPONSE =
         "\t\t\t<h2> Could not store file %1$s</h2>";
     public static final String FILE_STORED_TEMPLATE_RESPONSE =
@@ -46,13 +52,13 @@ public class StoreLogs {
     public DaoInterface logDao = new LogDao();
 
     //stores the logs into database with appropriate filename
-    public String checkAndStoreLog(HttpServletRequest request, String fileName,
-        String log) {
+    public String checkAndStoreLog(HttpServletRequest request,
+        String fileName, InputStream fileContent, boolean isUrl) {
         try {
             String indexName = IndexName.getIndexName(request, fileName);
             indexName = getUniqueIndexName(indexName);
-            final String response = storeLog(
-                request, indexName, log, OFFSET_FOR_PLAIN_TEXT );
+            final String response = storeLogsInBatches(
+                request, indexName, fileContent, isUrl);
             findAndStoreErrorsInIndex(indexName);
             return response;
         } catch (Exception e) {
@@ -64,6 +70,48 @@ public class StoreLogs {
         }
     }
 
+    // stores maximum 10000 log lines in a single API  call
+    public String storeLogsInBatches(HttpServletRequest request, 
+        String fileName, InputStream fileContent, boolean isUrl) 
+        throws IOException, DecoderException, UnsupportedEncodingException  {
+        InputStreamReader isReader = new InputStreamReader(fileContent);
+        BufferedReader reader = new BufferedReader(isReader);
+        String logLine;
+        int offset = 0;
+        String response = String.format(FILE_EMPTY_TEMPLATE_RESPONSE,
+            IndexName.getFileName(request, fileName));
+        String log = "";
+        int lineCount = 0;
+        while ((logLine = reader.readLine()) != null) {
+            log = log + logLine + "\n";
+            lineCount++;
+            if (lineCount >= MaxLogLines) {
+                response =
+                    storeLogs(request, fileName, log, offset, isUrl);
+                log = "";
+                lineCount = 0;
+                offset = offset + MaxLogLines;
+            }
+        }
+        if (!log.isEmpty()) {
+            response =
+               storeLogs(request, fileName, log, offset, isUrl);
+        }
+        return response;
+    }
+
+    /*remove html tags if the logs are from url and then stores the log 
+    into the database*/
+    private String storeLogs(HttpServletRequest request,  String fileName,
+     String log, int offset, boolean isUrl) throws IOException ,
+     DecoderException, UnsupportedEncodingException  {
+        if(isUrl) {
+            log = UrlLogs.removeHtmlTags(log);
+        }
+        String response = storeLog(request, fileName, log, offset);
+        return response;
+     }
+
     //Stores the log in an index with name fileName
     public String storeLog(HttpServletRequest request, String fileName, 
      String log, int offset) throws IOException, NullPointerException, 
@@ -74,7 +122,7 @@ public class StoreLogs {
         String logLines[] = log.split(LINE_BREAK);
         for (String logLine: logLines) {
             String cleanedLogLine = storeLogHelper.cleanLogText(logLine);
-            if (!(logLine.isEmpty())) {
+            if (!(logLine.isEmpty() || logLine.equals(" "))) {
                 String logLineNumberString = Integer.toString(logLineNumber);
                 Document document = new Document(
                     logLineNumberString, logLineNumber, cleanedLogLine);

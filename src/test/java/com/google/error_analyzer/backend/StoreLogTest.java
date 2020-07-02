@@ -18,6 +18,11 @@ import com.google.error_analyzer.backend.IndexName;
 import com.google.error_analyzer.backend.LogDao;
 import com.google.error_analyzer.backend.MockLogDao;
 import com.google.error_analyzer.backend.StoreLogs;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -46,6 +51,10 @@ public final class StoreLogTest {
     private StoreLogs storeLogs;
     private Cookie cookie;
     private static final String SESSIONID_VALUE = "abcd";
+    private static final String FILE_CONTENT =
+        "error1\nerror2\nerror3\nerror4\nerror5\nerror6\n";
+    private static final String URL_CONTENT =
+        "<html>error1\nerror2\nerror3\nerror4\nerror5\n<html>";
 
     @Mock
     HttpServletRequest request;
@@ -56,6 +65,7 @@ public final class StoreLogTest {
         storeLogs.logDao = new MockLogDao();
         request = Mockito.mock(HttpServletRequest.class);
         cookie = new Cookie(IndexName.SESSIONID, SESSIONID_VALUE);
+        
     }
 
     //store the log into the database when index with name same as the
@@ -64,32 +74,104 @@ public final class StoreLogTest {
     @Test
     public void checkAndStoreLog_alreadyExistingFile()
     throws IOException {
-        String log = "error2";
         String fileName = "samplefile1";
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
+        InputStream inputStream =
+            new ByteArrayInputStream(FILE_CONTENT.getBytes());
+        boolean isUrl = false;
         String expected = String.format(
             storeLogs.FILE_STORED_TEMPLATE_RESPONSE, fileName);
-        String actual = storeLogs.checkAndStoreLog(request, fileName, log);
+        String actual = storeLogs.checkAndStoreLog(
+            request, fileName, inputStream, isUrl);
         assertEquals(expected, actual);
+        inputStream =
+            new ByteArrayInputStream(FILE_CONTENT.getBytes());
         expected = String.format(
             storeLogs.FILE_STORED_TEMPLATE_RESPONSE, fileName + "(1)");
-        actual = storeLogs.checkAndStoreLog(request, fileName, log);
+        actual = storeLogs.checkAndStoreLog(request, fileName,  inputStream, isUrl);
         assertEquals(expected, actual);
+    }
+
+
+    /*unit test for the catch block of checkAndStoreLogs */
+    @Test
+    public void checkAndStoreLog_logExceptionCase() throws IOException{
+        String fileName = "file1";
+        when(request.getCookies()).thenThrow(NullPointerException.class);
+        InputStream inputStream =
+            new ByteArrayInputStream(FILE_CONTENT.getBytes());
+        boolean isUrl = false;
+        String actual = storeLogs
+            .checkAndStoreLog(request, fileName, inputStream, isUrl);
+        String nullPointerExceptionString = "java.lang.NullPointerException";
+        String expected = String.format(
+            storeLogs.ERROR_TEMPLATE_RESPONSE, nullPointerExceptionString);
+        Assert.assertEquals(expected, actual);
     }
 
     //check the creation of errorIndex
     @Test
     public void checkAndStoreLog_creationOfErrorIndex() throws IOException {
         String fileName = "file1";
-        String log = "error2";
         when(request.getCookies()).thenReturn(new Cookie[] {cookie});
         boolean isUrl = false;
-        storeLogs.checkAndStoreLog(request, fileName, log);
+        InputStream inputStream =
+            new ByteArrayInputStream(FILE_CONTENT.getBytes());
+        storeLogs.checkAndStoreLog(request, fileName, inputStream, isUrl);
         String errorIndexName = "6162636466696c6531error";
         boolean actual = storeLogs.logDao.fileExists(errorIndexName);
         boolean expected = true;
         Assert.assertEquals(expected, actual);
     }
+
+    /*store the file logs maximum 5 lines in a single API call*/
+    @Test
+    public void storeFileAndUrlLog_forFilesAndPlainText() throws IOException,
+    DecoderException, UnsupportedEncodingException  {
+        String indexName = "66696c6531";
+        InputStream inputStream =
+            new ByteArrayInputStream(FILE_CONTENT.getBytes());
+        when(request.getCookies()).thenReturn(new Cookie[] {cookie});
+        boolean isUrl = false;
+        storeLogs.storeLogsInBatches(
+            request, indexName, inputStream, isUrl);
+        for (int id = 1; id < 7; id++) {
+            String actual = storeLogs.logDao
+                .getJsonStringById(indexName, Integer.toString(id));
+            String expected = String.format(
+                "{\"logLineNumber\":%1$s,\"logText\":\"error%1$s\"}", id);
+            assertEquals(expected, actual);
+        }
+        String actual = storeLogs.logDao
+            .getJsonStringById(indexName, "7");
+        String expected = null;
+        assertEquals(expected, actual);
+    }
+
+    /*store the url logs maximum 5 lines in a single API call*/
+    @Test
+    public void storeFileAndUrlLog_forUrl() throws  IOException,
+    DecoderException, UnsupportedEncodingException  {
+        String indexName = "66696c6531";
+        InputStream inputStream =
+            new ByteArrayInputStream(URL_CONTENT.getBytes());
+        when(request.getCookies()).thenReturn(new Cookie[] {cookie});
+        boolean isUrl = true;
+        storeLogs.storeLogsInBatches(
+            request, indexName, inputStream, isUrl);
+        for (int id = 1; id < 6; id++) {
+            String actual = storeLogs.logDao
+                .getJsonStringById(indexName, Integer.toString(id));
+            String expected = String.format(
+                "{\"logLineNumber\":%1$s,\"logText\":\"error%1$s\"}", id);
+            assertEquals(expected, actual);
+        }
+        String actual = storeLogs.logDao
+            .getJsonStringById(indexName, "6");
+        String expected = null;
+        assertEquals(expected, actual);   
+    }
+
 
     /*unit test for storeLog method when offset is 0*/
     @Test
