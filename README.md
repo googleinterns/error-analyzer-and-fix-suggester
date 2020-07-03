@@ -48,6 +48,8 @@ Save and exit the file, and reload it
 
 [Kibana installation link](https://www.elastic.co/guide/en/kibana/7.x/install.html)
 
+##### Index template Setting
+
 ## Source Code Headers
 
 Every file containing source code must include copyright and license
