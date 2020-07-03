@@ -19,7 +19,7 @@ We used elasticsearch as our database engine. We utilise elasticsearch's inbuilt
 The database is connected to the server using java high-level REST API. Maven app engine is used to run the application.
 
 ### Prerequisite
-##### Maven:
+##### Installing Maven:
     
     sudo apt-get install maven
 To run the app use:
@@ -30,7 +30,7 @@ To run the app use:
 
     sudo apt-get install default-jdk
     sudo apt-get install oracle-java8-installer
-**Setiing Java variables**:
+**Setting Java variables**:
 Find where java is installed:
 
     sudo update-alternatives --config java
@@ -46,6 +46,7 @@ Save and exit the file, and reload it
  ##### Elasticsearch:
  
 [Elasticsearch installation link](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/install-elasticsearch.html)
+After setting up elasticsearch, add the ip address instead of localhost in RestHighLevelClient in src/main/java/com/google/error_analyzer/backend/LogDao.java
 
 ##### Kibana:
 
