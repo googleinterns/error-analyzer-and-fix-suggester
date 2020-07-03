@@ -42,12 +42,11 @@ Save and exit the file, and reload it
     source /etc/environment
  ##### Elasticsearch:
  
-[Elasticsearch installation link] (https://www.elastic.co/guide/en/elasticsearch/reference/7.x/install-elasticsearch.html)
+[Elasticsearch installation link](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/install-elasticsearch.html)
 
 ##### Kibana:
 
-[Kibana installation link] (https://www.elastic.co/guide/en/kibana/7.x/install.html)
-
+[Kibana installation link](https://www.elastic.co/guide/en/kibana/7.x/install.html)
 
 ## Source Code Headers
 
