@@ -48,6 +48,10 @@ Save and exit the file, and reload it
 
 [Kibana installation link](https://www.elastic.co/guide/en/kibana/7.x/install.html)
 
+##### Google Custom Search API:
+
+[CustomSearch API Client Library for Java](https://github.com/googleapis/google-api-java-client-services/tree/master/clients/google-api-services-customsearch/v1)
+
 ##### Index template Setting
 
 Set the index template given in error-analyzer-and-fix-suggester/src/main/java/com/google/error_analyzer/backend/index_template.json using kibane
