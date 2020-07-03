@@ -54,8 +54,9 @@ Save and exit the file, and reload it
 
 ##### Index template Setting
 
-Set the index template given in error-analyzer-and-fix-suggester/src/main/java/com/google/error_analyzer/backend/index_template.json using kibane
-[Index template setting](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/indices-templates.html)
+Set the index template given in
+error-analyzer-and-fix-suggester/src/main/java/com/google/error_analyzer/backend/index_template.json 
+using kibana [Index template setting](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/indices-templates.html)
 
 ## Source Code Headers
 
