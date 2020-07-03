@@ -18,6 +18,30 @@ We used elasticsearch as our database engine. We utilise elasticsearch's inbuilt
 - **Server:**
 The database is connected to the server using java high-level REST API. Maven app engine is used to run the application.
 
+### Prerequisite
+##### Maven:
+    
+    sudo apt-get install maven
+##### Java 8:
+**Installing Java 8**:
+
+    sudo apt-get install default-jdk
+    sudo apt-get install oracle-java8-installer
+**Setiing Java variables**:
+Find where java is installed:
+
+    sudo update-alternatives --config java
+Copy the path from installation and then open /etc/environment using nano or your favorite text editor
+
+    sudo nano /etc/environment
+At the end of this file, add the following line, making sure to replace the path with your own copied path
+
+    JAVA_HOME="/usr/lib/jvm/java-8-oracle"
+Save and exit the file, and reload it
+
+    source /etc/environment
+
+
 ## Source Code Headers
 
 Every file containing source code must include copyright and license
