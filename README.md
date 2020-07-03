@@ -50,7 +50,7 @@ Save and exit the file, and reload it
 
 ##### Google Custom Search API:
 
-[CustomSearch API Client Library for Java](https://github.com/googleapis/google-api-java-client-services/tree/master/clients/google-api-services-customsearch/v1)
+[CustomSearch API](https://developers.google.com/custom-search/)
 
 ##### Index template Setting
 
