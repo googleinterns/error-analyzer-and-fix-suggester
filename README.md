@@ -22,9 +22,7 @@ The database is connected to the server using java high-level REST API. Maven ap
 ##### Installing Maven:
     
     sudo apt-get install maven
-To run the app use:
 
-    mvn package appengine:run
 ##### Java 8:
 **Installing Java 8**:
 
@@ -61,6 +59,10 @@ After setting up elasticsearch, add the ip address instead of localhost in RestH
 Set the index template given in
 error-analyzer-and-fix-suggester/src/main/java/com/google/error_analyzer/backend/index_template.json 
 using kibana. For setting index template refer [Index template setting](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/indices-templates.html)
+
+#### To run the app use:
+
+    mvn package appengine:run
 
 ## Source Code Headers
 
