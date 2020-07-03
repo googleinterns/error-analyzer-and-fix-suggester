@@ -22,6 +22,9 @@ The database is connected to the server using java high-level REST API. Maven ap
 ##### Maven:
     
     sudo apt-get install maven
+To run the app use:
+
+    mvn package appengine:run
 ##### Java 8:
 **Installing Java 8**:
 
