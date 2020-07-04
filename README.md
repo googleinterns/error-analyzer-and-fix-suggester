@@ -18,6 +18,53 @@ We used elasticsearch as our database engine. We utilise elasticsearch's inbuilt
 - **Server:**
 The database is connected to the server using java high-level REST API. Maven app engine is used to run the application.
 
+### Prerequisite
+##### Installing Maven:
+    
+    sudo apt-get install maven
+
+##### Java 8:
+**Installing Java 8**:
+
+    sudo apt-get install default-jdk
+    sudo apt-get install oracle-java8-installer
+**Setting Java variables**:
+Find where java is installed:
+
+    sudo update-alternatives --config java
+Copy the path from installation and then open /etc/environment using nano or your favorite text editor
+
+    sudo nano /etc/environment
+At the end of this file, add the following line, making sure to replace the path with your own copied path
+
+    JAVA_HOME="/usr/lib/jvm/java-8-oracle"
+Save and exit the file, and reload it
+
+    source /etc/environment
+ ##### Elasticsearch:
+ 
+[Elasticsearch installation link](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/install-elasticsearch.html)
+After setting up elasticsearch, add the ip address instead of localhost in RestHighLevelClient in src/main/java/com/google/error_analyzer/backend/LogDao.java
+
+##### Kibana:
+
+[Kibana installation link](https://www.elastic.co/guide/en/kibana/7.x/install.html)
+
+##### Google Custom Search API:
+
+[CustomSearch API](https://developers.google.com/custom-search/)
+after generating API key and setting up search engine, add both API key and search engine id in src/main/java/com/google/error_analyzer/data/ErrorFixes.java
+
+##### Index template Setting
+
+Set the index template given in
+error-analyzer-and-fix-suggester/src/main/java/com/google/error_analyzer/backend/index_template.json 
+using kibana. For setting index template refer [Index template setting](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/indices-templates.html)
+
+#### To run the server use:
+
+    mvn package appengine:run
+
 ## Source Code Headers
 
 Every file containing source code must include copyright and license
