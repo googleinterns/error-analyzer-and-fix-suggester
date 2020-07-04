@@ -53,6 +53,7 @@ After setting up elasticsearch, add the ip address instead of localhost in RestH
 ##### Google Custom Search API:
 
 [CustomSearch API](https://developers.google.com/custom-search/)
+after generating API key and setting up search engine, add both API key and search engine id in src/main/java/com/google/error_analyzer/data/ErrorFixes.java
 
 ##### Index template Setting
 
